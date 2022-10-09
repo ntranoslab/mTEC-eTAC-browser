@@ -6,6 +6,7 @@
 
 from dash import Dash, dcc, html, Input, Output
 import plotly.express as px
+import numpy as np
 
 import pandas as pd
 
@@ -27,7 +28,7 @@ app.layout = html.Div([
 
         html.Div([
             dcc.Dropdown(
-                df['genotype'].unique(),
+                np.insert(df['genotype'].unique(), 0, 'All'),
                 'WT',
                 id='genotype-value'
             )
@@ -47,7 +48,7 @@ app.layout = html.Div([
     )
 def update_graph(cell_type_value, genotype_value, gene_value = 'Prr15l'):
 
-    dff = df[df['genotype'] == genotype_value]
+    dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
     fig = px.scatter(x=dff['x'],
         #x coordinates
                      y=dff['y'],
