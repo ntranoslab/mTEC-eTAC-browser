@@ -57,7 +57,11 @@ def update_graph(cell_type_value, genotype_value, gene_value = 'Prr15l'):
                      #y coordinates
                      #hover_name=dff[dff['Indicator Name'] == yaxis_column_name]['Country Name']
                      )
-    fig.update_layout(width = 800, height = 800, title = gene_value)
+    fig.update_layout(width = 800, height = 800, title = gene_value,
+        xaxis={'visible': False, 'showticklabels': False},
+        yaxis={'visible': False, 'showticklabels': False},
+        #paper_bgcolor = "rgba(0,0,0,0)"
+        )
 
     #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
 
