@@ -49,10 +49,11 @@ app.layout = html.Div([
 def update_graph(cell_type_value, genotype_value, gene_value = 'Prr15l'):
 
     dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
-    fig = px.scatter(x=dff['x'],
+    fig = px.scatter(dff, x='x',
         #x coordinates
-                     y=dff['y'],
-                     color = dff[gene_value]
+                     y='y',
+                     color = gene_value,
+                     hover_name = 'cell_type'
                      #y coordinates
                      #hover_name=dff[dff['Indicator Name'] == yaxis_column_name]['Country Name']
                      )
