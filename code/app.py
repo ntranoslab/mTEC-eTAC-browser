@@ -45,13 +45,13 @@ app.layout = html.Div([
     Input('genotype-value', 'value'),
     #Input('gene-value', 'value')
     )
-def update_graph(cell_type_value, genotype_value, gene_value = 'Gm26798'):
+def update_graph(cell_type_value, genotype_value, gene_value = 'Prr15l'):
 
     dff = df[df['genotype'] == genotype_value]
-    fig = px.scatter(x=df['x'],
+    fig = px.scatter(x=dff['x'],
         #x coordinates
-                     y=df['y'],
-                     color = df[gene_value]
+                     y=dff['y'],
+                     color = dff[gene_value]
                      #y coordinates
                      #hover_name=dff[dff['Indicator Name'] == yaxis_column_name]['Country Name']
                      )
