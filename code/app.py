@@ -15,8 +15,6 @@ app = Dash(__name__)
 
 #df = pd.read_csv('https://plotly.github.io/datasets/country_indicators.csv')
 df = None
-cell_type_list = []
-genotype_list = []
 #df = pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
 
 app.layout = html.Div([
@@ -45,61 +43,28 @@ app.layout = html.Div([
     html.Div([
         #dropdown with cell type
         html.Div([
-            dcc.Dropdown(cell_type_list, id='cell-type-value')
+            html.H3('Cell Type:'),
+            dcc.Dropdown([], id='cell-type-value')
         ], style={'width': '48%', 'display': 'inline-block'}),
         #dropdown with genotype
         html.Div([
-            dcc.Dropdown(genotype_list, id='genotype-value')
+            html.H3('Genotype:'),
+            dcc.Dropdown([], id='genotype-value')
         ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
     ]),
-    dcc.Graph(id='umap-graphic')
+    html.Div([
+        html.H3('UMAP'),
+        dcc.Graph(figure = px.scatter(x = [0], y=[0]),
+            #update_layout(width = 800, height = 800, xaxis={'visible': False, 'showticklabels': False},
+            #yaxis={'visible': False, 'showticklabels': False},
+            #paper_bgcolor = "black"
+            #"rgba(1,24,24,10)"
+            id='umap-graphic')
+    ])
+    
 
 ])
 
-#html.Div([
-#    #upload data bar
-#    dcc.Upload(
-#        id='upload-data',
-#        children=html.Div([
-#            'Drag and Drop or ',
-#            html.A('Select Files')
-#        ]),
-#        style={
-#            'width': '100%',
-#            'height': '60px',
-#            'lineHeight': '60px',
-#            'borderWidth': '1px',
-#            'borderStyle': 'dashed',
-#            'borderRadius': '5px',
-#            'textAlign': 'center',
-#            'margin': '10px'
-#        },
-#        # Allow multiple files to be uploaded
-#        multiple=False
-#    ),
-#    html.Div(id = 'output-data-result'),
-#
-#    html.Div([
-#        #dropdown with cell type
-#        html.Div([
-#            dcc.Dropdown(
-#                df['cell_type'].unique(),
-#                'Tuft',
-#                id='cell-type-value'
-#            )
-#        ], style={'width': '48%', 'display': 'inline-block'}),
-#        #dropdown with genotype
-#        html.Div([
-#            dcc.Dropdown(
-#                np.insert(df['genotype'].unique(), 0, 'All'),
-#                'All',
-#                id='genotype-value'
-#            )
-#        ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
-#    ]),
-#    dcc.Graph(id='umap-graphic')
-#
-#]) if df is not None else 
 
 
 def check_file(contents, filename):
@@ -154,7 +119,6 @@ def update_file(upload_data, filename, gene_value = 'Prr15l'):
         #is upload_data a csv?
         #assign df to csv
         check_file(upload_data, filename)
-        global cell_type_list, genotype_list
         cell_type_list = df['cell_type'].unique()
         genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
         dff = df
