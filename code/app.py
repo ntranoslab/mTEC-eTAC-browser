@@ -112,6 +112,7 @@ def check_file(contents, filename):
     Output ('output-data-result', 'children'),
     Output('cell-type-value', 'options'),
     Output('genotype-value', 'options'),
+    Output('gene-value', 'options'),
     Input('upload-data', 'contents'),
     State('upload-data', 'filename')
     #Input('gene-value', 'value')
@@ -125,6 +126,22 @@ def update_file(upload_data, filename, gene_value = 'Prr15l'):
         check_file(upload_data, filename)
         cell_type_list = np.insert(df['cell_type'].unique(), 0, 'All')
         genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
+        #return html.H5(genotype_list)
+        gene_list = list(df.columns.unique())
+        #remove unnamed col
+        gene_list.remove('Unnamed: 0')
+        #remove cell_type col
+        gene_list.remove('cell_type')
+        #remove genotype col
+        gene_list.remove('genotype')
+        #remove x col
+        gene_list.remove('x')
+        #remove y col
+        gene_list.remove('y')
+        #make gene list into array
+        gene_list = np.array(gene_list)
+        gene_list = np.insert(gene_list, 0, 'All')
+        #return html.H5([gene_list])
         dff = df
         #graph
         fig = px.scatter(dff, x='x',
@@ -142,10 +159,10 @@ def update_file(upload_data, filename, gene_value = 'Prr15l'):
             )
 
             #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
-        return check_file(upload_data, filename), cell_type_list, genotype_list
+        return check_file(upload_data, filename), cell_type_list, genotype_list, gene_list
     return html.Div([
             'No File Uploaded'
-        ]), [], []
+        ]), [], [], []
 
 
 @app.callback(
