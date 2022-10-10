@@ -53,6 +53,10 @@ app.layout = html.Div([
         ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
     ]),
     html.Div([
+            html.H3('Gene:'),
+            dcc.Dropdown([], id='gene-value')
+        ], style={'width': '48%', 'display': 'inline-block'}),
+    html.Div([
         html.H3('UMAP'),
         dcc.Graph(figure = px.scatter(x = [0], y=[0]),
             #update_layout(width = 800, height = 800, xaxis={'visible': False, 'showticklabels': False},
@@ -119,7 +123,7 @@ def update_file(upload_data, filename, gene_value = 'Prr15l'):
         #is upload_data a csv?
         #assign df to csv
         check_file(upload_data, filename)
-        cell_type_list = df['cell_type'].unique()
+        cell_type_list = np.insert(df['cell_type'].unique(), 0, 'All')
         genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
         dff = df
         #graph
@@ -153,7 +157,10 @@ def update_file(upload_data, filename, gene_value = 'Prr15l'):
 def update_graph(cell_type_value, genotype_value, gene_value = 'Prr15l'):
 
     if df is not None:
+        #filter df to only contain data with chosen genotype
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
+        #filter df to contain data with chosen cell type
+        dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
         fig = px.scatter(dff, x='x',
         #x coordinates
                      y='y',
