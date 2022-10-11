@@ -80,7 +80,7 @@ def check_file(contents, filename):
             # Assume that the user uploaded a CSV file
             global df
             df = pd.read_csv(
-                io.StringIO(decoded.decode('utf-8')))
+                io.StringIO(decoded.decode('utf-8')), index_col=0)
     except Exception as e:
         print(e)
         return html.Div([
@@ -129,7 +129,7 @@ def update_file(upload_data, filename, gene_value = 'Prr15l'):
         #return html.H5(genotype_list)
         gene_list = list(df.columns.unique())
         #remove unnamed col
-        gene_list.remove('Unnamed: 0')
+        #gene_list.remove('Unnamed: 0')
         #remove cell_type col
         gene_list.remove('cell_type')
         #remove genotype col
@@ -168,16 +168,18 @@ def update_file(upload_data, filename, gene_value = 'Prr15l'):
 @app.callback(
     Output('umap-graphic', 'figure'),
     Input('cell-type-value', 'value'),
-    Input('genotype-value', 'value')
-    #Input('gene-value', 'value')
+    Input('genotype-value', 'value'),
+    Input('gene-value', 'value')
     )
-def update_graph(cell_type_value, genotype_value, gene_value = 'Prr15l'):
-
+def update_graph(cell_type_value, genotype_value, gene_value):
+    #check gene_value is part of csv
+    #gene_value is text field
     if df is not None:
         #filter df to only contain data with chosen genotype
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
         #filter df to contain data with chosen cell type
         dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
+        dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != 'All' and gene_value != None else dff
         fig = px.scatter(dff, x='x',
         #x coordinates
                      y='y',
@@ -189,7 +191,7 @@ def update_graph(cell_type_value, genotype_value, gene_value = 'Prr15l'):
         fig.update_layout(width = 800, height = 800, title = gene_value,
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
-            #paper_bgcolor = "rgba(0,0,0,0)"
+            #paper_bgcolor = "black"
             )
 
             #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
