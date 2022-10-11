@@ -188,7 +188,7 @@ def update_graph(genotype_value, gene_value):
     #gene_value is text field
     if df is not None:
         #filter df to only contain data with chosen genotype
-        dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
+        dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' and genotype_value != None else df
         #filter df to contain data with chosen cell type
         #dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
         dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
