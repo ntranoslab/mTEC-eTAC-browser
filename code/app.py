@@ -41,11 +41,16 @@ app.layout = html.Div([
     html.Div(id = 'output-data-result'),
 
     html.Div([
-        #dropdown with cell type
+        #dropdown with gene
         html.Div([
-            html.H3('Cell Type:'),
-            dcc.Dropdown([], placeholder = 'Select a cell type...', id='cell-type-value')
+            html.H3('Gene:'),
+            dcc.Dropdown([], placeholder = 'Select a gene...', id='gene-value')
         ], style={'width': '48%', 'display': 'inline-block'}),
+        #dropdown with cell type
+        #html.Div([
+        #    html.H3('Cell Type:'),
+        #    dcc.Dropdown([], placeholder = 'Select a cell type...', id='cell-type-value')
+        #], style={'width': '48%', 'display': 'inline-block'}),
         #dropdown with genotype
         html.Div([
             html.H3('Genotype:'),
@@ -53,17 +58,23 @@ app.layout = html.Div([
         ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
     ]),
     html.Div([
-            html.H3('Gene:'),
-            dcc.Dropdown([], placeholder = 'Select a gene...', id='gene-value')
-        ], style={'width': '48%', 'display': 'inline-block'}),
-    html.Div([
-        html.H3('UMAP'),
-        dcc.Graph(figure = px.scatter(x = [0], y=[0]),
-            #update_layout(width = 800, height = 800, xaxis={'visible': False, 'showticklabels': False},
-            #yaxis={'visible': False, 'showticklabels': False},
-            #paper_bgcolor = "black"
-            #"rgba(1,24,24,10)"
-            id='umap-graphic')
+        html.H3('UMAPs'),
+        html.Div([
+            dcc.Graph(figure = px.scatter(x = [0], y=[0]),
+                #update_layout(width = 800, height = 800, xaxis={'visible': False, 'showticklabels': False},
+                #yaxis={'visible': False, 'showticklabels': False},
+                #paper_bgcolor = "black"
+                #"rgba(1,24,24,10)"
+                id='umap-graphic')
+        ]),
+        html.Div([
+            dcc.Graph(figure = px.scatter(x = [0], y=[0]),
+                #update_layout(width = 800, height = 800, xaxis={'visible': False, 'showticklabels': False},
+                #yaxis={'visible': False, 'showticklabels': False},
+                #paper_bgcolor = "black"
+                #"rgba(1,24,24,10)"
+                id='umap-graphic-cell-types')
+            ])
     ])
     
 
@@ -110,7 +121,7 @@ def check_file(contents, filename):
 
 @app.callback(
     Output ('output-data-result', 'children'),
-    Output('cell-type-value', 'options'),
+    #Output('cell-type-value', 'options'),
     Output('genotype-value', 'options'),
     Output('gene-value', 'options'),
     Input('upload-data', 'contents'),
@@ -124,7 +135,7 @@ def update_file(upload_data, filename, gene_value = 'Prr15l'):
         #is upload_data a csv?
         #assign df to csv
         check_file(upload_data, filename)
-        cell_type_list = np.insert(df['cell_type'].unique(), 0, 'All')
+        #cell_type_list = np.insert(df['cell_type'].unique(), 0, 'All')
         genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
         #return html.H5(genotype_list)
         gene_list = list(df.columns.unique())
@@ -159,28 +170,29 @@ def update_file(upload_data, filename, gene_value = 'Prr15l'):
             )
 
             #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
-        return check_file(upload_data, filename), cell_type_list, genotype_list, gene_list
+        return check_file(upload_data, filename), genotype_list, gene_list
     return html.Div([
             'No File Uploaded'
-        ]), [], [], []
+        ]), [], []
 
 
 @app.callback(
     Output('umap-graphic', 'figure'),
-    Input('cell-type-value', 'value'),
+    Output('umap-graphic-cell-types', 'figure'),
+    #Input('cell-type-value', 'value'),
     Input('genotype-value', 'value'),
     Input('gene-value', 'value')
     )
-def update_graph(cell_type_value, genotype_value, gene_value):
+def update_graph(genotype_value, gene_value):
     #check gene_value is part of csv
     #gene_value is text field
     if df is not None:
         #filter df to only contain data with chosen genotype
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
         #filter df to contain data with chosen cell type
-        dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
+        #dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
         dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != 'All' and gene_value != None else dff
-        fig = px.scatter(dff, x='x',
+        gene_fig = px.scatter(dff, x='x',
         #x coordinates
                      y='y',
                      color = gene_value,
@@ -188,15 +200,26 @@ def update_graph(cell_type_value, genotype_value, gene_value):
                      #y coordinates
                      #hover_name=dff[dff['Indicator Name'] == yaxis_column_name]['Country Name']
                      )
-        fig.update_layout(width = 800, height = 800, title = gene_value,
+        gene_fig.update_layout(width = 800, height = 800, title = gene_value,
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             #paper_bgcolor = "black"
             )
 
             #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
-        return fig
-    return px.scatter(x = [0], y=[0])
+        cell_type_fig = px.scatter(dff, x='x',
+        #x coordinates
+                     y='y',
+                     color = 'cell_type',
+                     )
+        cell_type_fig.update_layout(width = 800, height = 800, title = 'Cell Types',
+            xaxis={'visible': False, 'showticklabels': False},
+            yaxis={'visible': False, 'showticklabels': False},
+            #paper_bgcolor = "black"
+            )
+
+        return gene_fig, cell_type_fig
+    return px.scatter(x = [0], y=[0]), px.scatter(x = [0], y=[0])
 
 
 if __name__ == '__main__':
