@@ -65,7 +65,7 @@ app.layout = html.Div([
                 #yaxis={'visible': False, 'showticklabels': False},
                 #paper_bgcolor = "black"
                 #"rgba(1,24,24,10)"
-                id='umap-graphic')
+                id='umap-graphic-gene')
         ], style={'width': '45%', 'display': 'inline-block'}),
         html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0]),
@@ -151,7 +151,7 @@ def update_file(upload_data, filename, gene_value = 'Prr15l'):
         gene_list.remove('y')
         #make gene list into array
         gene_list = np.array(gene_list)
-        gene_list = np.insert(gene_list, 0, 'All')
+        #gene_list = np.insert(gene_list, 0, 'All')
         #return html.H5([gene_list])
         dff = df
         #graph
@@ -177,7 +177,7 @@ def update_file(upload_data, filename, gene_value = 'Prr15l'):
 
 
 @app.callback(
-    Output('umap-graphic', 'figure'),
+    Output('umap-graphic-gene', 'figure'),
     Output('umap-graphic-cell-types', 'figure'),
     #Input('cell-type-value', 'value'),
     Input('genotype-value', 'value'),
@@ -191,7 +191,7 @@ def update_graph(genotype_value, gene_value):
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
         #filter df to contain data with chosen cell type
         #dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
-        dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != 'All' and gene_value != None else dff
+        dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
         gene_fig = px.scatter(dff, x='x',
         #x coordinates
                      y='y',
