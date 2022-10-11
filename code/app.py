@@ -44,17 +44,17 @@ app.layout = html.Div([
         #dropdown with cell type
         html.Div([
             html.H3('Cell Type:'),
-            dcc.Dropdown([], id='cell-type-value')
+            dcc.Dropdown([], placeholder = 'Select a cell type...', id='cell-type-value')
         ], style={'width': '48%', 'display': 'inline-block'}),
         #dropdown with genotype
         html.Div([
             html.H3('Genotype:'),
-            dcc.Dropdown([], id='genotype-value')
+            dcc.Dropdown([], placeholder = 'Select a genotype...', id='genotype-value')
         ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
     ]),
     html.Div([
             html.H3('Gene:'),
-            dcc.Dropdown([], id='gene-value')
+            dcc.Dropdown([], placeholder = 'Select a gene...', id='gene-value')
         ], style={'width': '48%', 'display': 'inline-block'}),
     html.Div([
         html.H3('UMAP'),
@@ -80,7 +80,7 @@ def check_file(contents, filename):
             # Assume that the user uploaded a CSV file
             global df
             df = pd.read_csv(
-                io.StringIO(decoded.decode('utf-8')), index_col=0)
+                io.StringIO(decoded.decode('utf-8')), index_col = 0)
     except Exception as e:
         print(e)
         return html.Div([
