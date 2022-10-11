@@ -71,7 +71,7 @@ app.layout = html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0]),
                 #update_layout(width = 800, height = 800, xaxis={'visible': False, 'showticklabels': False},
                 #yaxis={'visible': False, 'showticklabels': False},
-                #paper_bgcolor = "black"
+                #paper_bgcolor = "black",
                 #"rgba(1,24,24,10)"
                 id='umap-graphic-cell-types')
             ], style={'width': '45%', 'float': 'right', 'display': 'inline-block'})
@@ -203,7 +203,8 @@ def update_graph(genotype_value, gene_value):
         gene_fig.update_layout(width = 700, height = 700, title = gene_value,
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
-            #paper_bgcolor = "black"
+            #paper_bgcolor = "black",
+            plot_bgcolor = "white"
             )
 
             #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
@@ -215,7 +216,7 @@ def update_graph(genotype_value, gene_value):
         cell_type_fig.update_layout(width = 700, height = 700, title = 'Cell Types',
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
-            #paper_bgcolor = "black"
+            plot_bgcolor = "white"
             )
 
         return gene_fig, cell_type_fig
