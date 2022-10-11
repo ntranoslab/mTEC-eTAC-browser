@@ -66,7 +66,7 @@ app.layout = html.Div([
                 #paper_bgcolor = "black"
                 #"rgba(1,24,24,10)"
                 id='umap-graphic')
-        ]),
+        ], style={'width': '45%', 'display': 'inline-block'}),
         html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0]),
                 #update_layout(width = 800, height = 800, xaxis={'visible': False, 'showticklabels': False},
@@ -74,7 +74,7 @@ app.layout = html.Div([
                 #paper_bgcolor = "black"
                 #"rgba(1,24,24,10)"
                 id='umap-graphic-cell-types')
-            ])
+            ], style={'width': '45%', 'float': 'right', 'display': 'inline-block'})
     ])
     
 
@@ -200,7 +200,7 @@ def update_graph(genotype_value, gene_value):
                      #y coordinates
                      #hover_name=dff[dff['Indicator Name'] == yaxis_column_name]['Country Name']
                      )
-        gene_fig.update_layout(width = 800, height = 800, title = gene_value,
+        gene_fig.update_layout(width = 700, height = 700, title = gene_value,
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             #paper_bgcolor = "black"
@@ -212,7 +212,7 @@ def update_graph(genotype_value, gene_value):
                      y='y',
                      color = 'cell_type',
                      )
-        cell_type_fig.update_layout(width = 800, height = 800, title = 'Cell Types',
+        cell_type_fig.update_layout(width = 700, height = 700, title = 'Cell Types',
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             #paper_bgcolor = "black"
