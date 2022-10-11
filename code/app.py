@@ -179,6 +179,7 @@ def update_file(upload_data, filename, gene_value = 'Prr15l'):
 @app.callback(
     Output('umap-graphic-gene', 'figure'),
     Output('umap-graphic-cell-types', 'figure'),
+    Output('genotype-value', 'value'),
     #Input('cell-type-value', 'value'),
     Input('genotype-value', 'value'),
     Input('gene-value', 'value')
@@ -188,7 +189,9 @@ def update_graph(genotype_value, gene_value):
     #gene_value is text field
     if df is not None:
         #filter df to only contain data with chosen genotype
-        dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' and genotype_value != None else df
+        if genotype_value is None:
+            genotype_value = 'All'
+        dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
         #filter df to contain data with chosen cell type
         #dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
         dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
@@ -219,8 +222,8 @@ def update_graph(genotype_value, gene_value):
             plot_bgcolor = "white"
             )
 
-        return gene_fig, cell_type_fig
-    return px.scatter(x = [0], y=[0]), px.scatter(x = [0], y=[0])
+        return gene_fig, cell_type_fig, genotype_value
+    return px.scatter(x = [0], y=[0]), px.scatter(x = [0], y=[0]), None
 
 
 if __name__ == '__main__':
