@@ -15,29 +15,41 @@ app = Dash(__name__)
 
 #df = pd.read_csv('https://plotly.github.io/datasets/country_indicators.csv')
 df = None
+existing_csv = {}
+#pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
+existing_csv_names = []
+#['WT_KO_thymus_subset.csv']
 #df = pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
-
+#a.filename for a in existing_csv
 app.layout = html.Div([
-    #upload data bar
-    dcc.Upload(
-        id='upload-data',
-        children=html.Div([
-            'Drag and Drop or ',
-            html.A('Select Files')
+    html.Div([
+        html.Div([
+            html.H3('File:'),
+            dcc.Dropdown(existing_csv_names, placeholder = 'Select a file...', id='file-value')
+        ], style={'width': '32%', 'display': 'inline-block'}),
+            #upload data bar
+            dcc.Upload(
+            id='upload-data',
+            children=html.Div([
+                'Drag and Drop or ',
+                html.A('Select Files')
+            ]),
+            style={
+                'width': '30%',
+                'height': '60px',
+                'lineHeight': '60px',
+                'borderWidth': '1px',
+                'borderStyle': 'dashed',
+                'borderRadius': '5px',
+                'textAlign': 'center',
+                'margin': '10px',
+                'display': 'inline-block'
+            },
+            # Allow multiple files to be uploaded
+            multiple=False
+            ),
         ]),
-        style={
-            'width': '100%',
-            'height': '60px',
-            'lineHeight': '60px',
-            'borderWidth': '1px',
-            'borderStyle': 'dashed',
-            'borderRadius': '5px',
-            'textAlign': 'center',
-            'margin': '10px'
-        },
-        # Allow multiple files to be uploaded
-        multiple=False
-    ),
+    
     html.Div(id = 'output-data-result'),
 
     html.Div([
@@ -92,6 +104,11 @@ def check_file(contents, filename):
             global df
             df = pd.read_csv(
                 io.StringIO(decoded.decode('utf-8')), index_col = 0)
+            if filename not in existing_csv_names:
+                existing_csv[filename] = df
+                #existing_csv_names.append(filename)
+                #print(existing_csv)
+                #print(existing_csv_names)
     except Exception as e:
         print(e)
         return html.Div([
@@ -122,59 +139,87 @@ def check_file(contents, filename):
 @app.callback(
     Output ('output-data-result', 'children'),
     #Output('cell-type-value', 'options'),
+    Output('file-value', 'options'),
     Output('genotype-value', 'options'),
     Output('gene-value', 'options'),
+    Input('file-value', 'value'),
     Input('upload-data', 'contents'),
+    #Input('file-value', 'contents'),
     State('upload-data', 'filename')
     #Input('gene-value', 'value')
     )
-def update_file(upload_data, filename, gene_value = 'Prr15l'):
+def update_file(file_value, upload_data, filename, gene_value = 'Gm26798'):
 
-    if upload_data is not None:
+    global df
+    if upload_data is None and file_value is None:
+        return html.Div([
+            'No File Uploaded'
+        ]), [], [], []
+    elif file_value is not None:
+        df = existing_csv.get(file_value, 'No such file exists')
+    elif upload_data is not None and file_value is None:
         #is upload_data in correct format?
         #is upload_data a csv?
         #assign df to csv
         check_file(upload_data, filename)
-        #cell_type_list = np.insert(df['cell_type'].unique(), 0, 'All')
-        genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
-        #return html.H5(genotype_list)
-        gene_list = list(df.columns.unique())
-        #remove unnamed col
-        #gene_list.remove('Unnamed: 0')
-        #remove cell_type col
-        gene_list.remove('cell_type')
-        #remove genotype col
-        gene_list.remove('genotype')
-        #remove x col
-        gene_list.remove('x')
-        #remove y col
-        gene_list.remove('y')
-        #make gene list into array
-        gene_list = np.array(gene_list)
-        #gene_list = np.insert(gene_list, 0, 'All')
-        #return html.H5([gene_list])
-        dff = df
-        #graph
-        fig = px.scatter(dff, x='x',
-                    #x coordinates
-                     y='y',
-                     color = gene_value,
-                     hover_name = 'cell_type'
-                     #y coordinates
-                     #hover_name=dff[dff['Indicator Name'] == yaxis_column_name]['Country Name']
-                     )
-        fig.update_layout(width = 800, height = 800, title = gene_value,
-            xaxis={'visible': False, 'showticklabels': False},
-            yaxis={'visible': False, 'showticklabels': False},
-            #paper_bgcolor = "rgba(0,0,0,0)"
-            )
+    #cell_type_list = np.insert(df['cell_type'].unique(), 0, 'All')
+    print(df)
+    genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
+    #return html.H5(genotype_list)
+    gene_list = list(df.columns.unique())
+    #remove unnamed col
+    #gene_list.remove('Unnamed: 0')
+    #remove cell_type col
+    gene_list.remove('cell_type')
+    #remove genotype col
+    gene_list.remove('genotype')
+    #remove x col
+    gene_list.remove('x')
+    #remove y col
+    gene_list.remove('y')
+    #make gene list into array
+    gene_list = np.array(gene_list)
+    #gene_list = np.insert(gene_list, 0, 'All')
+    #return html.H5([gene_list])
+    dff = df
+    #graph
+    fig = px.scatter(dff, x='x',
+                #x coordinates
+                 y='y',
+                 color = gene_value,
+                 hover_name = 'cell_type'
+                 #y coordinates
+                 #hover_name=dff[dff['Indicator Name'] == yaxis_column_name]['Country Name']
+                 )
+    fig.update_layout(width = 800, height = 800, title = gene_value,
+        xaxis={'visible': False, 'showticklabels': False},
+        yaxis={'visible': False, 'showticklabels': False},
+        #paper_bgcolor = "rgba(0,0,0,0)"
+        )
 
-            #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
-        return check_file(upload_data, filename), genotype_list, gene_list
+        #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
+    print('**********')
+    print(df)
+    #replace with checkfile maybe
     return html.Div([
-            'No File Uploaded'
-        ]), [], []
+        html.H5(filename if file_value is None else file_value),
+        #html.H6(datetime.datetime.fromtimestamp(date)),
 
+        #dash_table.DataTable(
+        #    df.to_dict('records'),
+        #    [{'name': i, 'id': i} for i in df.columns]
+        #),
+
+        html.Hr(),  # horizontal line
+
+        # For debugging, display the raw contents provided by the web browser
+        #html.Div('Raw Content'),
+        #html.Pre(contents[0:200] + '...', style={
+        #    'whiteSpace': 'pre-wrap',
+        #    'wordBreak': 'break-all'
+        #})
+    ]), list(existing_csv.keys()), genotype_list, gene_list
+    
 
 @app.callback(
     Output('umap-graphic-gene', 'figure'),
@@ -191,6 +236,7 @@ def update_graph(genotype_value, gene_value):
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
             genotype_value = 'All'
+        print(df)
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
         #filter df to contain data with chosen cell type
         #dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
