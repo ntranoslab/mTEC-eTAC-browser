@@ -163,7 +163,7 @@ def update_file(file_value, upload_data, filename, gene_value = 'Gm26798'):
         #assign df to csv
         check_file(upload_data, filename)
     #cell_type_list = np.insert(df['cell_type'].unique(), 0, 'All')
-    print(df)
+    #print(df)
     genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
     #return html.H5(genotype_list)
     gene_list = list(df.columns.unique())
@@ -198,8 +198,8 @@ def update_file(file_value, upload_data, filename, gene_value = 'Gm26798'):
         )
 
         #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
-    print('**********')
-    print(df)
+    #print('**********')
+    #print(df)
     #replace with checkfile maybe
     return html.Div([
         html.H5(filename if file_value is None else file_value),
@@ -236,7 +236,7 @@ def update_graph(genotype_value, gene_value):
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
             genotype_value = 'All'
-        print(df)
+        #print(df)
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
         #filter df to contain data with chosen cell type
         #dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
