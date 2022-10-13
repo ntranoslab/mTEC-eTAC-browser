@@ -17,7 +17,6 @@ app = Dash(__name__)
 df = None
 existing_csv = {}
 #pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
-existing_csv_names = []
 #['WT_KO_thymus_subset.csv']
 #df = pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
 #a.filename for a in existing_csv
@@ -25,7 +24,7 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             html.H3('File:'),
-            dcc.Dropdown(existing_csv_names, placeholder = 'Select a file...', id='file-value')
+            dcc.Dropdown([], placeholder = 'Select a file...', id='file-value')
         ], style={'width': '32%', 'display': 'inline-block'}),
             #upload data bar
             dcc.Upload(
@@ -104,11 +103,8 @@ def check_file(contents, filename):
             global df
             df = pd.read_csv(
                 io.StringIO(decoded.decode('utf-8')), index_col = 0)
-            if filename not in existing_csv_names:
+            if filename not in list(existing_csv.keys()):
                 existing_csv[filename] = df
-                #existing_csv_names.append(filename)
-                #print(existing_csv)
-                #print(existing_csv_names)
     except Exception as e:
         print(e)
         return html.Div([
