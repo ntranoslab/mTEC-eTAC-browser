@@ -13,15 +13,12 @@ import pandas as pd
 
 app = Dash(__name__)
 
-#problem when selecting file name and then trying to upload a file through drag and drop
-#file dropdown not reading existing csv
 #df = pd.read_csv('https://plotly.github.io/datasets/country_indicators.csv')
 df = None
 existing_csv = {'WT_KO_thymus_subset.csv': pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv', index_col=0)}
 #pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
 #['WT_KO_thymus_subset.csv']
 #df = pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
-#a.filename for a in existing_csv
 app.layout = html.Div([
     html.Div([
         html.Div([
@@ -164,12 +161,9 @@ def update_file(file_value, upload_data, filename, gene_value = 'Gm26798'):
         #assign df to csv
         check_file(upload_data, filename)
     #cell_type_list = np.insert(df['cell_type'].unique(), 0, 'All')
-    #print(df)
     genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
     #return html.H5(genotype_list)
     gene_list = list(df.columns.unique())
-    #remove unnamed col
-    #gene_list.remove('Unnamed: 0')
     #remove cell_type col
     gene_list.remove('cell_type')
     #remove genotype col
@@ -199,9 +193,6 @@ def update_file(file_value, upload_data, filename, gene_value = 'Gm26798'):
         )
 
         #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
-    #print('**********')
-    #print(df)
-    #replace with checkfile maybe
     return html.Div([
         html.H5(filename if input_id == 'upload-data' else file_value),
         #html.H6(datetime.datetime.fromtimestamp(date)),
@@ -237,7 +228,6 @@ def update_graph(genotype_value, gene_value):
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
             genotype_value = 'All'
-        #print(df)
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
         #filter df to contain data with chosen cell type
         #dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
@@ -253,7 +243,6 @@ def update_graph(genotype_value, gene_value):
         gene_fig.update_layout(width = 700, height = 700, title = gene_value,
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
-            #paper_bgcolor = "black",
             plot_bgcolor = "white"
             )
 
