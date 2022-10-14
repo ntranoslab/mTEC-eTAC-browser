@@ -144,7 +144,7 @@ def check_file(contents, filename):
     State('upload-data', 'filename')
     #Input('gene-value', 'value')
     )
-def update_file(file_value, upload_data, filename, gene_value = 'Gm26798'):
+def update_file(file_value, upload_data, filename):
 
     input_id = ctx.triggered_id
     print(input_id)
@@ -178,19 +178,19 @@ def update_file(file_value, upload_data, filename, gene_value = 'Gm26798'):
     #return html.H5([gene_list])
     dff = df
     #graph
-    fig = px.scatter(dff, x='x',
+    #fig = px.scatter(dff, x='x',
                 #x coordinates
-                 y='y',
-                 color = gene_value,
-                 hover_name = 'cell_type'
+                 #y='y',
+                 #color = gene_value if gene_value != None else '',
+                 #hover_name = 'cell_type'
                  #y coordinates
                  #hover_name=dff[dff['Indicator Name'] == yaxis_column_name]['Country Name']
-                 )
-    fig.update_layout(width = 800, height = 800, title = gene_value,
-        xaxis={'visible': False, 'showticklabels': False},
-        yaxis={'visible': False, 'showticklabels': False},
+                 #)
+    #fig.update_layout(width = 800, height = 800, title = 'Select a gene',
+        #xaxis={'visible': False, 'showticklabels': False},
+        #yaxis={'visible': False, 'showticklabels': False},
         #paper_bgcolor = "rgba(0,0,0,0)"
-        )
+        #)
 
         #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
     return html.Div([
