@@ -26,7 +26,7 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             html.H3('File:'),
-            dcc.Dropdown(['hallajdlfjajisdf', 'lfjasdf'], placeholder = 'Select a file...', id='file-value')
+            dcc.Dropdown(list(existing_csv.keys()), placeholder = 'Select a file...', id='file-value')
         ], style={'width': '32%', 'display': 'inline-block'}),
             #upload data bar
             dcc.Upload(
@@ -155,7 +155,7 @@ def update_file(file_value, upload_data, filename, gene_value = 'Gm26798'):
     if upload_data is None and file_value is None:
         return html.Div([
             'No File Uploaded'
-        ]), [], '', [], []
+        ]), list(existing_csv.keys()), '', [], []
     elif input_id == 'file-value':
         df = existing_csv.get(file_value, 'No such file exists')
     elif input_id == 'upload-data':
