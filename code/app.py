@@ -165,6 +165,8 @@ def update_file(file_value, upload_data, filename):
         #is upload_data a csv?
         #assign df to csv
         check_file(upload_data, filename)
+        if filename in list(existing_csv.keys()):
+            file_value = filename
     #cell_type_list = np.insert(df['cell_type'].unique(), 0, 'All')
     genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
     #return html.H5(genotype_list)
@@ -199,7 +201,7 @@ def update_file(file_value, upload_data, filename):
 
         #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
     return html.Div([
-        html.H5(filename if input_id == 'upload-data' else file_value),
+        html.H5(file_value),
         #html.H6(datetime.datetime.fromtimestamp(date)),
 
         #dash_table.DataTable(
@@ -215,7 +217,7 @@ def update_file(file_value, upload_data, filename):
         #    'whiteSpace': 'pre-wrap',
         #    'wordBreak': 'break-all'
         #})
-    ]), list(existing_csv.keys()), file_value if input_id == 'file-value' else '', genotype_list, gene_list
+    ]), list(existing_csv.keys()), file_value, genotype_list, gene_list
     
 
 @app.callback(
