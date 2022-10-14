@@ -5,7 +5,7 @@
 import base64
 import io
 
-from dash import Dash, dcc, html, Input, Output, State
+from dash import Dash, dcc, html, Input, Output, State, ctx
 import plotly.express as px
 import numpy as np
 
@@ -13,9 +13,11 @@ import pandas as pd
 
 app = Dash(__name__)
 
+#problem when selecting file name and then trying to upload a file through drag and drop
+#file dropdown not reading existing csv
 #df = pd.read_csv('https://plotly.github.io/datasets/country_indicators.csv')
 df = None
-existing_csv = {}
+existing_csv = {'WT_KO_thymus_subset.csv': pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv', index_col=0)}
 #pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
 #['WT_KO_thymus_subset.csv']
 #df = pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
@@ -24,7 +26,7 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             html.H3('File:'),
-            dcc.Dropdown([], placeholder = 'Select a file...', id='file-value')
+            dcc.Dropdown(['hallajdlfjajisdf', 'lfjasdf'], placeholder = 'Select a file...', id='file-value')
         ], style={'width': '32%', 'display': 'inline-block'}),
             #upload data bar
             dcc.Upload(
@@ -146,14 +148,16 @@ def check_file(contents, filename):
     )
 def update_file(file_value, upload_data, filename, gene_value = 'Gm26798'):
 
+    input_id = ctx.triggered_id
+    print(input_id)
     global df
     if upload_data is None and file_value is None:
         return html.Div([
             'No File Uploaded'
         ]), [], [], []
-    elif file_value is not None:
+    elif input_id == 'file-value':
         df = existing_csv.get(file_value, 'No such file exists')
-    elif upload_data is not None and file_value is None:
+    elif input_id == 'upload-data':
         #is upload_data in correct format?
         #is upload_data a csv?
         #assign df to csv
@@ -198,7 +202,7 @@ def update_file(file_value, upload_data, filename, gene_value = 'Gm26798'):
     #print(df)
     #replace with checkfile maybe
     return html.Div([
-        html.H5(filename if file_value is None else file_value),
+        html.H5(filename if input_id == 'upload-data' else file_value),
         #html.H6(datetime.datetime.fromtimestamp(date)),
 
         #dash_table.DataTable(
