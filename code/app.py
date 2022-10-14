@@ -70,15 +70,20 @@ app.layout = html.Div([
     html.Div([
         html.H3('UMAPs'),
         html.Div([
-            dcc.Graph(figure = px.scatter(x = [0], y=[0]),
-                #update_layout(width = 800, height = 800, xaxis={'visible': False, 'showticklabels': False},
+            dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                xaxis={'visible': False, 'showticklabels': False},
+                yaxis={'visible': False, 'showticklabels': False},
+                plot_bgcolor = "white"),
                 #yaxis={'visible': False, 'showticklabels': False},
                 #paper_bgcolor = "black"
                 #"rgba(1,24,24,10)"
                 id='umap-graphic-gene')
         ], style={'width': '45%', 'display': 'inline-block'}),
         html.Div([
-            dcc.Graph(figure = px.scatter(x = [0], y=[0]),
+            dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                xaxis={'visible': False, 'showticklabels': False},
+                yaxis={'visible': False, 'showticklabels': False},
+                plot_bgcolor = "white"),
                 #update_layout(width = 800, height = 800, xaxis={'visible': False, 'showticklabels': False},
                 #yaxis={'visible': False, 'showticklabels': False},
                 #paper_bgcolor = "black",
@@ -147,7 +152,7 @@ def check_file(contents, filename):
 def update_file(file_value, upload_data, filename):
 
     input_id = ctx.triggered_id
-    print(input_id)
+    #print(input_id)
     global df
     if upload_data is None and file_value is None:
         return html.Div([
@@ -259,7 +264,19 @@ def update_graph(genotype_value, gene_value):
             )
 
         return gene_fig, cell_type_fig, genotype_value
-    return px.scatter(x = [0], y=[0]), px.scatter(x = [0], y=[0]), None
+    fig = px.scatter(x=[0],
+                #x coordinates
+                 y=[0],
+                 color_discrete_sequence=['white']
+                 )
+    fig.update_layout(width = 800, height = 800,
+        xaxis={'visible': False, 'showticklabels': False},
+        yaxis={'visible': False, 'showticklabels': False},
+        #paper_bgcolor = "rgba(0,0,0,0)"
+        plot_bgcolor = "white",
+        hovermode = False
+        )
+    return fig, fig, None
 
 
 if __name__ == '__main__':
