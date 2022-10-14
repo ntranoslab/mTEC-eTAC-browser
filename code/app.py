@@ -138,6 +138,7 @@ def check_file(contents, filename):
     Output ('output-data-result', 'children'),
     #Output('cell-type-value', 'options'),
     Output('file-value', 'options'),
+    Output('file-value', 'value'),
     Output('genotype-value', 'options'),
     Output('gene-value', 'options'),
     Input('file-value', 'value'),
@@ -154,7 +155,7 @@ def update_file(file_value, upload_data, filename, gene_value = 'Gm26798'):
     if upload_data is None and file_value is None:
         return html.Div([
             'No File Uploaded'
-        ]), [], [], []
+        ]), [], '', [], []
     elif input_id == 'file-value':
         df = existing_csv.get(file_value, 'No such file exists')
     elif input_id == 'upload-data':
@@ -218,7 +219,7 @@ def update_file(file_value, upload_data, filename, gene_value = 'Gm26798'):
         #    'whiteSpace': 'pre-wrap',
         #    'wordBreak': 'break-all'
         #})
-    ]), list(existing_csv.keys()), genotype_list, gene_list
+    ]), list(existing_csv.keys()), file_value if input_id == 'file-value' else '', genotype_list, gene_list
     
 
 @app.callback(
