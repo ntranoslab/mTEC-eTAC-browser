@@ -250,8 +250,6 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
         dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
         gene_graph_slider_min = min(dff[gene_value])
         gene_graph_slider_max = max(dff[gene_value])
-        print(dff)
-        print(min(dff[gene_value]))
 
         gene_fig = px.scatter(dff, x='x',
         #x coordinates
