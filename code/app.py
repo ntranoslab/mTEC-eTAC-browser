@@ -81,8 +81,8 @@ app.layout = html.Div([
                 id='umap-graphic-gene')
         ], style={'width': '38%', 'display': 'inline-block'}),
         html.Div([
-            dcc.RangeSlider(0, 20, marks = None, value=[5, 15], allowCross = False, id='umap-graphic-gene-slider', vertical = True)
-            ], style={'marginBottom': '100px',
+            dcc.RangeSlider(0, 20, marks = None, value=[0, 20], allowCross = False, id='umap-graphic-gene-slider', vertical = True, verticalHeight = 475)
+            ], style={'marginBottom': '60px',
                     'marginLeft': '150px',
                     'display': 'inline-block'}),
         html.Div([
