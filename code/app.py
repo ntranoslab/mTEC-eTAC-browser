@@ -19,6 +19,7 @@ existing_csv = {'WT_KO_thymus_subset.csv': pd.read_csv('file://localhost/Users/n
 #pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
 #['WT_KO_thymus_subset.csv']
 #df = pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
+cell_meta_cols = ['cell_type', 'genotype', 'x', 'y']
 app.layout = html.Div([
     html.Div([
         html.Div([
@@ -78,7 +79,12 @@ app.layout = html.Div([
                 #paper_bgcolor = "black"
                 #"rgba(1,24,24,10)"
                 id='umap-graphic-gene')
-        ], style={'width': '45%', 'display': 'inline-block'}),
+        ], style={'width': '38%', 'display': 'inline-block'}),
+        html.Div([
+            dcc.RangeSlider(0, 20, marks = None, value=[5, 15], allowCross = False, id='umap-graphic-gene-slider', vertical = True)
+            ], style={'marginBottom': '100px',
+                    'marginLeft': '150px',
+                    'display': 'inline-block'}),
         html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                 xaxis={'visible': False, 'showticklabels': False},
@@ -89,7 +95,7 @@ app.layout = html.Div([
                 #paper_bgcolor = "black",
                 #"rgba(1,24,24,10)"
                 id='umap-graphic-cell-types')
-            ], style={'width': '45%', 'float': 'right', 'display': 'inline-block'})
+            ], style={'width': '38%', 'float': 'right', 'display': 'inline-block'}),
     ])
     
 
@@ -224,13 +230,16 @@ def update_file(file_value, upload_data, filename):
     Output('umap-graphic-gene', 'figure'),
     Output('umap-graphic-cell-types', 'figure'),
     Output('genotype-value', 'value'),
+    #Output('umap-graphic-gene-slider', 'contents'),
     #Input('cell-type-value', 'value'),
     Input('genotype-value', 'value'),
-    Input('gene-value', 'value')
+    Input('gene-value', 'value'),
+    Input('umap-graphic-gene-slider', 'value')
     )
-def update_graph(genotype_value, gene_value):
+def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
     #check gene_value is part of csv
     #gene_value is text field
+    input_id = ctx.triggered_id
     if df is not None:
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
@@ -239,46 +248,58 @@ def update_graph(genotype_value, gene_value):
         #filter df to contain data with chosen cell type
         #dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
         dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
+        gene_graph_slider_min = min(dff[gene_value])
+        gene_graph_slider_max = max(dff[gene_value])
+        print(dff)
+        print(min(dff[gene_value]))
+
         gene_fig = px.scatter(dff, x='x',
         #x coordinates
                      y='y',
                      color = gene_value,
-                     hover_name = 'cell_type'
+                     hover_name = 'cell_type',
+                     range_color=[gene_graph_slider_min if input_id != 'umap-graphic-gene-slider' else min(umap_graphic_gene_slider), gene_graph_slider_max if input_id != 'umap-graphic-gene-slider' else max(umap_graphic_gene_slider)]
                      #y coordinates
                      #hover_name=dff[dff['Indicator Name'] == yaxis_column_name]['Country Name']
                      )
-        gene_fig.update_layout(width = 700, height = 700, title = gene_value,
+        gene_fig.update_layout(width = 650, height = 650, title = gene_value,
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
+
+        gene_slider = dcc.RangeSlider(gene_graph_slider_min, gene_graph_slider_max, marks = None, vertical = True)
 
             #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
         cell_type_fig = px.scatter(dff, x='x',
         #x coordinates
                      y='y',
                      color = 'cell_type',
+                     hover_name = 'cell_type'
                      )
-        cell_type_fig.update_layout(width = 700, height = 700, title = 'Cell Types',
+        cell_type_fig.update_layout(width = 650, height = 650, title = 'Cell Types',
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
 
         return gene_fig, cell_type_fig, genotype_value
+        #gene_slider
     fig = px.scatter(x=[0],
                 #x coordinates
                  y=[0],
                  color_discrete_sequence=['white']
                  )
-    fig.update_layout(width = 800, height = 800,
+    fig.update_layout(width = 650, height = 650,
         xaxis={'visible': False, 'showticklabels': False},
         yaxis={'visible': False, 'showticklabels': False},
         #paper_bgcolor = "rgba(0,0,0,0)"
         plot_bgcolor = "white",
         hovermode = False
         )
+    default_slider = dcc.RangeSlider(0, 20, marks = None, value=[5, 15], vertical = True)
     return fig, fig, None
+    #default_slider
 
 
 if __name__ == '__main__':
