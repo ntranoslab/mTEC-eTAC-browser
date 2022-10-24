@@ -26,6 +26,10 @@ app.layout = html.Div([
             html.H3('File:'),
             dcc.Dropdown(list(existing_csv.keys()), placeholder = 'Select a file...', id='file-value')
         ], style={'width': '32%', 'display': 'inline-block'}),
+        html.Div([
+            html.H3('Analyze:'),
+            dcc.RadioItems(['mTECs', 'eTACs'], 'mTECs', id='analyze-cell-value')
+        ], style={'width': '32%', 'float': 'right', 'display': 'inline-block'}),
             #upload data bar
             dcc.Upload(
             id='upload-data',
@@ -51,7 +55,7 @@ app.layout = html.Div([
     
     html.Div(id = 'output-data-result'),
     html.H3('Category:'),
-    dcc.RadioItems(['Genotype']),
+    dcc.RadioItems(['Genotype', 'Other'], 'Genotype', id='category-value'),
 
     html.Br(),
 
@@ -73,7 +77,7 @@ app.layout = html.Div([
         ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
     ]),
     html.Div([
-        html.H3('UMAPs'),
+        html.H3('UMAPs', id='graph-name-value'),
         html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                 xaxis={'visible': False, 'showticklabels': False},
@@ -234,16 +238,19 @@ def update_file(file_value, upload_data, filename):
     Output('umap-graphic-gene', 'figure'),
     Output('umap-graphic-cell-types', 'figure'),
     Output('genotype-value', 'value'),
+    Output('graph-name-value', 'children'),
     #Output('umap-graphic-gene-slider', 'contents'),
     #Input('cell-type-value', 'value'),
     Input('genotype-value', 'value'),
     Input('gene-value', 'value'),
-    Input('umap-graphic-gene-slider', 'value')
+    Input('umap-graphic-gene-slider', 'value'),
+    Input('analyze-cell-value', 'value')
     )
-def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
+def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_cell_value):
     #check gene_value is part of csv
     #gene_value is text field
     input_id = ctx.triggered_id
+    graph_name = ''
     if df is not None:
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
@@ -284,8 +291,13 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
+        #change to dictionary
+        if analyze_cell_value == 'mTECs':
+            graph_name = 'UMAPs'
+        else:
+            graph_name = 'tSNEs'
 
-        return gene_fig, cell_type_fig, genotype_value
+        return gene_fig, cell_type_fig, genotype_value, html.Div(graph_name, id='graph-name-value')
         #gene_slider
     fig = px.scatter(x=[0],
                 #x coordinates
@@ -300,7 +312,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
         hovermode = False
         )
     default_slider = dcc.RangeSlider(0, 20, marks = None, value=[5, 15], vertical = True)
-    return fig, fig, None
+    return fig, fig, None, html.Div('UMAPs' if analyze_cell_value == 'mTECs' else 'tSNEs', id='graph-name-value')
     #default_slider
 
 
