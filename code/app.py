@@ -19,7 +19,8 @@ existing_csv = {'WT_KO_thymus_subset.csv': pd.read_csv('file://localhost/Users/n
 #pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
 #['WT_KO_thymus_subset.csv']
 #df = pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
-cell_meta_cols = ['cell_type', 'genotype', 'x', 'y']
+cell_meta_cols = ['genotype']
+analyze_cell_dict = {'mTECs': 'UMAPs', 'eTACs': 'tSNEs'}
 app.layout = html.Div([
     html.Div([
         html.Div([
@@ -55,7 +56,7 @@ app.layout = html.Div([
     
     html.Div(id = 'output-data-result'),
     html.H3('Category:'),
-    dcc.RadioItems(['Genotype', 'Other'], 'Genotype', id='category-value'),
+    dcc.RadioItems(cell_meta_cols, cell_meta_cols[0], id='category-value'),
 
     html.Br(),
 
@@ -250,7 +251,6 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
     #check gene_value is part of csv
     #gene_value is text field
     input_id = ctx.triggered_id
-    graph_name = ''
     if df is not None:
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
@@ -291,13 +291,8 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
-        #change to dictionary
-        if analyze_cell_value == 'mTECs':
-            graph_name = 'UMAPs'
-        else:
-            graph_name = 'tSNEs'
 
-        return gene_fig, cell_type_fig, genotype_value, html.Div(graph_name, id='graph-name-value')
+        return gene_fig, cell_type_fig, genotype_value, html.Div(analyze_cell_dict[analyze_cell_value])
         #gene_slider
     fig = px.scatter(x=[0],
                 #x coordinates
@@ -312,7 +307,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
         hovermode = False
         )
     default_slider = dcc.RangeSlider(0, 20, marks = None, value=[5, 15], vertical = True)
-    return fig, fig, None, html.Div('UMAPs' if analyze_cell_value == 'mTECs' else 'tSNEs', id='graph-name-value')
+    return fig, fig, None, html.Div(analyze_cell_dict[analyze_cell_value])
     #default_slider
 
 
