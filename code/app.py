@@ -90,7 +90,7 @@ app.layout = html.Div([
                 id='umap-graphic-gene')
         ], style={'width': '38%', 'display': 'inline-block'}),
         html.Div([
-            dcc.RangeSlider(0, 20, marks = None, value=[0, 20], allowCross = False, id='umap-graphic-gene-slider', vertical = True, verticalHeight = 475)
+            dcc.RangeSlider(min=0, max=20, marks = None, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider')
             ], style={'marginBottom': '60px',
                     'marginLeft': '150px',
                     'display': 'inline-block'}),
@@ -239,13 +239,16 @@ def update_file(file_value, upload_data, filename):
     Output('umap-graphic-gene', 'figure'),
     Output('umap-graphic-cell-types', 'figure'),
     Output('genotype-value', 'value'),
+    Output('umap-graphic-gene-slider', 'min'),
+    Output('umap-graphic-gene-slider', 'max'),
+    #Output('umap-graphic-gene-slider', 'value'),
     Output('graph-name-value', 'children'),
-    #Output('umap-graphic-gene-slider', 'contents'),
     #Input('cell-type-value', 'value'),
     Input('genotype-value', 'value'),
     Input('gene-value', 'value'),
     Input('umap-graphic-gene-slider', 'value'),
     Input('analyze-cell-value', 'value')
+    #State('umap-graphic-gene-slider', 'value')
     )
 def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_cell_value):
     #check gene_value is part of csv
@@ -259,25 +262,27 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
         #filter df to contain data with chosen cell type
         #dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
         dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
-        gene_graph_slider_min = min(dff[gene_value])
-        gene_graph_slider_max = max(dff[gene_value])
+        df_gene_min = min(dff[gene_value])
+        df_gene_max = max(dff[gene_value])
 
-        gene_fig = px.scatter(dff, x='x',
-        #x coordinates
+        gene_fig = px.scatter(dff,
+                     #x coordinates
+                     x='x',
+                     #y coordinates
                      y='y',
                      color = gene_value,
                      hover_name = 'cell_type',
-                     range_color=[gene_graph_slider_min if input_id != 'umap-graphic-gene-slider' else min(umap_graphic_gene_slider), gene_graph_slider_max if input_id != 'umap-graphic-gene-slider' else max(umap_graphic_gene_slider)]
-                     #y coordinates
-                     #hover_name=dff[dff['Indicator Name'] == yaxis_column_name]['Country Name']
+                     range_color=
+                     #min of color range
+                     [df_gene_min  if input_id != 'umap-graphic-gene-slider' else min(umap_graphic_gene_slider), 
+                     #max of color range
+                     df_gene_max  if input_id != 'umap-graphic-gene-slider' else max(umap_graphic_gene_slider)]
                      )
         gene_fig.update_layout(width = 650, height = 650, title = gene_value,
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
-
-        gene_slider = dcc.RangeSlider(gene_graph_slider_min, gene_graph_slider_max, marks = None, vertical = True)
 
             #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
         cell_type_fig = px.scatter(dff, x='x',
@@ -292,7 +297,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
             plot_bgcolor = "white"
             )
 
-        return gene_fig, cell_type_fig, genotype_value, html.Div(analyze_cell_dict[analyze_cell_value])
+        return gene_fig, cell_type_fig, genotype_value, df_gene_min, df_gene_max, html.H3(analyze_cell_dict[analyze_cell_value])
         #gene_slider
     fig = px.scatter(x=[0],
                 #x coordinates
@@ -306,8 +311,8 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
         plot_bgcolor = "white",
         hovermode = False
         )
-    default_slider = dcc.RangeSlider(0, 20, marks = None, value=[5, 15], vertical = True)
-    return fig, fig, None, html.Div(analyze_cell_dict[analyze_cell_value])
+    #default_slider = dcc.RangeSlider(min=0, max=20, marks = None, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475)
+    return fig, fig, None, 0, 20, html.H3(analyze_cell_dict[analyze_cell_value])
     #default_slider
 
 
