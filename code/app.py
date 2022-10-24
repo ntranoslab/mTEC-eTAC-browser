@@ -50,6 +50,10 @@ app.layout = html.Div([
         ]),
     
     html.Div(id = 'output-data-result'),
+    html.H3('Category:'),
+    dcc.RadioItems(['Genotype']),
+
+    html.Br(),
 
     html.Div([
         #dropdown with gene
