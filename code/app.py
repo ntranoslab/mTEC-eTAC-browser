@@ -241,7 +241,8 @@ def update_file(file_value, upload_data, filename):
     Output('genotype-value', 'value'),
     Output('umap-graphic-gene-slider', 'min'),
     Output('umap-graphic-gene-slider', 'max'),
-    #Output('umap-graphic-gene-slider', 'value'),
+    #Output('umap_graphic_gene_slider', 'marks'),
+    Output('umap-graphic-gene-slider', 'value'),
     Output('graph-name-value', 'children'),
     #Input('cell-type-value', 'value'),
     Input('genotype-value', 'value'),
@@ -291,13 +292,18 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
                      color = 'cell_type',
                      hover_name = 'cell_type'
                      )
-        cell_type_fig.update_layout(width = 650, height = 650, title = 'Cell Types',
+        cell_type_fig.update_layout(width = 650, height = 650,
+            title = 'Cell Types',
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
+        #cell_type_fig.update_xaxes(autorange=False, automargin = False)
+        lower_slider_value = df_gene_min if input_id == 'gene-value' else min(umap_graphic_gene_slider)
+        higher_slider_value = df_gene_max if input_id == 'gene-value' else max(umap_graphic_gene_slider)
 
-        return gene_fig, cell_type_fig, genotype_value, df_gene_min, df_gene_max, html.H3(analyze_cell_dict[analyze_cell_value])
+
+        return gene_fig, cell_type_fig, genotype_value, df_gene_min, df_gene_max, [lower_slider_value, higher_slider_value], html.H3(analyze_cell_dict[analyze_cell_value])
         #gene_slider
     fig = px.scatter(x=[0],
                 #x coordinates
@@ -312,7 +318,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
         hovermode = False
         )
     #default_slider = dcc.RangeSlider(min=0, max=20, marks = None, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475)
-    return fig, fig, None, 0, 20, html.H3(analyze_cell_dict[analyze_cell_value])
+    return fig, fig, None, 0, 20, [5, 15], html.H3(analyze_cell_dict[analyze_cell_value])
     #default_slider
 
 
