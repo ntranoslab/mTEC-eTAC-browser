@@ -90,7 +90,7 @@ app.layout = html.Div([
                 id='umap-graphic-gene')
         ], style={'width': '38%', 'display': 'inline-block'}),
         html.Div([
-            dcc.RangeSlider(min=0, max=20, marks = None, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider')
+            dcc.RangeSlider(min=0, max=20, marks = {'10': '50th (10)'}, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider')
             ], style={'marginBottom': '60px',
                     'marginLeft': '150px',
                     'display': 'inline-block'}),
@@ -241,7 +241,7 @@ def update_file(file_value, upload_data, filename):
     Output('genotype-value', 'value'),
     Output('umap-graphic-gene-slider', 'min'),
     Output('umap-graphic-gene-slider', 'max'),
-    #Output('umap_graphic_gene_slider', 'marks'),
+    Output('umap-graphic-gene-slider', 'marks'),
     Output('umap-graphic-gene-slider', 'value'),
     Output('graph-name-value', 'children'),
     #Input('cell-type-value', 'value'),
@@ -263,8 +263,11 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
         #filter df to contain data with chosen cell type
         #dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
         dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
+        percentile_values = np.quantile(dff[gene_value], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
+        lower_slider_value = percentile_values[1] if input_id == 'gene-value' else min(umap_graphic_gene_slider)
+        higher_slider_value = percentile_values[0] if input_id == 'gene-value' else max(umap_graphic_gene_slider)
 
         gene_fig = px.scatter(dff,
                      #x coordinates
@@ -275,9 +278,9 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
                      hover_name = 'cell_type',
                      range_color=
                      #min of color range
-                     [df_gene_min  if input_id != 'umap-graphic-gene-slider' else min(umap_graphic_gene_slider), 
+                     [lower_slider_value  if input_id != 'umap-graphic-gene-slider' else min(umap_graphic_gene_slider), 
                      #max of color range
-                     df_gene_max  if input_id != 'umap-graphic-gene-slider' else max(umap_graphic_gene_slider)]
+                     higher_slider_value  if input_id != 'umap-graphic-gene-slider' else max(umap_graphic_gene_slider)]
                      )
         gene_fig.update_layout(width = 650, height = 650, title = gene_value,
             xaxis={'visible': False, 'showticklabels': False},
@@ -299,11 +302,10 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
             plot_bgcolor = "white"
             )
         #cell_type_fig.update_xaxes(autorange=False, automargin = False)
-        lower_slider_value = df_gene_min if input_id == 'gene-value' else min(umap_graphic_gene_slider)
-        higher_slider_value = df_gene_max if input_id == 'gene-value' else max(umap_graphic_gene_slider)
 
 
-        return gene_fig, cell_type_fig, genotype_value, df_gene_min, df_gene_max, [lower_slider_value, higher_slider_value], html.H3(analyze_cell_dict[analyze_cell_value])
+
+        return gene_fig, cell_type_fig, genotype_value, df_gene_min, df_gene_max, {percentile_values[0]: '99th'}, [lower_slider_value, higher_slider_value], html.H3(analyze_cell_dict[analyze_cell_value])
         #gene_slider
     fig = px.scatter(x=[0],
                 #x coordinates
@@ -317,8 +319,9 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
         plot_bgcolor = "white",
         hovermode = False
         )
+    default_slider_marks = {'10': '50th (10)'}
     #default_slider = dcc.RangeSlider(min=0, max=20, marks = None, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475)
-    return fig, fig, None, 0, 20, [5, 15], html.H3(analyze_cell_dict[analyze_cell_value])
+    return fig, fig, None, 0, 20, default_slider_marks, [min(umap_graphic_gene_slider), max(umap_graphic_gene_slider)], html.H3(analyze_cell_dict[analyze_cell_value])
     #default_slider
 
 
