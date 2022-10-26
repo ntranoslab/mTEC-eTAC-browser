@@ -304,10 +304,10 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
             plot_bgcolor = "white"
             )
         #cell_type_fig.update_xaxes(autorange=False, automargin = False)
-        percentile_values = np.round(percentile_values, 1)
+        #percentile_values = np.round(percentile_values, 1)
         print(percentile_values)
         #percentile_marks = {str(int(percentile_values[0])): '99th (' + str(percentile_values[0]) + ')', str(int(percentile_values[1])): '1st (' + str(percentile_values[1]) + ')', str(int(percentile_values[2])): '95th (' + str(percentile_values[2]) + ')', str(int(percentile_values[3])): '5th (' + str(percentile_values[3]) + ')', str(int(percentile_values[4])): '90th (' + str(percentile_values[4]) + ')', str(int(percentile_values[5])): '10th (' + str(percentile_values[5]) + ')', str(int(percentile_values[6])): '50th (' + str(percentile_values[6]) + ')'}
-        percentile_marks = {int(percentile_values[0]): '99th', int(percentile_values[1]): '1st', int(percentile_values[2]): '95th', int(percentile_values[3]): '5th', int(percentile_values[4]): '90th', int(percentile_values[5]): '10th', int(percentile_values[6]): '50th'}
+        percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st', percentile_values[2]: '95th', percentile_values[3]: '5th', percentile_values[4]: '90th', percentile_values[5]: '10th', percentile_values[6]: '50th'}
 
 
 
