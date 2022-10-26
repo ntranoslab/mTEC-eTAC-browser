@@ -24,12 +24,12 @@ analyze_cell_dict = {'mTECs': 'UMAPs', 'eTACs': 'tSNEs', 'Other': '', '': ''}
 app.layout = html.Div([
     html.Div([
         html.Div([
-            html.H3('File:'),
-            dcc.Dropdown(list(existing_csv.keys()), placeholder = 'Select a file...', id='file-value')
-        ], style={'width': '32%', 'display': 'inline-block'}),
-        html.Div([
             html.H3('Analyze:'),
             dcc.RadioItems(['mTECs', 'eTACs', 'Other'], '', id='analyze-cell-value')
+        ], style={'width': '32%', 'display': 'inline-block'}),
+        html.Div([
+            html.H3('File:'),
+            dcc.Dropdown(list(existing_csv.keys()), placeholder = 'Select a file...', id='file-value')
         ], style={'width': '32%', 'float': 'right', 'display': 'inline-block'}),
             #upload data bar
             dcc.Upload(
@@ -47,14 +47,15 @@ app.layout = html.Div([
                 'borderRadius': '5px',
                 'textAlign': 'center',
                 'margin': '10px',
-                'display': 'inline-block'
+                'display': 'inline-block',
+                'float': 'right'
             },
             # Allow multiple files to be uploaded
             multiple=False
             ),
         ]),
     
-    html.Div(id = 'output-data-result'),
+    html.Div(id = 'output-data-result', style={'float': 'right'}),
     html.H3('Category:'),
     dcc.RadioItems(cell_meta_cols, cell_meta_cols[0], id='category-value'),
 
@@ -90,7 +91,7 @@ app.layout = html.Div([
                 id='umap-graphic-gene')
         ], style={'width': '38%', 'display': 'inline-block'}),
         html.Div([
-            dcc.RangeSlider(min=0, max=20, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right'}, id='umap-graphic-gene-slider')
+            dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right'}, id='umap-graphic-gene-slider')
             ], style={'marginBottom': '60px',
                     'marginLeft': '150px',
                     'display': 'inline-block'}),
@@ -325,11 +326,11 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
         plot_bgcolor = "white",
         hovermode = False
         )
-    default_percentiles = np.quantile([0, 20], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
+    default_percentiles = np.quantile([0, 100], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
     #print(default_percentiles)
-    default_slider_marks = {str(default_percentiles[0]): '99th (' + str(default_percentiles[0]) + ')', str(default_percentiles[1]): '1st (' + str(default_percentiles[1]) + ')', str(int(default_percentiles[2])): '95th (' + str(default_percentiles[2]) + ')', str(int(default_percentiles[3])): '5th (' + str(default_percentiles[3]) + ')', str(int(default_percentiles[4])): '90th (' + str(default_percentiles[4]) + ')', str(int(default_percentiles[5])): '10th (' + str(default_percentiles[5]) + ')', str(int(default_percentiles[6])): '50th (' + str(default_percentiles[6]) + ')'}
+    default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st', int(default_percentiles[2]): '95th', int(default_percentiles[3]): '5th', int(default_percentiles[4]): '90th', int(default_percentiles[5]): '10th', int(default_percentiles[6]): '50th'}
     #default_slider = dcc.RangeSlider(min=0, max=20, marks = None, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475)
-    return fig, fig, None, 0, 20, default_slider_marks, [default_percentiles[1], default_percentiles[0]], html.H3(analyze_cell_dict[analyze_cell_value])
+    return fig, fig, None, 0, 100, default_slider_marks, [default_percentiles[1], default_percentiles[0]], html.H3(analyze_cell_dict[analyze_cell_value])
     #default_slider
 
 
