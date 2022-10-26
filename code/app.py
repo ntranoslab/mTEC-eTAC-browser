@@ -266,8 +266,10 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
-        lower_slider_value = percentile_values[1] if input_id == 'gene-value' else min(umap_graphic_gene_slider)
-        higher_slider_value = percentile_values[0] if input_id == 'gene-value' else max(umap_graphic_gene_slider)
+        lower_slider_value = percentile_values[1] if input_id == 'gene-value' or input_id == 'genotype-value' else min(umap_graphic_gene_slider)
+        higher_slider_value = percentile_values[0] if input_id == 'gene-value' or input_id == 'genotype-value' else max(umap_graphic_gene_slider)
+        print(lower_slider_value)
+        print(higher_slider_value)
 
         gene_fig = px.scatter(dff,
                      #x coordinates
