@@ -19,6 +19,7 @@ df = None
 #existing_csv = {'WT_KO_thymus_subset.csv': pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv', index_col=0)}
 #For Radio items
 existing_csv = {'mTECs': pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv', index_col=0),'eTACs': pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset_random_genes.csv', index_col=0)}
+uploaded_csv = {}
 #pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
 #['WT_KO_thymus_subset.csv']
 #df = pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
@@ -50,8 +51,7 @@ app.layout = html.Div([
                 'borderRadius': '5px',
                 'textAlign': 'center',
                 'margin': '10px',
-                'display': 'inline-block',
-                'float': 'right'
+                'display': 'inline-block'
             },
             # Allow multiple files to be uploaded
             multiple=False
@@ -126,8 +126,8 @@ def check_file(contents, filename):
             global df
             df = pd.read_csv(
                 io.StringIO(decoded.decode('utf-8')), index_col = 0)
-            if filename not in list(existing_csv.keys()):
-                existing_csv[filename] = df
+            if filename not in list(uploaded_csv.keys()):
+                uploaded_csv[filename] = df
     except Exception as e:
         print(e)
         return html.Div([
@@ -179,7 +179,7 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
     if upload_data is None and file_value is None and analyze_cell_value == '':
         return html.Div([
             'No File Uploaded'
-        ]), list(existing_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_cell_value])
+        ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_cell_value])
     elif input_id == 'analyze-cell-value':
         if analyze_cell_value == 'Other':
             #return the upload data box
@@ -245,7 +245,7 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
         #    'whiteSpace': 'pre-wrap',
         #    'wordBreak': 'break-all'
         #})
-    ]), list(existing_csv.keys()), file_value, genotype_list, gene_list, html.H3(analyze_cell_dict[analyze_cell_value])
+    ]), list(uploaded_csv.keys()), file_value, genotype_list, gene_list, html.H3(analyze_cell_dict[analyze_cell_value])
     
 
 @app.callback(
