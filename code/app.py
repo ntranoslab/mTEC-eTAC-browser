@@ -15,7 +15,10 @@ app = Dash(__name__)
 
 #df = pd.read_csv('https://plotly.github.io/datasets/country_indicators.csv')
 df = None
-existing_csv = {'WT_KO_thymus_subset.csv': pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv', index_col=0)}
+#For file dropdown
+#existing_csv = {'WT_KO_thymus_subset.csv': pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv', index_col=0)}
+#For Radio items
+existing_csv = {'mTECs': pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv', index_col=0),'eTACs': pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset_random_genes.csv', index_col=0)}
 #pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
 #['WT_KO_thymus_subset.csv']
 #df = pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
@@ -159,30 +162,39 @@ def check_file(contents, filename):
     Output('file-value', 'value'),
     Output('genotype-value', 'options'),
     Output('gene-value', 'options'),
+    Output('graph-name-value', 'children'),
+
+    Input('analyze-cell-value', 'value'),
     Input('file-value', 'value'),
     Input('upload-data', 'contents'),
     #Input('file-value', 'contents'),
     State('upload-data', 'filename')
     #Input('gene-value', 'value')
     )
-def update_file(file_value, upload_data, filename):
+def update_file(analyze_cell_value, file_value, upload_data, filename):
 
     input_id = ctx.triggered_id
     #print(input_id)
     global df
-    if upload_data is None and file_value is None:
+    if upload_data is None and file_value is None and analyze_cell_value == '':
         return html.Div([
             'No File Uploaded'
-        ]), list(existing_csv.keys()), '', [], []
-    elif input_id == 'file-value':
-        df = existing_csv.get(file_value, 'No such file exists')
+        ]), list(existing_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_cell_value])
+    elif input_id == 'analyze-cell-value':
+        if analyze_cell_value == 'Other':
+            #return the upload data box
+            print('Other')
+        else:
+            df = existing_csv.get(analyze_cell_value, 'No such file exists')
+    #elif input_id == 'file-value':
+    #    df = existing_csv.get(file_value, 'No such file exists')
     elif input_id == 'upload-data':
         #is upload_data in correct format?
         #is upload_data a csv?
         #assign df to csv
         check_file(upload_data, filename)
-        if filename in list(existing_csv.keys()):
-            file_value = filename
+        #if filename in list(existing_csv.keys()):
+        #    file_value = filename
     #cell_type_list = np.insert(df['cell_type'].unique(), 0, 'All')
     genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
     #return html.H5(genotype_list)
@@ -233,7 +245,7 @@ def update_file(file_value, upload_data, filename):
         #    'whiteSpace': 'pre-wrap',
         #    'wordBreak': 'break-all'
         #})
-    ]), list(existing_csv.keys()), file_value, genotype_list, gene_list
+    ]), list(existing_csv.keys()), file_value, genotype_list, gene_list, html.H3(analyze_cell_dict[analyze_cell_value])
     
 
 @app.callback(
@@ -244,15 +256,14 @@ def update_file(file_value, upload_data, filename):
     Output('umap-graphic-gene-slider', 'max'),
     Output('umap-graphic-gene-slider', 'marks'),
     Output('umap-graphic-gene-slider', 'value'),
-    Output('graph-name-value', 'children'),
     #Input('cell-type-value', 'value'),
     Input('genotype-value', 'value'),
     Input('gene-value', 'value'),
     Input('umap-graphic-gene-slider', 'value'),
-    Input('analyze-cell-value', 'value')
+    #Input('analyze-cell-value', 'value')
     #State('umap-graphic-gene-slider', 'value')
     )
-def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_cell_value):
+def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
     #check gene_value is part of csv
     #gene_value is text field
     input_id = ctx.triggered_id
@@ -312,7 +323,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
 
 
 
-        return gene_fig, cell_type_fig, genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value], html.H3(analyze_cell_dict[analyze_cell_value])
+        return gene_fig, cell_type_fig, genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                 #x coordinates
@@ -330,7 +341,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
     #print(default_percentiles)
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st', int(default_percentiles[2]): '95th', int(default_percentiles[3]): '5th', int(default_percentiles[4]): '90th', int(default_percentiles[5]): '10th', int(default_percentiles[6]): '50th'}
     #default_slider = dcc.RangeSlider(min=0, max=20, marks = None, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475)
-    return fig, fig, None, 0, 100, default_slider_marks, [default_percentiles[1], default_percentiles[0]], html.H3(analyze_cell_dict[analyze_cell_value])
+    return fig, fig, None, 0, 100, default_slider_marks, [default_percentiles[1], default_percentiles[0]]
     #default_slider
 
 
