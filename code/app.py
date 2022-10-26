@@ -20,7 +20,7 @@ existing_csv = {'WT_KO_thymus_subset.csv': pd.read_csv('file://localhost/Users/n
 #['WT_KO_thymus_subset.csv']
 #df = pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
 cell_meta_cols = ['genotype']
-analyze_cell_dict = {'mTECs': 'UMAPs', 'eTACs': 'tSNEs'}
+analyze_cell_dict = {'mTECs': 'UMAPs', 'eTACs': 'tSNEs', 'Other': '', '': ''}
 app.layout = html.Div([
     html.Div([
         html.Div([
@@ -29,7 +29,7 @@ app.layout = html.Div([
         ], style={'width': '32%', 'display': 'inline-block'}),
         html.Div([
             html.H3('Analyze:'),
-            dcc.RadioItems(['mTECs', 'eTACs'], 'mTECs', id='analyze-cell-value')
+            dcc.RadioItems(['mTECs', 'eTACs', 'Other'], '', id='analyze-cell-value')
         ], style={'width': '32%', 'float': 'right', 'display': 'inline-block'}),
             #upload data bar
             dcc.Upload(
@@ -90,7 +90,7 @@ app.layout = html.Div([
                 id='umap-graphic-gene')
         ], style={'width': '38%', 'display': 'inline-block'}),
         html.Div([
-            dcc.RangeSlider(min=0, max=20, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider')
+            dcc.RangeSlider(min=0, max=20, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right'}, id='umap-graphic-gene-slider')
             ], style={'marginBottom': '60px',
                     'marginLeft': '150px',
                     'display': 'inline-block'}),
@@ -329,7 +329,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
     #print(default_percentiles)
     default_slider_marks = {str(default_percentiles[0]): '99th (' + str(default_percentiles[0]) + ')', str(default_percentiles[1]): '1st (' + str(default_percentiles[1]) + ')', str(int(default_percentiles[2])): '95th (' + str(default_percentiles[2]) + ')', str(int(default_percentiles[3])): '5th (' + str(default_percentiles[3]) + ')', str(int(default_percentiles[4])): '90th (' + str(default_percentiles[4]) + ')', str(int(default_percentiles[5])): '10th (' + str(default_percentiles[5]) + ')', str(int(default_percentiles[6])): '50th (' + str(default_percentiles[6]) + ')'}
     #default_slider = dcc.RangeSlider(min=0, max=20, marks = None, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475)
-    return fig, fig, None, default_percentiles[1], default_percentiles[0], default_slider_marks, [0, 20], html.H3(analyze_cell_dict[analyze_cell_value])
+    return fig, fig, None, 0, 20, default_slider_marks, [default_percentiles[1], default_percentiles[0]], html.H3(analyze_cell_dict[analyze_cell_value])
     #default_slider
 
 
