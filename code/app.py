@@ -90,7 +90,7 @@ app.layout = html.Div([
                 id='umap-graphic-gene')
         ], style={'width': '38%', 'display': 'inline-block'}),
         html.Div([
-            dcc.RangeSlider(min=0, max=20, marks = {'10': '50th (10)'}, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider')
+            dcc.RangeSlider(min=0, max=20, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider')
             ], style={'marginBottom': '60px',
                     'marginLeft': '150px',
                     'display': 'inline-block'}),
@@ -302,10 +302,14 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
             plot_bgcolor = "white"
             )
         #cell_type_fig.update_xaxes(autorange=False, automargin = False)
+        percentile_values = np.round(percentile_values, 1)
+        print(percentile_values)
+        #percentile_marks = {str(int(percentile_values[0])): '99th (' + str(percentile_values[0]) + ')', str(int(percentile_values[1])): '1st (' + str(percentile_values[1]) + ')', str(int(percentile_values[2])): '95th (' + str(percentile_values[2]) + ')', str(int(percentile_values[3])): '5th (' + str(percentile_values[3]) + ')', str(int(percentile_values[4])): '90th (' + str(percentile_values[4]) + ')', str(int(percentile_values[5])): '10th (' + str(percentile_values[5]) + ')', str(int(percentile_values[6])): '50th (' + str(percentile_values[6]) + ')'}
+        percentile_marks = {int(percentile_values[0]): '99th', int(percentile_values[1]): '1st', int(percentile_values[2]): '95th', int(percentile_values[3]): '5th', int(percentile_values[4]): '90th', int(percentile_values[5]): '10th', int(percentile_values[6]): '50th'}
 
 
 
-        return gene_fig, cell_type_fig, genotype_value, df_gene_min, df_gene_max, {percentile_values[0]: '99th'}, [lower_slider_value, higher_slider_value], html.H3(analyze_cell_dict[analyze_cell_value])
+        return gene_fig, cell_type_fig, genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value], html.H3(analyze_cell_dict[analyze_cell_value])
         #gene_slider
     fig = px.scatter(x=[0],
                 #x coordinates
@@ -319,9 +323,11 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, analyze_c
         plot_bgcolor = "white",
         hovermode = False
         )
-    default_slider_marks = {'10': '50th (10)'}
+    default_percentiles = np.quantile([0, 20], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
+    #print(default_percentiles)
+    default_slider_marks = {str(default_percentiles[0]): '99th (' + str(default_percentiles[0]) + ')', str(default_percentiles[1]): '1st (' + str(default_percentiles[1]) + ')', str(int(default_percentiles[2])): '95th (' + str(default_percentiles[2]) + ')', str(int(default_percentiles[3])): '5th (' + str(default_percentiles[3]) + ')', str(int(default_percentiles[4])): '90th (' + str(default_percentiles[4]) + ')', str(int(default_percentiles[5])): '10th (' + str(default_percentiles[5]) + ')', str(int(default_percentiles[6])): '50th (' + str(default_percentiles[6]) + ')'}
     #default_slider = dcc.RangeSlider(min=0, max=20, marks = None, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475)
-    return fig, fig, None, 0, 20, default_slider_marks, [min(umap_graphic_gene_slider), max(umap_graphic_gene_slider)], html.H3(analyze_cell_dict[analyze_cell_value])
+    return fig, fig, None, default_percentiles[1], default_percentiles[0], default_slider_marks, [0, 20], html.H3(analyze_cell_dict[analyze_cell_value])
     #default_slider
 
 
