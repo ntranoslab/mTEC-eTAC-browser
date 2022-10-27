@@ -34,8 +34,9 @@ app.layout = html.Div([
         html.Div([
             html.H3('File:'),
             dcc.Dropdown(list(existing_csv.keys()), placeholder = 'Select a file...', id='file-value')
-        ], style={'width': '32%', 'float': 'right', 'display': 'inline-block'}),
+        ], style={'width': '32%', 'float': 'right', 'display': 'none'}, id='file-dropdown'),
             #upload data bar
+        html.Div([
             dcc.Upload(
             id='upload-data',
             children=html.Div([
@@ -51,14 +52,14 @@ app.layout = html.Div([
                 'borderRadius': '5px',
                 'textAlign': 'center',
                 'margin': '10px',
-                'display': 'inline-block'
+                'display': 'none'
             },
             # Allow multiple files to be uploaded
             multiple=False
             ),
+        ], id='upload-data-box'),
         ]),
-    
-    html.Div(id = 'output-data-result', style={'float': 'right'}),
+    html.Div(id = 'output-data-result', style={'float': 'right', 'display': 'none'}),
     html.H3('Category:'),
     dcc.RadioItems(cell_meta_cols, cell_meta_cols[0], id='category-value'),
 
