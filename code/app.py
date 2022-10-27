@@ -183,9 +183,31 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
     file_dropdown_style={'display': 'none'}
     upload_data_style={'display': 'none'}
     output_data_result_style={'display': 'none'}
+    print(input_id)
+    if input_id is None:
+        #) or (upload_data is None and (file_value is None or file_value=='') and (analyze_cell_value == 'Other' or analyze_cell_value == '')):
+        #print('HERE')
+        return html.Div([
+            'No File Uploaded'
+        ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_cell_value]), file_dropdown_style, upload_data_style, output_data_result_style
     if analyze_cell_value == 'Other':
         file_dropdown_style={'width': '32%', 'float': 'right', 'display': 'inline-block'}
         upload_data_style={
+            'width': '30%',
+            'height': '60px',
+            'lineHeight': '60px',
+            'borderWidth': '1px',
+            'borderStyle': 'dashed',
+            'borderRadius': '5px',
+            'textAlign': 'center',
+            'margin': '10px',
+            'display': 'inline-block'
+            }
+        output_data_result_style={'float': 'right', 'display': 'inline-block'}
+    if input_id == 'analyze-cell-value':
+        if analyze_cell_value == 'Other':
+            file_dropdown_style={'width': '32%', 'float': 'right', 'display': 'inline-block'}
+            upload_data_style={
                 'width': '30%',
                 'height': '60px',
                 'lineHeight': '60px',
@@ -196,17 +218,18 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
                 'margin': '10px',
                 'display': 'inline-block'
             }
-        output_data_result_style={'float': 'right', 'display': 'inline-block'}
+            output_data_result_style={'float': 'right', 'display': 'inline-block'}
+            if file_value is None or file_value=='':
+                return html.Div([
+            'No File Uploaded'
+        ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_cell_value]), file_dropdown_style, upload_data_style, output_data_result_style
+            else:
+                df = uploaded_csv.get(file_value, 'No such file exists')
     #print(str(upload_data) + ' 1')
     #print(str(file_value) + ' 2')
     #print('here')
-    if upload_data is None and (file_value is None or file_value=='') and (analyze_cell_value == 'Other' or analyze_cell_value == ''):
-        #print('HERE')
-        return html.Div([
-            'No File Uploaded'
-        ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_cell_value]), file_dropdown_style, upload_data_style, output_data_result_style
-    elif input_id == 'analyze-cell-value' and analyze_cell_value != 'Other':
-        df = existing_csv.get(analyze_cell_value, 'No such file exists')
+        else:
+            df = existing_csv.get(analyze_cell_value, 'No such file exists')
     #elif input_id == 'file-value':
     #    df = existing_csv.get(file_value, 'No such file exists')
     elif input_id == 'upload-data':
