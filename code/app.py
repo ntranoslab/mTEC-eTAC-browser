@@ -220,8 +220,8 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
                 df = uploaded_csv.get(file_value, 'No such file exists')
         else:
             df = existing_csv.get(analyze_cell_value, 'No such file exists')
-    #elif input_id == 'file-value':
-    #    df = existing_csv.get(file_value, 'No such file exists')
+    elif input_id == 'file-value':
+        df = uploaded_csv.get(file_value, 'No such file exists')
     elif input_id == 'upload-data':
         #is upload_data in correct format?
         #is upload_data a csv?
