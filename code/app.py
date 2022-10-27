@@ -158,7 +158,6 @@ def check_file(contents, filename):
 
 @app.callback(
     Output ('output-data-result', 'children'),
-    #Output('cell-type-value', 'options'),
     Output('file-value', 'options'),
     Output('file-value', 'value'),
     Output('genotype-value', 'options'),
@@ -171,22 +170,16 @@ def check_file(contents, filename):
     Input('analyze-cell-value', 'value'),
     Input('file-value', 'value'),
     Input('upload-data', 'contents'),
-    #Input('file-value', 'contents'),
     State('upload-data', 'filename')
-    #Input('gene-value', 'value')
     )
 def update_file(analyze_cell_value, file_value, upload_data, filename):
 
     input_id = ctx.triggered_id
-    #print(input_id)
     global df
     file_dropdown_style={'display': 'none'}
     upload_data_style={'display': 'none'}
     output_data_result_style={'display': 'none'}
-    print(input_id)
     if input_id is None:
-        #) or (upload_data is None and (file_value is None or file_value=='') and (analyze_cell_value == 'Other' or analyze_cell_value == '')):
-        #print('HERE')
         return html.Div([
             'No File Uploaded'
         ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_cell_value]), file_dropdown_style, upload_data_style, output_data_result_style
@@ -225,9 +218,6 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
         ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_cell_value]), file_dropdown_style, upload_data_style, output_data_result_style
             else:
                 df = uploaded_csv.get(file_value, 'No such file exists')
-    #print(str(upload_data) + ' 1')
-    #print(str(file_value) + ' 2')
-    #print('here')
         else:
             df = existing_csv.get(analyze_cell_value, 'No such file exists')
     #elif input_id == 'file-value':
@@ -256,22 +246,6 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
     #gene_list = np.insert(gene_list, 0, 'All')
     #return html.H5([gene_list])
     dff = df
-    #graph
-    #fig = px.scatter(dff, x='x',
-                #x coordinates
-                 #y='y',
-                 #color = gene_value if gene_value != None else '',
-                 #hover_name = 'cell_type'
-                 #y coordinates
-                 #hover_name=dff[dff['Indicator Name'] == yaxis_column_name]['Country Name']
-                 #)
-    #fig.update_layout(width = 800, height = 800, title = 'Select a gene',
-        #xaxis={'visible': False, 'showticklabels': False},
-        #yaxis={'visible': False, 'showticklabels': False},
-        #paper_bgcolor = "rgba(0,0,0,0)"
-        #)
-
-        #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
     return html.Div([
         html.H5(file_value),
         #html.H6(datetime.datetime.fromtimestamp(date)),
@@ -300,12 +274,9 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
     Output('umap-graphic-gene-slider', 'max'),
     Output('umap-graphic-gene-slider', 'marks'),
     Output('umap-graphic-gene-slider', 'value'),
-    #Input('cell-type-value', 'value'),
     Input('genotype-value', 'value'),
     Input('gene-value', 'value'),
-    Input('umap-graphic-gene-slider', 'value'),
-    #Input('analyze-cell-value', 'value')
-    #State('umap-graphic-gene-slider', 'value')
+    Input('umap-graphic-gene-slider', 'value')
     )
 def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
     #check gene_value is part of csv
@@ -316,16 +287,12 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
         if genotype_value is None:
             genotype_value = 'All'
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
-        #filter df to contain data with chosen cell type
-        #dff = dff[dff['cell_type'] == cell_type_value] if cell_type_value != 'All' else dff
         dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
         lower_slider_value = percentile_values[1] if input_id == 'gene-value' or input_id == 'genotype-value' else min(umap_graphic_gene_slider)
         higher_slider_value = percentile_values[0] if input_id == 'gene-value' or input_id == 'genotype-value' else max(umap_graphic_gene_slider)
-        print(lower_slider_value)
-        print(higher_slider_value)
 
         gene_fig = px.scatter(dff,
                      #x coordinates
@@ -359,10 +326,6 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
-        #cell_type_fig.update_xaxes(autorange=False, automargin = False)
-        #percentile_values = np.round(percentile_values, 1)
-        print(percentile_values)
-        #percentile_marks = {str(int(percentile_values[0])): '99th (' + str(percentile_values[0]) + ')', str(int(percentile_values[1])): '1st (' + str(percentile_values[1]) + ')', str(int(percentile_values[2])): '95th (' + str(percentile_values[2]) + ')', str(int(percentile_values[3])): '5th (' + str(percentile_values[3]) + ')', str(int(percentile_values[4])): '90th (' + str(percentile_values[4]) + ')', str(int(percentile_values[5])): '10th (' + str(percentile_values[5]) + ')', str(int(percentile_values[6])): '50th (' + str(percentile_values[6]) + ')'}
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st', percentile_values[2]: '95th', percentile_values[3]: '5th', percentile_values[4]: '90th', percentile_values[5]: '10th', percentile_values[6]: '50th'}
 
 
@@ -382,7 +345,6 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
         hovermode = False
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
-    #print(default_percentiles)
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st', int(default_percentiles[2]): '95th', int(default_percentiles[3]): '5th', int(default_percentiles[4]): '90th', int(default_percentiles[5]): '10th', int(default_percentiles[6]): '50th'}
     #default_slider = dcc.RangeSlider(min=0, max=20, marks = None, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475)
     return fig, fig, None, 0, 100, default_slider_marks, [default_percentiles[1], default_percentiles[0]]
