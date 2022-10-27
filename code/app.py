@@ -57,7 +57,7 @@ app.layout = html.Div([
             # Allow multiple files to be uploaded
             multiple=False
             ),
-        ], id='upload-data-box'),
+        ]),
         ]),
     html.Div(id = 'output-data-result', style={'float': 'right', 'display': 'none'}),
     html.H3('Category:'),
@@ -164,6 +164,9 @@ def check_file(contents, filename):
     Output('genotype-value', 'options'),
     Output('gene-value', 'options'),
     Output('graph-name-value', 'children'),
+    Output('file-dropdown', 'style'),
+    Output('upload-data', 'style'),
+    Output('output-data-result', 'style'),
 
     Input('analyze-cell-value', 'value'),
     Input('file-value', 'value'),
@@ -177,16 +180,33 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
     input_id = ctx.triggered_id
     #print(input_id)
     global df
-    if upload_data is None and file_value is None and analyze_cell_value == '':
+    file_dropdown_style={'display': 'none'}
+    upload_data_style={'display': 'none'}
+    output_data_result_style={'display': 'none'}
+    if analyze_cell_value == 'Other':
+        file_dropdown_style={'width': '32%', 'float': 'right', 'display': 'inline-block'}
+        upload_data_style={
+                'width': '30%',
+                'height': '60px',
+                'lineHeight': '60px',
+                'borderWidth': '1px',
+                'borderStyle': 'dashed',
+                'borderRadius': '5px',
+                'textAlign': 'center',
+                'margin': '10px',
+                'display': 'inline-block'
+            }
+        output_data_result_style={'float': 'right', 'display': 'inline-block'}
+    #print(str(upload_data) + ' 1')
+    #print(str(file_value) + ' 2')
+    #print('here')
+    if upload_data is None and (file_value is None or file_value=='') and (analyze_cell_value == 'Other' or analyze_cell_value == ''):
+        #print('HERE')
         return html.Div([
             'No File Uploaded'
-        ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_cell_value])
-    elif input_id == 'analyze-cell-value':
-        if analyze_cell_value == 'Other':
-            #return the upload data box
-            print('Other')
-        else:
-            df = existing_csv.get(analyze_cell_value, 'No such file exists')
+        ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_cell_value]), file_dropdown_style, upload_data_style, output_data_result_style
+    elif input_id == 'analyze-cell-value' and analyze_cell_value != 'Other':
+        df = existing_csv.get(analyze_cell_value, 'No such file exists')
     #elif input_id == 'file-value':
     #    df = existing_csv.get(file_value, 'No such file exists')
     elif input_id == 'upload-data':
@@ -246,7 +266,7 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
         #    'whiteSpace': 'pre-wrap',
         #    'wordBreak': 'break-all'
         #})
-    ]), list(uploaded_csv.keys()), file_value, genotype_list, gene_list, html.H3(analyze_cell_dict[analyze_cell_value])
+    ]), list(uploaded_csv.keys()), file_value, genotype_list, gene_list, html.H3(analyze_cell_dict[analyze_cell_value]), file_dropdown_style, upload_data_style, output_data_result_style
     
 
 @app.callback(
