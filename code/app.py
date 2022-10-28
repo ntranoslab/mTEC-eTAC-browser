@@ -89,25 +89,18 @@ app.layout = html.Div([
                 xaxis={'visible': False, 'showticklabels': False},
                 yaxis={'visible': False, 'showticklabels': False},
                 plot_bgcolor = "white"),
-                #yaxis={'visible': False, 'showticklabels': False},
-                #paper_bgcolor = "black"
-                #"rgba(1,24,24,10)"
                 id='umap-graphic-gene')
         ], style={'width': '38%', 'display': 'inline-block'}),
         html.Div([
             dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right'}, id='umap-graphic-gene-slider')
             ], style={'marginBottom': '60px',
-                    'marginLeft': '150px',
+                    'marginLeft': '20px',
                     'display': 'inline-block'}),
         html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                 xaxis={'visible': False, 'showticklabels': False},
                 yaxis={'visible': False, 'showticklabels': False},
                 plot_bgcolor = "white"),
-                #update_layout(width = 800, height = 800, xaxis={'visible': False, 'showticklabels': False},
-                #yaxis={'visible': False, 'showticklabels': False},
-                #paper_bgcolor = "black",
-                #"rgba(1,24,24,10)"
                 id='umap-graphic-cell-types')
             ], style={'width': '38%', 'float': 'right', 'display': 'inline-block'}),
     ])
@@ -307,9 +300,16 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
                      #max of color range
                      higher_slider_value  if input_id != 'umap-graphic-gene-slider' else max(umap_graphic_gene_slider)]
                      )
-        gene_fig.update_layout(width = 650, height = 650, title = gene_value,
+        gene_fig.update_layout(
+            autosize = True,
+            minreducedwidth=650,
+            minreducedheight=650,
+            #idth = 650, height = 650, 
+            title = gene_value,
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
+            margin = dict(l=50, r=50, t=50, b=50, pad=4),
+            #minreducedwidth = 400,
             plot_bgcolor = "white"
             )
 
@@ -320,10 +320,13 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
                      color = 'cell_type',
                      hover_name = 'cell_type'
                      )
-        cell_type_fig.update_layout(width = 650, height = 650,
+        cell_type_fig.update_layout(
+            #width = 650, height = 650,
+            autosize = True,
             title = 'Cell Types',
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
+            margin = dict(l=50, r=50, t=50, b=50, pad=4),
             plot_bgcolor = "white"
             )
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st', percentile_values[2]: '95th', percentile_values[3]: '5th', percentile_values[4]: '90th', percentile_values[5]: '10th', percentile_values[6]: '50th'}
@@ -333,14 +336,14 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
         return gene_fig, cell_type_fig, genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
-                #x coordinates
                  y=[0],
                  color_discrete_sequence=['white']
                  )
-    fig.update_layout(width = 650, height = 650,
+    fig.update_layout(
+        width = 650, height = 650,
         xaxis={'visible': False, 'showticklabels': False},
         yaxis={'visible': False, 'showticklabels': False},
-        #paper_bgcolor = "rgba(0,0,0,0)"
+        margin = dict(l=50, r=50, t=50, b=50, pad=4),
         plot_bgcolor = "white",
         hovermode = False
         )
