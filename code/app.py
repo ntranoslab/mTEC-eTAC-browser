@@ -220,6 +220,7 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
         #is upload_data a csv?
         #assign df to csv
         check_file(upload_data, filename)
+        file_value = filename
         #if filename in list(existing_csv.keys()):
         #    file_value = filename
     #cell_type_list = np.insert(df['cell_type'].unique(), 0, 'All')
