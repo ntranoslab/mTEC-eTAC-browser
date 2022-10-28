@@ -90,7 +90,7 @@ app.layout = html.Div([
                 yaxis={'visible': False, 'showticklabels': False},
                 plot_bgcolor = "white"),
                 id='umap-graphic-gene')
-        ], style={'width': '38%', 'display': 'inline-block'}),
+        ], style={'width': '45vw', 'display': 'inline-block'}),
         html.Div([
             dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right'}, id='umap-graphic-gene-slider')
             ], style={'marginBottom': '60px',
@@ -102,7 +102,7 @@ app.layout = html.Div([
                 yaxis={'visible': False, 'showticklabels': False},
                 plot_bgcolor = "white"),
                 id='umap-graphic-cell-types')
-            ], style={'width': '38%', 'float': 'right', 'display': 'inline-block'}),
+            ], style={'width': '45vw', 'float': 'right', 'display': 'inline-block'}),
     ])
     
 
@@ -308,7 +308,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
             title = gene_value,
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
-            margin = dict(l=50, r=50, t=50, b=50, pad=4),
+            #margin = dict(l=50, r=50, t=50, b=50, pad=4),
             #minreducedwidth = 400,
             plot_bgcolor = "white"
             )
@@ -326,7 +326,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
             title = 'Cell Types',
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
-            margin = dict(l=50, r=50, t=50, b=50, pad=4),
+            #margin = dict(l=50, r=50, t=50, b=50, pad=4),
             plot_bgcolor = "white"
             )
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st', percentile_values[2]: '95th', percentile_values[3]: '5th', percentile_values[4]: '90th', percentile_values[5]: '10th', percentile_values[6]: '50th'}
