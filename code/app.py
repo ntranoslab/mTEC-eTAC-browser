@@ -29,8 +29,12 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             html.H3('Analyze:'),
-            dcc.RadioItems(['mTECs', 'eTACs', 'Other'], '', id='analyze-cell-value')
-        ], style={'width': '32%', 'display': 'inline-block'}),
+            dcc.Tabs(id='analyze-tabs', value='mTECs', children=[
+                dcc.Tab(label='mTECs', value='mTECs'),
+                dcc.Tab(label='eTACs', value='eTACs'),
+                dcc.Tab(label='Other', value='Other')]),
+            #dcc.RadioItems(['mTECs', 'eTACs', 'Other'], '', id='analyze-cell-value')
+        ], style={'display': 'inline-block'}),
         html.Div([
             html.H3('File:'),
             dcc.Dropdown(list(existing_csv.keys()), placeholder = 'Select a file...', id='file-value')
@@ -160,12 +164,13 @@ def check_file(contents, filename):
     Output('upload-data', 'style'),
     Output('output-data-result', 'style'),
 
-    Input('analyze-cell-value', 'value'),
+    Input('analyze-tabs','value'),
+    #Input('analyze-cell-value', 'value'),
     Input('file-value', 'value'),
     Input('upload-data', 'contents'),
     State('upload-data', 'filename')
     )
-def update_file(analyze_cell_value, file_value, upload_data, filename):
+def update_file(analyze_tabs, file_value, upload_data, filename):
 
     input_id = ctx.triggered_id
     global df
@@ -175,8 +180,8 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
     if input_id is None:
         return html.Div([
             'No File Uploaded'
-        ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_cell_value]), file_dropdown_style, upload_data_style, output_data_result_style
-    if analyze_cell_value == 'Other':
+        ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_tabs]), file_dropdown_style, upload_data_style, output_data_result_style
+    if analyze_tabs == 'Other':
         file_dropdown_style={'width': '32%', 'float': 'right', 'display': 'inline-block'}
         upload_data_style={
             'width': '30%',
@@ -190,8 +195,8 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
             'display': 'inline-block'
             }
         output_data_result_style={'float': 'right', 'display': 'inline-block'}
-    if input_id == 'analyze-cell-value':
-        if analyze_cell_value == 'Other':
+    if input_id == 'analyze-tabs':
+        if analyze_tabs == 'Other':
             file_dropdown_style={'width': '32%', 'float': 'right', 'display': 'inline-block'}
             upload_data_style={
                 'width': '30%',
@@ -208,11 +213,11 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
             if file_value is None or file_value=='':
                 return html.Div([
             'No File Uploaded'
-        ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_cell_value]), file_dropdown_style, upload_data_style, output_data_result_style
+        ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_tabs]), file_dropdown_style, upload_data_style, output_data_result_style
             else:
                 df = uploaded_csv.get(file_value, 'No such file exists')
         else:
-            df = existing_csv.get(analyze_cell_value, 'No such file exists')
+            df = existing_csv.get(analyze_tabs, 'No such file exists')
     elif input_id == 'file-value':
         df = uploaded_csv.get(file_value, 'No such file exists')
     elif input_id == 'upload-data':
@@ -257,7 +262,7 @@ def update_file(analyze_cell_value, file_value, upload_data, filename):
         #    'whiteSpace': 'pre-wrap',
         #    'wordBreak': 'break-all'
         #})
-    ]), list(uploaded_csv.keys()), file_value, genotype_list, gene_list, html.H3(analyze_cell_dict[analyze_cell_value]), file_dropdown_style, upload_data_style, output_data_result_style
+    ]), list(uploaded_csv.keys()), file_value, genotype_list, gene_list, html.H3(analyze_cell_dict[analyze_tabs]), file_dropdown_style, upload_data_style, output_data_result_style
     
 
 @app.callback(
