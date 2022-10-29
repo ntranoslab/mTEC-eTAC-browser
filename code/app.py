@@ -288,7 +288,11 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
     #check gene_value is part of csv
     #gene_value is text field
     input_id = ctx.triggered_id
-    if df is not None:
+    if df is not None and (gene_value is not None or genotype_value is not None):
+        print(gene_value)
+        print(genotype_value)
+        print('hi')
+
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
             print('genotype none')
