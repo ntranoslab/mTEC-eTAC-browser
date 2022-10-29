@@ -292,6 +292,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
         print(gene_value)
         print(genotype_value)
         print('hi')
+        print(umap_graphic_gene_slider)
 
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
@@ -311,9 +312,9 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
         df_gene_max = max(dff[gene_value])
         print(percentile_values)
         print(umap_graphic_gene_slider)
-        lower_slider_value = percentile_values[1]
+        lower_slider_value = percentile_values[1] if input_id != 'umap-graphic-gene-slider' else min(umap_graphic_gene_slider)
         # if input_id == 'gene-value' or input_id == 'genotype-value' else min(umap_graphic_gene_slider)
-        higher_slider_value = percentile_values[0]
+        higher_slider_value = percentile_values[0] if input_id != 'umap-graphic-gene-slider' else max(umap_graphic_gene_slider)
         # if input_id == 'gene-value' or input_id == 'genotype-value' else max(umap_graphic_gene_slider)
 
         gene_fig = px.scatter(dff,
@@ -325,11 +326,9 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
                      hover_name = 'cell_type',
                      range_color=
                      #min of color range
-                     [lower_slider_value,
-                     #  if input_id != 'umap-graphic-gene-slider' else min(umap_graphic_gene_slider), 
+                     [lower_slider_value, 
                      #max of color range
                      higher_slider_value]
-                     #  if input_id != 'umap-graphic-gene-slider' else max(umap_graphic_gene_slider)]
                      )
         gene_fig.update_layout(
             autosize = True,
