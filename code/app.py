@@ -177,10 +177,16 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
     file_dropdown_style={'display': 'none'}
     upload_data_style={'display': 'none'}
     output_data_result_style={'display': 'none'}
+    print(analyze_tabs)
     if input_id is None:
-        return html.Div([
-            'No File Uploaded'
-        ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_tabs]), file_dropdown_style, upload_data_style, output_data_result_style
+        print('1')
+        if analyze_tabs != 'Other':
+            print('2')
+            df = existing_csv.get(analyze_tabs, 'No such file exists')
+        else:
+            return html.Div([
+                'No File Uploaded'
+                ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_tabs]), file_dropdown_style, upload_data_style, output_data_result_style
     if analyze_tabs == 'Other':
         file_dropdown_style={'width': '32%', 'float': 'right', 'display': 'inline-block'}
         upload_data_style={
@@ -268,6 +274,7 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
 @app.callback(
     Output('umap-graphic-gene', 'figure'),
     Output('umap-graphic-cell-types', 'figure'),
+    Output('gene-value', 'value'),
     Output('genotype-value', 'value'),
     Output('umap-graphic-gene-slider', 'min'),
     Output('umap-graphic-gene-slider', 'max'),
@@ -284,14 +291,26 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
     if df is not None:
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
-            genotype_value = 'All'
+            print('genotype none')
+            genotype_value = 'All' 
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
+        if gene_value is None or gene_value not in list(dff):
+            first_gene = list(dff)[0]
+            if first_gene is not None and first_gene != 'cell_type' and first_gene != 'genotype' and first_gene != 'x' and first_gene != 'y':
+                gene_value = first_gene
+                print(gene_value)
+            else:
+                print('no genes found')
         dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
-        lower_slider_value = percentile_values[1] if input_id == 'gene-value' or input_id == 'genotype-value' else min(umap_graphic_gene_slider)
-        higher_slider_value = percentile_values[0] if input_id == 'gene-value' or input_id == 'genotype-value' else max(umap_graphic_gene_slider)
+        print(percentile_values)
+        print(umap_graphic_gene_slider)
+        lower_slider_value = percentile_values[1]
+        # if input_id == 'gene-value' or input_id == 'genotype-value' else min(umap_graphic_gene_slider)
+        higher_slider_value = percentile_values[0]
+        # if input_id == 'gene-value' or input_id == 'genotype-value' else max(umap_graphic_gene_slider)
 
         gene_fig = px.scatter(dff,
                      #x coordinates
@@ -302,9 +321,11 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
                      hover_name = 'cell_type',
                      range_color=
                      #min of color range
-                     [lower_slider_value  if input_id != 'umap-graphic-gene-slider' else min(umap_graphic_gene_slider), 
+                     [lower_slider_value,
+                     #  if input_id != 'umap-graphic-gene-slider' else min(umap_graphic_gene_slider), 
                      #max of color range
-                     higher_slider_value  if input_id != 'umap-graphic-gene-slider' else max(umap_graphic_gene_slider)]
+                     higher_slider_value]
+                     #  if input_id != 'umap-graphic-gene-slider' else max(umap_graphic_gene_slider)]
                      )
         gene_fig.update_layout(
             autosize = True,
@@ -339,7 +360,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
 
 
 
-        return gene_fig, cell_type_fig, genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value, genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -356,7 +377,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
     default_percentiles = np.quantile([0, 100], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st', int(default_percentiles[2]): '95th', int(default_percentiles[3]): '5th', int(default_percentiles[4]): '90th', int(default_percentiles[5]): '10th', int(default_percentiles[6]): '50th'}
     #default_slider = dcc.RangeSlider(min=0, max=20, marks = None, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475)
-    return fig, fig, None, 0, 100, default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+    return fig, fig, None, None, 0, 100, default_slider_marks, [default_percentiles[1], default_percentiles[0]]
     #default_slider
 
 
