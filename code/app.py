@@ -13,16 +13,9 @@ import pandas as pd
 
 app = Dash(__name__)
 
-#df = pd.read_csv('https://plotly.github.io/datasets/country_indicators.csv')
 df = None
-#For file dropdown
-#existing_csv = {'WT_KO_thymus_subset.csv': pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv', index_col=0)}
-#For Radio items
 existing_csv = {'mTECs': pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv', index_col=0),'eTACs': pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset_random_genes.csv', index_col=0)}
 uploaded_csv = {}
-#pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
-#['WT_KO_thymus_subset.csv']
-#df = pd.read_csv('file://localhost/Users/nolanhorner/Documents/UCSF/computer-projects/mTEC-eTAC-atlases/test-data/WT_KO_thymus_subset.csv')
 cell_meta_cols = ['genotype']
 analyze_cell_dict = {'mTECs': 'UMAPs', 'eTACs': 'tSNEs', 'Other': '', '': ''}
 app.layout = html.Div([
@@ -33,7 +26,6 @@ app.layout = html.Div([
                 dcc.Tab(label='mTECs', value='mTECs'),
                 dcc.Tab(label='eTACs', value='eTACs'),
                 dcc.Tab(label='Other', value='Other')]),
-            #dcc.RadioItems(['mTECs', 'eTACs', 'Other'], '', id='analyze-cell-value')
         ], style={'display': 'inline-block'}),
         html.Div([
             html.H3('File:'),
@@ -58,7 +50,7 @@ app.layout = html.Div([
                 'margin': '10px',
                 'display': 'none'
             },
-            # Allow multiple files to be uploaded
+            # Not allow multiple files to be uploaded
             multiple=False
             ),
         ]),
@@ -75,11 +67,6 @@ app.layout = html.Div([
             html.H3('Gene:'),
             dcc.Dropdown([], placeholder = 'Select a gene...', id='gene-value')
         ], style={'width': '48%', 'display': 'inline-block'}),
-        #dropdown with cell type
-        #html.Div([
-        #    html.H3('Cell Type:'),
-        #    dcc.Dropdown([], placeholder = 'Select a cell type...', id='cell-type-value')
-        #], style={'width': '48%', 'display': 'inline-block'}),
         #dropdown with genotype
         html.Div([
             html.H3('Genotype:'),
@@ -120,7 +107,7 @@ def check_file(contents, filename):
     decoded = base64.b64decode(content_string)
     try:
         if 'csv' in filename:
-            # Assume that the user uploaded a CSV file
+            # User uploaded a CSV file
             global df
             df = pd.read_csv(
                 io.StringIO(decoded.decode('utf-8')), index_col = 0)
@@ -135,12 +122,6 @@ def check_file(contents, filename):
 
     return html.Div([
         html.H5(filename),
-        #html.H6(datetime.datetime.fromtimestamp(date)),
-
-        #dash_table.DataTable(
-        #    df.to_dict('records'),
-        #    [{'name': i, 'id': i} for i in df.columns]
-        #),
 
         html.Hr(),  # horizontal line
 
@@ -177,11 +158,8 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
     file_dropdown_style={'display': 'none'}
     upload_data_style={'display': 'none'}
     output_data_result_style={'display': 'none'}
-    print(analyze_tabs)
     if input_id is None:
-        print('1')
         if analyze_tabs != 'Other':
-            print('2')
             df = existing_csv.get(analyze_tabs, 'No such file exists')
         else:
             return html.Div([
@@ -227,16 +205,10 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
     elif input_id == 'file-value':
         df = uploaded_csv.get(file_value, 'No such file exists')
     elif input_id == 'upload-data':
-        #is upload_data in correct format?
-        #is upload_data a csv?
-        #assign df to csv
+        #is upload_data in correct format? is upload_data a csv? assign df to csv
         check_file(upload_data, filename)
         file_value = filename
-        #if filename in list(existing_csv.keys()):
-        #    file_value = filename
-    #cell_type_list = np.insert(df['cell_type'].unique(), 0, 'All')
     genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
-    #return html.H5(genotype_list)
     gene_list = list(df.columns.unique())
     #remove cell_type col
     gene_list.remove('cell_type')
@@ -248,17 +220,9 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
     gene_list.remove('y')
     #make gene list into array
     gene_list = np.array(gene_list)
-    #gene_list = np.insert(gene_list, 0, 'All')
-    #return html.H5([gene_list])
     dff = df
     return html.Div([
         html.H5(file_value),
-        #html.H6(datetime.datetime.fromtimestamp(date)),
-
-        #dash_table.DataTable(
-        #    df.to_dict('records'),
-        #    [{'name': i, 'id': i} for i in df.columns]
-        #),
 
         html.Hr(),  # horizontal line
 
@@ -285,37 +249,27 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
     Input('umap-graphic-gene-slider', 'value')
     )
 def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
-    #check gene_value is part of csv
-    #gene_value is text field
+
     input_id = ctx.triggered_id
     if df is not None and (gene_value is not None or genotype_value is not None):
-        print(gene_value)
-        print(genotype_value)
-        print('hi')
-        print(umap_graphic_gene_slider)
 
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
-            print('genotype none')
             genotype_value = 'All' 
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
         if gene_value is None or gene_value not in list(dff):
             first_gene = list(dff)[0]
+            #make sure there is actually at least one gene in the csv
             if first_gene is not None and first_gene != 'cell_type' and first_gene != 'genotype' and first_gene != 'x' and first_gene != 'y':
                 gene_value = first_gene
-                print(gene_value)
             else:
                 print('no genes found')
         dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
-        print(percentile_values)
-        print(umap_graphic_gene_slider)
         lower_slider_value = percentile_values[1] if input_id != 'umap-graphic-gene-slider' else min(umap_graphic_gene_slider)
-        # if input_id == 'gene-value' or input_id == 'genotype-value' else min(umap_graphic_gene_slider)
         higher_slider_value = percentile_values[0] if input_id != 'umap-graphic-gene-slider' else max(umap_graphic_gene_slider)
-        # if input_id == 'gene-value' or input_id == 'genotype-value' else max(umap_graphic_gene_slider)
 
         gene_fig = px.scatter(dff,
                      #x coordinates
@@ -334,29 +288,26 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
             autosize = True,
             minreducedwidth=650,
             minreducedheight=650,
-            #idth = 650, height = 650, 
             title = gene_value,
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
-            #margin = dict(l=50, r=50, t=50, b=50, pad=4),
-            #minreducedwidth = 400,
             plot_bgcolor = "white"
             )
 
-            #fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
         cell_type_fig = px.scatter(dff, x='x',
         #x coordinates
                      y='y',
                      color = 'cell_type',
-                     hover_name = 'cell_type'
+                     hover_name = 'cell_type',
                      )
         cell_type_fig.update_layout(
             #width = 650, height = 650,
             autosize = True,
+            minreducedwidth=650,
+            minreducedheight=650,
             title = 'Cell Types',
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
-            #margin = dict(l=50, r=50, t=50, b=50, pad=4),
             plot_bgcolor = "white"
             )
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st', percentile_values[2]: '95th', percentile_values[3]: '5th', percentile_values[4]: '90th', percentile_values[5]: '10th', percentile_values[6]: '50th'}
@@ -379,9 +330,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st', int(default_percentiles[2]): '95th', int(default_percentiles[3]): '5th', int(default_percentiles[4]): '90th', int(default_percentiles[5]): '10th', int(default_percentiles[6]): '50th'}
-    #default_slider = dcc.RangeSlider(min=0, max=20, marks = None, value=[0, 20], allowCross = False, vertical = True, verticalHeight = 475)
     return fig, fig, None, None, 0, 100, default_slider_marks, [default_percentiles[1], default_percentiles[0]]
-    #default_slider
 
 
 if __name__ == '__main__':
