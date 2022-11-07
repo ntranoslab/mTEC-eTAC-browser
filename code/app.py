@@ -40,10 +40,8 @@ app.layout = html.Div([
         ]),
         html.Div([
             html.H3('File:'),
-            dcc.Dropdown(list(existing_csv.keys()), placeholder = 'Select a file...', id='file-value')
-        ], style={'width': '32%', 'float': 'right', 'display': 'none'}, id='file-dropdown'),
-            #upload data bar
-        html.Div([
+            dcc.Dropdown(list(existing_csv.keys()), placeholder = 'Select a file...', id='file-value', style = {'width': '32vw'}),
+            html.Div([
             dcc.Upload(
             id='upload-data',
             children=html.Div([
@@ -51,7 +49,7 @@ app.layout = html.Div([
                 html.A('Select Files')
             ]),
             style={
-                'width': '30%',
+                'width': '32vw',
                 'height': '60px',
                 'lineHeight': '60px',
                 'borderWidth': '1px',
@@ -65,8 +63,10 @@ app.layout = html.Div([
             multiple=False
             ),
         ]),
+             html.Div(id = 'output-data-result', style={'float': 'right', 'display': 'none'})
+        ], style={'display': 'none'}, id='file-dropdown'),
+            #upload data bar
         ]),
-    html.Div(id = 'output-data-result', style={'float': 'right', 'display': 'none'}),
     html.Div([
         html.H3('Category:'),
         dcc.RadioItems(cell_meta_cols, cell_meta_cols[0], id='category-value'),
@@ -187,9 +187,9 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
                 'No File Uploaded'
                 ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_tabs]), file_dropdown_style, upload_data_style, output_data_result_style
     if analyze_tabs == 'Other':
-        file_dropdown_style={'width': '32%', 'float': 'right', 'display': 'inline-block'}
+        file_dropdown_style={'width': '32vw', 'display': 'inline-block'}
         upload_data_style={
-            'width': '30%',
+            'width': '30vw',
             'height': '60px',
             'lineHeight': '60px',
             'borderWidth': '1px',
@@ -199,12 +199,12 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
             'margin': '10px',
             'display': 'inline-block'
             }
-        output_data_result_style={'float': 'right', 'display': 'inline-block'}
+        output_data_result_style={'display': 'inline-block'}
     if input_id == 'analyze-tabs':
         if analyze_tabs == 'Other':
-            file_dropdown_style={'width': '32%', 'float': 'right', 'display': 'inline-block'}
+            file_dropdown_style={'width': '32vw', 'display': 'inline-block'}
             upload_data_style={
-                'width': '30%',
+                'width': '30vw',
                 'height': '60px',
                 'lineHeight': '60px',
                 'borderWidth': '1px',
@@ -214,7 +214,7 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
                 'margin': '10px',
                 'display': 'inline-block'
             }
-            output_data_result_style={'float': 'right', 'display': 'inline-block'}
+            output_data_result_style={'display': 'inline-block'}
             if file_value is None or file_value=='':
                 return html.Div([
             'No File Uploaded'
