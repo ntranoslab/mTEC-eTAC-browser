@@ -96,7 +96,7 @@ app.layout = html.Div([
                 id='umap-graphic-gene')
         ], style={'width': '45vw', 'display': 'inline-block'}),
         html.Div([
-            dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right'}, id='umap-graphic-gene-slider')
+            dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider')
             ], style={'marginBottom': '60px',
                     'marginLeft': '20px',
                     'display': 'inline-block'}),
@@ -287,7 +287,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             else:
                 print('no genes found')
         dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
-        percentile_values = np.quantile(dff[gene_value], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
+        percentile_values = np.quantile(dff[gene_value], [0.99, 0.01])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
         lower_slider_value = percentile_values[1] if input_id != 'umap-graphic-gene-slider' else min(umap_graphic_gene_slider)
@@ -333,7 +333,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
-        percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st', percentile_values[2]: '95th', percentile_values[3]: '5th', percentile_values[4]: '90th', percentile_values[5]: '10th', percentile_values[6]: '50th'}
+        percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
 
 
 
@@ -351,8 +351,8 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         plot_bgcolor = "white",
         hovermode = False
         )
-    default_percentiles = np.quantile([0, 100], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
-    default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st', int(default_percentiles[2]): '95th', int(default_percentiles[3]): '5th', int(default_percentiles[4]): '90th', int(default_percentiles[5]): '10th', int(default_percentiles[6]): '50th'}
+    default_percentiles = np.quantile([0, 100], [0.99, 0.01])
+    default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
     return fig, fig, None, None, 0, 100, default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
 
