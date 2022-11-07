@@ -24,12 +24,15 @@ analyze_cell_dict = {'mTECs': 'UMAPs', 'eTACs': 'tSNEs', 'Other': '', '': ''}
 app.layout = html.Div([
     html.Div([
         html.Div([
-            html.H3('Analyze:'),
-            dcc.Tabs(id='analyze-tabs', value='mTECs', children=[
+            html.Img(src='assets/gardner-lab-logo-200w.png', style={'display': 'inline-block', 'border-color': 'red'}),
+            html.H3('Analyze:', id = 'headline'),
+            html.Div([
+                dcc.Tabs(id='analyze-tabs', value='mTECs', children=[
                 dcc.Tab(label='mTECs', value='mTECs'),
                 dcc.Tab(label='eTACs', value='eTACs'),
-                dcc.Tab(label='Other', value='Other')]),
-        ], style={'display': 'inline-block'}),
+                dcc.Tab(label='Other', value='Other')])
+                ], style = {'float': 'right'}),
+        ]),
         html.Div([
             html.H3('File:'),
             dcc.Dropdown(list(existing_csv.keys()), placeholder = 'Select a file...', id='file-value')
@@ -59,20 +62,22 @@ app.layout = html.Div([
         ]),
         ]),
     html.Div(id = 'output-data-result', style={'float': 'right', 'display': 'none'}),
-    html.H3('Category:'),
-    dcc.RadioItems(cell_meta_cols, cell_meta_cols[0], id='category-value'),
+    html.Div([
+        html.H3('Category:'),
+        dcc.RadioItems(cell_meta_cols, cell_meta_cols[0], id='category-value'),
+        ], id = 'category'),
 
     html.Br(),
 
     html.Div([
         #dropdown with gene
         html.Div([
-            html.H3('Gene:'),
+            html.H3('Gene:', id = 'gene-headline'),
             dcc.Dropdown([], placeholder = 'Select a gene...', id='gene-value')
         ], style={'width': '48%', 'display': 'inline-block'}),
         #dropdown with genotype
         html.Div([
-            html.H3('Genotype:'),
+            html.H3('Genotype:', id = 'genotype-headline'),
             dcc.Dropdown([], placeholder = 'Select a genotype...', id='genotype-value')
         ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
     ]),
