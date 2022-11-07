@@ -21,6 +21,7 @@ existing_csv = {'mTECs': pd.read_csv('../test-data/WT_KO_thymus_subset.csv', ind
 uploaded_csv = {}
 cell_meta_cols = ['genotype']
 analyze_cell_dict = {'mTECs': 'UMAPs', 'eTACs': 'tSNEs', 'Other': '', '': ''}
+colorscales = px.colors.named_colorscales()
 app.layout = html.Div([
     html.Div([
         html.Div([
@@ -106,7 +107,15 @@ app.layout = html.Div([
                 plot_bgcolor = "white"),
                 id='umap-graphic-cell-types')
             ], style={'width': '45vw', 'float': 'right', 'display': 'inline-block'}),
-    ])
+    ]),
+    html.Div([
+        html.P("Color Scale"),
+        dcc.Dropdown(
+            id= 'color-scale-dropdown',
+            options = colorscales,
+            value = 'plasma'
+            )
+        ], style = {'width': '48%'})
     
 
 ])
@@ -258,9 +267,10 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
     Output('umap-graphic-gene-slider', 'value'),
     Input('genotype-value', 'value'),
     Input('gene-value', 'value'),
-    Input('umap-graphic-gene-slider', 'value')
+    Input('umap-graphic-gene-slider', 'value'),
+    Input('color-scale-dropdown', 'value')
     )
-def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
+def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_scale_dropdown_value):
 
     input_id = ctx.triggered_id
     if df is not None and (gene_value is not None or genotype_value is not None):
@@ -294,7 +304,8 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
                      #min of color range
                      [lower_slider_value, 
                      #max of color range
-                     higher_slider_value]
+                     higher_slider_value],
+                     color_continuous_scale = color_scale_dropdown_value
                      )
         gene_fig.update_layout(
             autosize = True,
