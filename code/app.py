@@ -24,7 +24,11 @@ analyze_cell_dict = {'mTECs': 'UMAPs', 'eTACs': 'tSNEs', 'Other': '', '': ''}
 app.layout = html.Div([
     html.Div([
         html.Div([
-            html.Img(src='assets/gardner-lab-logo-200w.png', style={'display': 'inline-block', 'border-color': 'red'}),
+            html.A(
+                html.Img(src='assets/gardner-lab-logo-200w.png', style={'display': 'inline-block'}),
+                href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
+                target = '_blank'
+                ),
             html.H3('Analyze:', id = 'headline'),
             html.Div([
                 dcc.Tabs(id='analyze-tabs', value='mTECs', children=[
