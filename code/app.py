@@ -32,7 +32,7 @@ app.layout = html.Div([
                 ),
             html.H3('Analyze:', id = 'headline'),
             html.Div([
-                dcc.Tabs(id='analyze-tabs', value='mTECs', children=[
+                dcc.Tabs(id='analyze-tabs', value='eTACs', children=[
                 dcc.Tab(label='mTECs', value='mTECs'),
                 dcc.Tab(label='eTACs', value='eTACs'),
                 dcc.Tab(label='Other', value='Other')])
@@ -92,7 +92,8 @@ app.layout = html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                 xaxis={'visible': False, 'showticklabels': False},
                 yaxis={'visible': False, 'showticklabels': False},
-                plot_bgcolor = "white"),
+                plot_bgcolor = "white",
+                width = 650, height = 650),
                 id='umap-graphic-gene')
         ], style={'width': '45vw', 'display': 'inline-block'}),
         html.Div([
@@ -104,7 +105,8 @@ app.layout = html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                 xaxis={'visible': False, 'showticklabels': False},
                 yaxis={'visible': False, 'showticklabels': False},
-                plot_bgcolor = "white"),
+                plot_bgcolor = "white",
+                width = 650, height = 650),
                 id='umap-graphic-cell-types')
             ], style={'width': '45vw', 'float': 'right', 'display': 'inline-block'}),
     ]),
@@ -268,12 +270,14 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
     Input('genotype-value', 'value'),
     Input('gene-value', 'value'),
     Input('umap-graphic-gene-slider', 'value'),
-    Input('color-scale-dropdown', 'value')
+    Input('color-scale-dropdown', 'value'),
+    Input('analyze-tabs', 'value')
     )
-def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_scale_dropdown_value):
+def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_scale_dropdown_value, analyze_tabs):
 
     input_id = ctx.triggered_id
-    if df is not None and (gene_value is not None or genotype_value is not None):
+    if df is not None:
+    # and (gene_value is not None or genotype_value is not None):
 
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
@@ -316,6 +320,9 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
+        #color scale does not change size of graph, but might overlap
+        #gene_fig.update_coloraxes(colorbar_xanchor = 'center', colorbar_xpad = 0 )
+            #colorbar_thickness = 30, colorbar_thicknessmode = 'pixels')
 
         cell_type_fig = px.scatter(dff, x='x',
         #x coordinates
@@ -324,7 +331,6 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
                      hover_name = 'cell_type',
                      )
         cell_type_fig.update_layout(
-            #width = 650, height = 650,
             autosize = True,
             minreducedwidth=650,
             minreducedheight=650,
