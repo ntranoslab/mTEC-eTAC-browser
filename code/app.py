@@ -14,25 +14,36 @@ import pandas as pd
 app = Dash(__name__)
 
 df = None
-existing_csv = {'mTECs': pd.read_csv('../data/thymus_single_cell_dec_2022.csv', index_col=0),'eTACs': pd.read_csv('../data/thymus_single_cell_dec_2022.csv', index_col=0)}
+#For Lab computer
+#existing_csv = {'mTECs': pd.read_csv('../data/combined_thymus.csv', index_col=0),'eTACs': pd.read_csv('../data/combined_ln.csv', index_col=0)}
+#For Nolan's computer
+existing_csv = {'mTECs': pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0),'eTACs': pd.read_csv('../test-data/WT_KO_thymus_subset_random_genes.csv', index_col=0)}
 uploaded_csv = {}
 cell_meta_cols = ['genotype']
 analyze_cell_dict = {'mTECs': 'UMAPs', 'eTACs': 'tSNEs', 'Other': '', '': ''}
+colorscales = px.colors.named_colorscales()
 app.layout = html.Div([
     html.Div([
         html.Div([
-            html.H3('Analyze:'),
-            dcc.Tabs(id='analyze-tabs', value='mTECs', children=[
+            html.A(
+                html.Img(src='assets/gardner-lab-logo-200w.png', style={'display': 'inline-block'}),
+                href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
+                target = '_blank'
+                ),
+            html.H3('Analyze:', id = 'headline'),
+            html.Div([
+                dcc.Tabs(id='analyze-tabs', value='eTACs', children=[
+
+            
                 dcc.Tab(label='mTECs', value='mTECs'),
                 dcc.Tab(label='eTACs', value='eTACs'),
-                dcc.Tab(label='Other', value='Other')]),
-        ], style={'display': 'inline-block'}),
+                dcc.Tab(label='Other', value='Other')])
+                ], style = {'float': 'right'}),
+        ]),
         html.Div([
             html.H3('File:'),
-            dcc.Dropdown(list(existing_csv.keys()), placeholder = 'Select a file...', id='file-value')
-        ], style={'width': '32%', 'float': 'right', 'display': 'none'}, id='file-dropdown'),
-            #upload data bar
-        html.Div([
+            dcc.Dropdown(list(existing_csv.keys()), placeholder = 'Select a file...', id='file-value', style = {'width': '32vw'}),
+            html.Div([
             dcc.Upload(
             id='upload-data',
             children=html.Div([
@@ -40,7 +51,7 @@ app.layout = html.Div([
                 html.A('Select Files')
             ]),
             style={
-                'width': '30%',
+                'width': '32vw',
                 'height': '60px',
                 'lineHeight': '60px',
                 'borderWidth': '1px',
@@ -54,22 +65,26 @@ app.layout = html.Div([
             multiple=False
             ),
         ]),
+            html.Div(id = 'output-data-result', style={'float': 'right', 'display': 'none'})
+        ], style={'display': 'none'}, id='file-dropdown'),
+            #upload data bar
         ]),
-    html.Div(id = 'output-data-result', style={'float': 'right', 'display': 'none'}),
-    html.H3('Category:'),
-    dcc.RadioItems(cell_meta_cols, cell_meta_cols[0], id='category-value'),
+    html.Div([
+        html.H3('Category:'),
+        dcc.RadioItems(cell_meta_cols, cell_meta_cols[0], id='category-value'),
+        ], id = 'category'),
 
     html.Br(),
 
     html.Div([
         #dropdown with gene
         html.Div([
-            html.H3('Gene:'),
+            html.H3('Gene:', id='gene-headline'),
             dcc.Dropdown([], placeholder = 'Select a gene...', id='gene-value')
         ], style={'width': '48%', 'display': 'inline-block'}),
         #dropdown with genotype
         html.Div([
-            html.H3('Genotype:'),
+            html.H3('Genotype:', id='genotype-headline'),
             dcc.Dropdown([], placeholder = 'Select a genotype...', id='genotype-value')
         ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
     ]),
@@ -79,11 +94,12 @@ app.layout = html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                 xaxis={'visible': False, 'showticklabels': False},
                 yaxis={'visible': False, 'showticklabels': False},
-                plot_bgcolor = "white"),
+                plot_bgcolor = "white",
+                width=650, height=650),
                 id='umap-graphic-gene')
         ], style={'width': '45vw', 'display': 'inline-block'}),
         html.Div([
-            dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right'}, id='umap-graphic-gene-slider')
+            dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider')
             ], style={'marginBottom': '60px',
                     'marginLeft': '20px',
                     'display': 'inline-block'}),
@@ -91,10 +107,19 @@ app.layout = html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                 xaxis={'visible': False, 'showticklabels': False},
                 yaxis={'visible': False, 'showticklabels': False},
-                plot_bgcolor = "white"),
+                plot_bgcolor = "white",
+                width=650, height=650),
                 id='umap-graphic-cell-types')
             ], style={'width': '45vw', 'float': 'right', 'display': 'inline-block'}),
-    ])
+    ]),
+    html.Div([
+        html.P("Color Scale"),
+        dcc.Dropdown(
+            id= 'color-scale-dropdown',
+            options = colorscales,
+            value = 'plasma'
+            )
+        ], style = {'width': '48%'})
     
 
 ])
@@ -166,9 +191,9 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
                 'No File Uploaded'
                 ]), list(uploaded_csv.keys()), '', [], [], html.H3(analyze_cell_dict[analyze_tabs]), file_dropdown_style, upload_data_style, output_data_result_style
     if analyze_tabs == 'Other':
-        file_dropdown_style={'width': '32%', 'float': 'right', 'display': 'inline-block'}
+        file_dropdown_style={'width': '32vw', 'display': 'inline-block'}
         upload_data_style={
-            'width': '30%',
+            'width': '30vw',
             'height': '60px',
             'lineHeight': '60px',
             'borderWidth': '1px',
@@ -178,12 +203,12 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
             'margin': '10px',
             'display': 'inline-block'
             }
-        output_data_result_style={'float': 'right', 'display': 'inline-block'}
+        output_data_result_style={'display': 'inline-block'}
     if input_id == 'analyze-tabs':
         if analyze_tabs == 'Other':
-            file_dropdown_style={'width': '32%', 'float': 'right', 'display': 'inline-block'}
+            file_dropdown_style={'width': '32vw', 'display': 'inline-block'}
             upload_data_style={
-                'width': '30%',
+                'width': '30vw',
                 'height': '60px',
                 'lineHeight': '60px',
                 'borderWidth': '1px',
@@ -193,7 +218,7 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
                 'margin': '10px',
                 'display': 'inline-block'
             }
-            output_data_result_style={'float': 'right', 'display': 'inline-block'}
+            output_data_result_style={'display': 'inline-block'}
             if file_value is None or file_value=='':
                 return html.Div([
             'No File Uploaded'
@@ -246,12 +271,14 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
     Output('umap-graphic-gene-slider', 'value'),
     Input('genotype-value', 'value'),
     Input('gene-value', 'value'),
-    Input('umap-graphic-gene-slider', 'value')
+    Input('umap-graphic-gene-slider', 'value'),
+    Input('color-scale-dropdown', 'value'),
+    Input('analyze-tabs', 'value')
     )
-def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
+def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_scale_dropdown_value, analyze_tabs):
 
     input_id = ctx.triggered_id
-    if df is not None and (gene_value is not None or genotype_value is not None):
+    if df is not None:
 
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
@@ -265,7 +292,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
             else:
                 print('no genes found')
         dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
-        percentile_values = np.quantile(dff[gene_value], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
+        percentile_values = np.quantile(dff[gene_value], [0.99, 0.01])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
         lower_slider_value = percentile_values[1] if input_id != 'umap-graphic-gene-slider' else min(umap_graphic_gene_slider)
@@ -282,7 +309,8 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
                      #min of color range
                      [lower_slider_value, 
                      #max of color range
-                     higher_slider_value]
+                     higher_slider_value],
+                     color_continuous_scale = color_scale_dropdown_value
                      )
         gene_fig.update_layout(
             autosize = True,
@@ -293,12 +321,6 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
-<<<<<<< HEAD
-        #color scale does not change size of graph, but might overlap
-        #gene_fig.update_coloraxes(colorbar_xanchor = 'center')
-            #colorbar_thickness = 30, colorbar_thicknessmode = 'pixels')
-=======
->>>>>>> 61da463e322b4bf1b9a07d9aedb3b937133b3191
 
         cell_type_fig = px.scatter(dff, x='x',
         #x coordinates
@@ -316,7 +338,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
-        percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st', percentile_values[2]: '95th', percentile_values[3]: '5th', percentile_values[4]: '90th', percentile_values[5]: '10th', percentile_values[6]: '50th'}
+        percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
 
 
 
@@ -334,8 +356,8 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider):
         plot_bgcolor = "white",
         hovermode = False
         )
-    default_percentiles = np.quantile([0, 100], [0.99, 0.01, 0.95, 0.05, 0.90, 0.10, 0.5])
-    default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st', int(default_percentiles[2]): '95th', int(default_percentiles[3]): '5th', int(default_percentiles[4]): '90th', int(default_percentiles[5]): '10th', int(default_percentiles[6]): '50th'}
+    default_percentiles = np.quantile([0, 100], [0.99, 0.01])
+    default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
     return fig, fig, None, None, 0, 100, default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
 
