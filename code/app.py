@@ -14,7 +14,7 @@ import pandas as pd
 app = Dash(__name__)
 
 df = None
-existing_csv = {'mTECs': pd.read_csv('../data/combined_thymus.csv.txt', index_col=0),'eTACs': pd.read_csv('../data/combined_ln.csv.txt', index_col=0)}
+existing_csv = {'mTECs': pd.read_csv('../data/thymus_single_cell_dec_2022.csv', index_col=0),'eTACs': pd.read_csv('../data/thymus_single_cell_dec_2022.csv', index_col=0)}
 uploaded_csv = {}
 cell_meta_cols = ['genotype']
 analyze_cell_dict = {'mTECs': 'UMAPs', 'eTACs': 'tSNEs', 'Other': '', '': ''}
