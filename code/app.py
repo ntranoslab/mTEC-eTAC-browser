@@ -321,7 +321,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             plot_bgcolor = "white"
             )
         #color scale does not change size of graph, but might overlap
-        #gene_fig.update_coloraxes(colorbar_xanchor = 'center', colorbar_xpad = 0 )
+        #gene_fig.update_coloraxes(colorbar_xanchor = 'center')
             #colorbar_thickness = 30, colorbar_thicknessmode = 'pixels')
 
         cell_type_fig = px.scatter(dff, x='x',
