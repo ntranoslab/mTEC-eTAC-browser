@@ -17,14 +17,12 @@ server = app.server
 ##=========================Global variables=========================##
 df = None
 #For Lab computer
-#existing_csv = {'mTECs': pd.read_csv('../data/combined_thymus.csv', index_col=0),'eTACs': pd.read_csv('../data/combined_ln.csv', index_col=0)}
-existing_csv = {'mTECs': '../data/combined_thymus.csv','eTACs': '../data/combined_ln.csv'}
+existing_csv = {
+    'mTECs': 'data/thymus_single_cell_dec_2022.csv',
+    'eTACs': 'data/ln_single_cell_dec_2022.csv'
+}
 #For Nolan's computer
 #existing_csv = {'mTECs': '../test-data/WT_KO_thymus_subset.csv','eTACs': '../test-data/WT_KO_thymus_subset_random_genes.csv'}
-#existing_csv = {
-#    'mTECs': pd.read_csv('data/thymus_single_cell_dec_2022.csv', index_col=0),
-#    'eTACs': pd.read_csv('data/ln_single_cell_dec_2022.csv', index_col=0)
-#}
 #existing_csv = {'mTECs': pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0),'eTACs': pd.read_csv('../test-data/WT_KO_thymus_subset_random_genes.csv', index_col=0)}
 uploaded_csv = {}
 cell_meta_cols = ['genotype']
