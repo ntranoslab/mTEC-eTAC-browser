@@ -314,12 +314,10 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
             genotype_value = 'All'
-        df_genes = pd.read_csv(df_path, index_col = 0, nrows = 1)
-        print('hi')
-        print(list(df_genes))
-        print(gene_value in list(df_genes))
-        df = pd.read_csv(df_path, usecols = cell_cols_no_genes + [gene_value]) if (gene_value != None and gene_value in list(df_genes)) else pd.read_csv(df_path, usecols = cell_cols_no_genes + [df_genes.columns[0]])
-        print(gene_value)
+        if analyze_tabs != 'Other':
+            df_genes = pd.read_csv(df_path, index_col = 0, nrows = 1)
+            df = pd.read_csv(df_path, usecols = cell_cols_no_genes + [gene_value]) if (gene_value != None and gene_value in list(df_genes)) else pd.read_csv(df_path, usecols = cell_cols_no_genes + [df_genes.columns[0]])
+
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
         if gene_value is None or gene_value not in list(dff):
             first_gene = list(dff)[0]
@@ -328,7 +326,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
                 gene_value = first_gene
             else:
                 print('no genes found')
-        dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
+        #dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
