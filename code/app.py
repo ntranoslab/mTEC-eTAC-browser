@@ -243,7 +243,7 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
         check_file(upload_data, filename)
         file_value = filename
     #generate genotype list
-    if df_path == '':
+    if analyze_tabs == 'Other':
         genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
         #generate gene list
         gene_list = list(df.columns.unique())
@@ -310,7 +310,6 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
     df_path = existing_csv.get(analyze_tabs, 'No such file exists')
     global df
     if df is not None:
-
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
             genotype_value = 'All'
