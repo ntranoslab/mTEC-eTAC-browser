@@ -1,5 +1,5 @@
 # Run this app with `python app.py` and
-# visit http://127.0.0.1:8050/ in your web browser.
+# visit http://localhost:8050/ in your web browser.
 
 
 import base64
@@ -12,19 +12,27 @@ import numpy as np
 import pandas as pd
 
 app = Dash(__name__)
+server = app.server
 
+##=========================Global variables=========================##
 df = None
 #For Lab computer
 #existing_csv = {'mTECs': pd.read_csv('../data/combined_thymus.csv', index_col=0),'eTACs': pd.read_csv('../data/combined_ln.csv', index_col=0)}
-#existing_csv = {'mTECs': '../data/combined_thymus.csv','eTACs': '../data/combined_ln.csv'}
+existing_csv = {'mTECs': '../data/combined_thymus.csv','eTACs': '../data/combined_ln.csv'}
 #For Nolan's computer
-existing_csv = {'mTECs': '../test-data/WT_KO_thymus_subset.csv','eTACs': '../test-data/WT_KO_thymus_subset_random_genes.csv'}
+#existing_csv = {'mTECs': '../test-data/WT_KO_thymus_subset.csv','eTACs': '../test-data/WT_KO_thymus_subset_random_genes.csv'}
+#existing_csv = {
+#    'mTECs': pd.read_csv('data/thymus_single_cell_dec_2022.csv', index_col=0),
+#    'eTACs': pd.read_csv('data/ln_single_cell_dec_2022.csv', index_col=0)
+#}
 #existing_csv = {'mTECs': pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0),'eTACs': pd.read_csv('../test-data/WT_KO_thymus_subset_random_genes.csv', index_col=0)}
 uploaded_csv = {}
 cell_meta_cols = ['genotype']
 cell_cols_no_genes = ['cell_type', 'genotype' ,'x', 'y']
 analyze_cell_dict = {'mTECs': 'UMAPs', 'eTACs': 'tSNEs', 'Other': '', '': ''}
 colorscales = px.colors.named_colorscales()
+
+##=========================Page Layout=========================##
 app.layout = html.Div([
     html.Div([
         html.Div([
@@ -127,8 +135,6 @@ app.layout = html.Div([
 
 ])
 
-
-
 def check_file(contents, filename):
     content_type, content_string = contents.split(',')
 
@@ -161,6 +167,7 @@ def check_file(contents, filename):
         #})
     ])
 
+##=========================Callback=========================##
 
 @app.callback(
     Output ('output-data-result', 'children'),
@@ -178,7 +185,9 @@ def check_file(contents, filename):
     Input('file-value', 'value'),
     Input('upload-data', 'contents'),
     State('upload-data', 'filename')
-    )
+)
+
+
 def update_file(analyze_tabs, file_value, upload_data, filename):
 
     input_id = ctx.triggered_id
@@ -288,6 +297,7 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
         #})
     ]), list(uploaded_csv.keys()), file_value, genotype_list, gene_list, html.H3(analyze_cell_dict[analyze_tabs]), file_dropdown_style, upload_data_style, output_data_result_style
     
+##=========================Callback=========================##
 
 @app.callback(
     Output('umap-graphic-gene', 'figure'),
@@ -304,6 +314,7 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
     Input('color-scale-dropdown', 'value'),
     Input('analyze-tabs', 'value')
     )
+
 def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_scale_dropdown_value, analyze_tabs):
 
     input_id = ctx.triggered_id
@@ -394,7 +405,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
     return fig, fig, None, None, 0, 100, default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
-
+##=========================Local development only=========================##
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, port=8050)
 
