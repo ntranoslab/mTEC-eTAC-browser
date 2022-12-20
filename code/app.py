@@ -259,7 +259,7 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
         gene_list = np.array(gene_list)
     else:
         df_no_genes = pd.read_csv(df_path, usecols = cell_cols_no_genes)
-        df_genes = pd.read_csv(df_path, nrows = 1)
+        df_genes = pd.read_csv(df_path, index_col = 0, nrows = 1)
         df = pd.read_csv(df_path, usecols = cell_cols_no_genes + [df_genes.columns[0]])
         genotype_list = np.insert(df_no_genes['genotype'].unique(), 0, 'All')
         #generate gene list
@@ -316,7 +316,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             genotype_value = 'All'
         df_genes = pd.read_csv(df_path, nrows = 1)
         print('hi')
-        df = pd.read_csv(df_path, usecols = cell_cols_no_genes + [gene_value]) if gene_value != None else pd.read_csv(df_path, usecols = cell_cols_no_genes + [df_genes.columns[0]])
+        df = pd.read_csv(df_path, usecols = cell_cols_no_genes + [gene_value]) if (gene_value != None or gene_value not in list(df_genes)) else pd.read_csv(df_path, usecols = cell_cols_no_genes + [df_genes.columns[0]])
         print(gene_value)
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
         print('******** df:')
