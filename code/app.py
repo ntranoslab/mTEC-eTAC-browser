@@ -16,10 +16,13 @@ app = Dash(__name__)
 df = None
 #For Lab computer
 #existing_csv = {'mTECs': pd.read_csv('../data/combined_thymus.csv', index_col=0),'eTACs': pd.read_csv('../data/combined_ln.csv', index_col=0)}
+#existing_csv = {'mTECs': '../data/combined_thymus.csv','eTACs': '../data/combined_ln.csv'}
 #For Nolan's computer
-existing_csv = {'mTECs': pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0),'eTACs': pd.read_csv('../test-data/WT_KO_thymus_subset_random_genes.csv', index_col=0)}
+existing_csv = {'mTECs': '../test-data/WT_KO_thymus_subset.csv','eTACs': '../test-data/WT_KO_thymus_subset_random_genes.csv'}
+#existing_csv = {'mTECs': pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0),'eTACs': pd.read_csv('../test-data/WT_KO_thymus_subset_random_genes.csv', index_col=0)}
 uploaded_csv = {}
 cell_meta_cols = ['genotype']
+cell_cols_no_genes = ['cell_type', 'genotype' ,'x', 'y']
 analyze_cell_dict = {'mTECs': 'UMAPs', 'eTACs': 'tSNEs', 'Other': '', '': ''}
 colorscales = px.colors.named_colorscales()
 app.layout = html.Div([
@@ -180,12 +183,15 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
 
     input_id = ctx.triggered_id
     global df
+    df_path = ''
+    df_no_genes = None
+    df_genes = None
     file_dropdown_style={'display': 'none'}
     upload_data_style={'display': 'none'}
     output_data_result_style={'display': 'none'}
     if input_id is None:
         if analyze_tabs != 'Other':
-            df = existing_csv.get(analyze_tabs, 'No such file exists')
+            df_path = existing_csv.get(analyze_tabs, 'No such file exists')
         else:
             return html.Div([
                 'No File Uploaded'
@@ -226,26 +232,49 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
             else:
                 df = uploaded_csv.get(file_value, 'No such file exists')
         else:
-            df = existing_csv.get(analyze_tabs, 'No such file exists')
+            df_path = existing_csv.get(analyze_tabs, 'No such file exists')
+            df_no_genes = pd.read_csv(df_path, usecols = cell_cols_no_genes)
+            df_genes = pd.read_csv(df_path, nrows = 1)
+            df = pd.read_csv(df_path, usecols = cell_cols_no_genes + [df_genes.columns[0]])
     elif input_id == 'file-value':
         df = uploaded_csv.get(file_value, 'No such file exists')
     elif input_id == 'upload-data':
         #is upload_data in correct format? is upload_data a csv? assign df to csv
         check_file(upload_data, filename)
         file_value = filename
-    genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
-    gene_list = list(df.columns.unique())
-    #remove cell_type col
-    gene_list.remove('cell_type')
-    #remove genotype col
-    gene_list.remove('genotype')
-    #remove x col
-    gene_list.remove('x')
-    #remove y col
-    gene_list.remove('y')
-    #make gene list into array
-    gene_list = np.array(gene_list)
-    dff = df
+    #generate genotype list
+    if df_path == '':
+        genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
+        #generate gene list
+        gene_list = list(df.columns.unique())
+        #remove cell_type col from gene list
+        gene_list.remove('cell_type')
+        #remove genotype col from gene list
+        gene_list.remove('genotype')
+        #remove x col from gene list
+        gene_list.remove('x')
+        #remove y col from gene list
+        gene_list.remove('y')
+        #make gene list into array
+        gene_list = np.array(gene_list)
+    else:
+        df_no_genes = pd.read_csv(df_path, usecols = cell_cols_no_genes)
+        df_genes = pd.read_csv(df_path, nrows = 1)
+        df = pd.read_csv(df_path, usecols = cell_cols_no_genes + [df_genes.columns[0]])
+        genotype_list = np.insert(df_no_genes['genotype'].unique(), 0, 'All')
+        #generate gene list
+        gene_list = list(df_genes.columns.unique())
+        #remove cell_type col from gene list
+        gene_list.remove('cell_type')
+        #remove genotype col from gene list
+        gene_list.remove('genotype')
+        #remove x col from gene list
+        gene_list.remove('x')
+        #remove y col from gene list
+        gene_list.remove('y')
+        #make gene list into array
+        gene_list = np.array(gene_list)
+
     return html.Div([
         html.H5(file_value),
 
@@ -278,12 +307,23 @@ def update_file(analyze_tabs, file_value, upload_data, filename):
 def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_scale_dropdown_value, analyze_tabs):
 
     input_id = ctx.triggered_id
+    df_path = existing_csv.get(analyze_tabs, 'No such file exists')
+    global df
     if df is not None:
 
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
-            genotype_value = 'All' 
+            genotype_value = 'All'
+        df_genes = pd.read_csv(df_path, nrows = 1)
+        print('hi')
+        df = pd.read_csv(df_path, usecols = cell_cols_no_genes + [gene_value]) if gene_value != None else pd.read_csv(df_path, usecols = cell_cols_no_genes + [df_genes.columns[0]])
+        print(gene_value)
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
+        print('******** df:')
+        print(df)
+        print('***** dff:')
+        print(dff)
+        #print(gene_value in list(dff))
         if gene_value is None or gene_value not in list(dff):
             first_gene = list(dff)[0]
             #make sure there is actually at least one gene in the csv
