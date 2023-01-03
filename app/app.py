@@ -35,24 +35,22 @@ colorscales = px.colors.named_colorscales()
 ##=========================Page Layout=========================##
 app.layout = html.Div([
     html.Div([
+        html.A(
+            html.Img(src='assets/gardner-lab-logo-200w.png', style={'display': 'inline-block'}),
+            href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
+            target = '_blank'
+            ),
+        html.H3('Analyze:', id = 'headline'),
         html.Div([
-            html.A(
-                html.Img(src='assets/gardner-lab-logo-200w.png', style={'display': 'inline-block'}),
-                href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
-                target = '_blank'
-                ),
-            html.H3('Analyze:', id = 'headline'),
-            html.Div([
-                dcc.Tabs(id='analyze-tabs', value='mTECs', children=[
+            dcc.Tabs(id='analyze-tabs', value='mTECs', children=[
 
-            
-                dcc.Tab(label='mTECs', value='mTECs')
-                #dcc.Tab(label='eTACs', value='eTACs'),
-                #dcc.Tab(label='Other', value='Other')
-                ])
-                ], style = {'float': 'right'}),
-        ]),
-        ]),
+        
+            dcc.Tab(label='mTECs', value='mTECs')
+            #dcc.Tab(label='eTACs', value='eTACs'),
+            #dcc.Tab(label='Other', value='Other')
+            ])
+            ], style = {'float': 'right'}),
+    ]),
 
     html.Br(),
 
@@ -60,7 +58,7 @@ app.layout = html.Div([
         #dropdown with gene
         html.Div([
             html.H3('Gene:', id='gene-headline'),
-            dcc.Dropdown(gene_list, placeholder = 'Select a gene...', id='gene-value')
+            dcc.Input(placeholder = 'Select a gene...', debounce = True, id='gene-value')
         ], style={'width': '48%', 'display': 'inline-block'}),
         #dropdown with genotype
         html.Div([
@@ -110,7 +108,6 @@ app.layout = html.Div([
 @app.callback(
     Output('umap-graphic-gene', 'figure'),
     Output('umap-graphic-cell-types', 'figure'),
-    Output('gene-value', 'value'),
     Output('genotype-value', 'value'),
     Output('umap-graphic-gene-slider', 'min'),
     Output('umap-graphic-gene-slider', 'max'),
@@ -188,7 +185,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
 
 
 
-        return gene_fig, cell_type_fig, gene_value, genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
