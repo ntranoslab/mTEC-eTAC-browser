@@ -17,18 +17,13 @@ server = app.server
 ##=========================Global variables=========================##
 #Nolan's computer
 df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
+default_gene = list(df)[0]
+#df = pd.read_csv('../thymus_single_cell_dec_2022.csv', index_col=0)
+#default_gene = 'Aire'
 #For Lab computer
 #df = pd.read_csv('data/thymus_single_cell_dec_2022.csv', index_col=0)
-#existing_csv = {
-#    'mTECs': 'data/thymus_single_cell_dec_2022.csv',
-#    'eTACs': 'data/ln_single_cell_dec_2022.csv'
-#}
-#existing_csv = {'mTECs': pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)}
-uploaded_csv = {}
-#cell_meta_cols = ['genotype']
 cell_cols_no_genes = ['cell_type', 'genotype' ,'x', 'y']
 analyze_cell_dict = {'mTECs': 'UMAPs'}
-#, 'eTACs': 'tSNEs', 'Other': '', '': ''}
 colorscales = px.colors.named_colorscales()
 
 ##=========================Page Layout=========================##
@@ -79,7 +74,9 @@ app.layout = html.Div([
         #    html.Div(id = 'output-data-result', style={'float': 'right', 'display': 'none'})
         #], style={'display': 'none'}, id='file-dropdown'),
             #upload data bar
+
         ]),
+
     #html.Div([
     #    html.H3('Category:'),
     #    dcc.RadioItems('genotype', 'genotype', id='category-value'),
@@ -160,22 +157,18 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
 
     input_id = ctx.triggered_id
     global df
-    print('not')
     if df is not None:
-        print('here')
-        print(genotype_value)
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
             genotype_value = 'All'
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
         if gene_value is None or gene_value not in list(dff):
-            first_gene = list(dff)[0]
+            gene = default_gene if default_gene in list(dff) else list(dff)[0]
             #make sure there is actually at least one gene in the csv
-            if first_gene is not None and first_gene != 'cell_type' and first_gene != 'genotype' and first_gene != 'x' and first_gene != 'y':
-                gene_value = first_gene
+            if gene is not None and gene not in cell_cols_no_genes:
+                gene_value = gene
             else:
                 print('no genes found')
-        #dff = dff[[gene_value, 'cell_type', 'genotype', 'x', 'y']] if gene_value != None else dff
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
@@ -228,14 +221,9 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
         #generate gene list
         gene_list = list(df.columns.unique())
-        #remove cell_type col from gene list
-        gene_list.remove('cell_type')
-        #remove genotype col from gene list
-        gene_list.remove('genotype')
-        #remove x col from gene list
-        gene_list.remove('x')
-        #remove y col from gene list
-        gene_list.remove('y')
+        #remove non-gene columns from gene list
+        for i in cell_cols_no_genes:
+            gene_list.remove(i)
         #make gene list into array
         gene_list = np.array(gene_list)
 
