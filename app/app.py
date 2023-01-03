@@ -17,13 +17,19 @@ server = app.server
 ##=========================Global variables=========================##
 #Nolan's computer
 df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
-default_gene = list(df)[0]
 #df = pd.read_csv('../thymus_single_cell_dec_2022.csv', index_col=0)
-#default_gene = 'Aire'
+default_gene = 'Aire'
 #For Lab computer
 #df = pd.read_csv('data/thymus_single_cell_dec_2022.csv', index_col=0)
 cell_cols_no_genes = ['cell_type', 'genotype' ,'x', 'y']
-analyze_cell_dict = {'mTECs': 'UMAPs'}
+genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
+#generate gene list
+gene_list = list(df.columns.unique())
+#remove non-gene columns from gene list
+for i in cell_cols_no_genes:
+    gene_list.remove(i)
+#make gene list into array
+gene_list = np.array(gene_list)
 colorscales = px.colors.named_colorscales()
 
 ##=========================Page Layout=========================##
@@ -46,41 +52,7 @@ app.layout = html.Div([
                 ])
                 ], style = {'float': 'right'}),
         ]),
-        #html.Div([
-        #    html.H3('File:'),
-        #    dcc.Dropdown('mTECs', placeholder = 'Select a file...', id='file-value', style = {'width': '32vw'}),
-        #    html.Div([
-        #    dcc.Upload(
-        #    id='upload-data',
-        #    children=html.Div([
-        #        'Drag and Drop or ',
-        #        html.A('Select Files')
-        #    ]),
-        #    style={
-        #        'width': '32vw',
-        #        'height': '60px',
-        #        'lineHeight': '60px',
-        #        'borderWidth': '1px',
-        #        'borderStyle': 'dashed',
-        #        'borderRadius': '5px',
-        #        'textAlign': 'center',
-        #        'margin': '10px',
-        #        'display': 'none'
-        #    },
-        #    # Not allow multiple files to be uploaded
-        #    multiple=False
-        #    ),
-        #]),
-        #    html.Div(id = 'output-data-result', style={'float': 'right', 'display': 'none'})
-        #], style={'display': 'none'}, id='file-dropdown'),
-            #upload data bar
-
         ]),
-
-    #html.Div([
-    #    html.H3('Category:'),
-    #    dcc.RadioItems('genotype', 'genotype', id='category-value'),
-    #    ], id = 'category'),
 
     html.Br(),
 
@@ -88,12 +60,12 @@ app.layout = html.Div([
         #dropdown with gene
         html.Div([
             html.H3('Gene:', id='gene-headline'),
-            dcc.Dropdown([], placeholder = 'Select a gene...', id='gene-value')
+            dcc.Dropdown(gene_list, placeholder = 'Select a gene...', id='gene-value')
         ], style={'width': '48%', 'display': 'inline-block'}),
         #dropdown with genotype
         html.Div([
             html.H3('Genotype:', id='genotype-headline'),
-            dcc.Dropdown([], placeholder = 'Select a genotype...', id='genotype-value')
+            dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value')
         ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
     ]),
     html.Div([
@@ -140,9 +112,6 @@ app.layout = html.Div([
     Output('umap-graphic-cell-types', 'figure'),
     Output('gene-value', 'value'),
     Output('genotype-value', 'value'),
-    Output('genotype-value', 'options'),
-    Output('gene-value', 'options'),
-    Output('graph-name-value', 'children'),
     Output('umap-graphic-gene-slider', 'min'),
     Output('umap-graphic-gene-slider', 'max'),
     Output('umap-graphic-gene-slider', 'marks'),
@@ -160,7 +129,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
     if df is not None:
         #filter df to only contain data with chosen genotype
         if genotype_value is None:
-            genotype_value = 'All'
+            genotype_value = 'WT'
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
         if gene_value is None or gene_value not in list(dff):
             gene = default_gene if default_gene in list(dff) else list(dff)[0]
@@ -217,19 +186,9 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             )
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
 
-        #generate genotype list
-        genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
-        #generate gene list
-        gene_list = list(df.columns.unique())
-        #remove non-gene columns from gene list
-        for i in cell_cols_no_genes:
-            gene_list.remove(i)
-        #make gene list into array
-        gene_list = np.array(gene_list)
 
 
-
-        return gene_fig, cell_type_fig, gene_value, genotype_value, genotype_list, gene_list, html.H3(analyze_cell_dict['mTECs']), df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value, genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
