@@ -13,4 +13,4 @@ RUN useradd -m appUser
 USER appUser
 # Run locally on port 8050
 EXPOSE 8050
-CMD gunicorn --bind 0.0.0.0:8050 app:server
+CMD gunicorn --bind 0.0.0.0:8050 -t 100000 app:server
