@@ -109,6 +109,7 @@ app.layout = html.Div([
 @app.callback(
     Output('umap-graphic-gene', 'figure'),
     Output('umap-graphic-cell-types', 'figure'),
+    Output('gene-value', 'value'),
     Output('genotype-value', 'value'),
     Output('umap-graphic-gene-slider', 'min'),
     Output('umap-graphic-gene-slider', 'max'),
@@ -129,13 +130,12 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         if genotype_value is None:
             genotype_value = 'WT'
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
-        if gene_value is None or gene_value not in list(dff):
-            gene = default_gene if default_gene in list(dff) else list(dff)[0]
-            #make sure there is actually at least one gene in the csv
-            if gene is not None and gene not in cell_cols_no_genes:
-                gene_value = gene
-            else:
-                print('no genes found')
+        gene_value_in_df = gene_value in list(dff)
+        if gene_value is None or not gene_value_in_df:
+            gene_value = default_gene if default_gene in list(dff) else list(dff)[0]
+            #check if list(dff)[0] is a gene
+            if gene_value in cell_cols_no_genes:
+                gene_value = None
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
@@ -147,7 +147,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
                      x='x',
                      #y coordinates
                      y='y',
-                     color = gene_value,
+                     color = gene_value if gene_value != None else default_gene,
                      hover_name = 'cell_type',
                      range_color=
                      #min of color range
@@ -210,7 +210,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
 
 
 
-        return gene_fig, cell_type_fig, genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value if gene_value_in_df else 'No Genes Found', genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
