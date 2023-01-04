@@ -1,6 +1,7 @@
 body {
 	color: #99A6BC;
 	font-family: Arial;
+	background-color: ghostwhite;
 }
 
 #category {
@@ -19,8 +20,20 @@ body {
 	color: #4C5C75;
 }
 
+#color-scale-headline {
+	color: #4C5C75;
+}
+
 #graph-name-value {
 	color: purple;
+}
+
+.header {
+	background-color: ghostwhite;
+}
+
+.graphs{
+	background-color: white;
 }
 
 .has-value.Select--single>.Select-control .Select-value .Select-value-label {
