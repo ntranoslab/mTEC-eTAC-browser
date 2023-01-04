@@ -67,7 +67,7 @@ app.layout = html.Div([
                 plot_bgcolor = "white",
                 width=650, height=650),
                 id='umap-graphic-gene')
-        ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '1.5%'}),
+        ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%'}),
         html.Div([
             dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider')
             ], style={'marginBottom': '60px',
@@ -103,6 +103,11 @@ app.layout = html.Div([
                 ], style = {'display': 'inline-block'})
         ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
     ], className = 'graphs', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),
+
+    html.Div([
+        html.H3('Description:', id='description-headline'),
+        html.H5('About us and Links to Publications...To be, or not to be: that is the question: Whether tis nobler in the mind to suffer\\The slings and arrows of outrageous fortune,\\Or to take arms against a sea of troubles,\\And by opposing end them?\\To die: to sleep;\\No more; and by a sleep to say we end The heart-ache and the thousand natural shocksThat flesh is heir to, tis a consummation Devoutly to be wishd. // To die, to sleep;To sleep: perchance to dream: ay, theres the rub For in that sleep of death what dreams may come When we have shuffled off this mortal coil,Must give us pause: // theres the respect That makes calamity of so long life;')
+        ])
     
 
 ], style = {'marginLeft': '2%', 'marginRight': '2%', 'marginTop': '1%', 'marginBottom': '1%'})
