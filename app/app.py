@@ -147,9 +147,11 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             gene_value = default_gene
         #check if gene value is in dataframe
         gene_value_in_df = gene_value in list(dff)
-        #set gene value to be equal to default gene if gene not in dataframe
+        #set gene value to be equal to default gene if gene not in dataframe (assuming default gene is in dataframe)
         if not gene_value_in_df:
             gene_value = default_gene
+
+        #percentile slider code
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
@@ -166,7 +168,11 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             lower_slider_value = percentile_values[1]
             higher_slider_value = percentile_values[0]
 
-        gene_fig = px.scatter(dff,
+
+        
+        #graphs
+        #sort dff based on cells highest expressing to lowest expressing gene - makes the gene scatter plot graph highest expressing cells on top of lower expressing cells
+        gene_fig = px.scatter(dff.sort_values(by=[gene_value], kind='mergesort'),
                      #x coordinates
                      x='x',
                      #y coordinates
