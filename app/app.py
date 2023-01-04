@@ -12,15 +12,15 @@ import numpy as np
 import pandas as pd
 
 app = Dash(__name__)
-server = app.server
+#server = app.server
 
 ##=========================Global variables=========================##
 #Nolan's computer
 df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
-#df = pd.read_csv('../thymus_single_cell_dec_2022.csv', index_col=0)
-default_gene = 'Aire'
+default_gene = 'Gm26798'
 #For Lab computer
-#df = pd.read_csv('data/thymus_single_cell_dec_2022.csv', index_col=0)
+#df = pd.read_hdf('data/thymus_single_cell_dec_2022.hdf5', index_col=0)
+#default_gene = 'Aire'
 cell_cols_no_genes = ['cell_type', 'genotype' ,'x', 'y']
 genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
 #generate gene list
@@ -126,16 +126,19 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
     input_id = ctx.triggered_id
     global df
     if df is not None:
-        #filter df to only contain data with chosen genotype
+        #set default genotype value to WT
         if genotype_value is None:
             genotype_value = 'WT'
+        #filter df to only contain data with chosen genotype
         dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
+        #set initial gene value to be equal to default gene
+        if gene_value is None:
+            gene_value = default_gene
+        #check if gene value is in dataframe
         gene_value_in_df = gene_value in list(dff)
-        if gene_value is None or not gene_value_in_df:
-            gene_value = default_gene if default_gene in list(dff) else list(dff)[0]
-            #check if list(dff)[0] is a gene
-            if gene_value in cell_cols_no_genes:
-                gene_value = None
+        #set gene value to be equal to default gene if gene not in dataframe
+        if not gene_value_in_df:
+            gene_value = default_gene
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
@@ -230,5 +233,5 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
 
 ##=========================Local development only=========================##
 if __name__ == '__main__':
-    app.run_server(debug=True, port=8050)
+    app.run_server(debug=True)
 
