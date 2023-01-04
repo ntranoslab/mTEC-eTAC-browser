@@ -35,22 +35,26 @@ colorscales = px.colors.named_colorscales()
 ##=========================Page Layout=========================##
 app.layout = html.Div([
     html.Div([
-        html.A(
-            html.Img(src='assets/gardner-lab-logo-200w.png', style={'display': 'inline-block'}),
-            href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
-            target = '_blank'
-            ),
-        html.H3('Analyze:', id = 'headline'),
         html.Div([
-            dcc.Tabs(id='analyze-tabs', value='mTECs', children=[
-
-        
-            dcc.Tab(label='mTECs', value='mTECs')
-            #dcc.Tab(label='eTACs', value='eTACs'),
-            #dcc.Tab(label='Other', value='Other')
-            ])
-            ], style = {'float': 'right'}),
+                html.A(
+                html.Img(src='assets/gardner-lab-logo-200w-transparent.png', style={'width': '15%', 'display': 'inline-block'}),
+                href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
+                target = '_blank'
+                ),
+                html.Div([
+                    dcc.Tabs(id='analyze-tabs', value='mTECs', children=[
+                
+                    dcc.Tab(label='mTECs', value='mTECs'),
+                    dcc.Tab(label='eTACs', value='eTACs'),
+                    dcc.Tab(label='Other', value='Other')
+                    ])
+                ], style = {'float': 'right'}),
+            ]),
+        html.Div([
+            html.H3('mTECs', id = 'headline'),
+        ])
     ], className = 'header'),
+
 
     html.Br(),
 
@@ -63,13 +67,13 @@ app.layout = html.Div([
                 plot_bgcolor = "white",
                 width=650, height=650),
                 id='umap-graphic-gene')
-        ], style={'width': '40vw', 'display': 'inline-block'}),
+        ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '1.5%'}),
         html.Div([
             dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider')
             ], style={'marginBottom': '60px',
-                    'marginLeft': '10px',
-                    'marginRight': '20px',
-                    'display': 'inline-block'}),
+                    'marginLeft': '1%',
+                    'marginRight': '1.5%',
+                    'display': 'inline-block', 'float': 'center'}),
         html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                 xaxis={'visible': False, 'showticklabels': False},
@@ -77,7 +81,7 @@ app.layout = html.Div([
                 plot_bgcolor = "white",
                 width=650, height=650),
                 id='umap-graphic-cell-types')
-            ], style={'width': '40vw', 'display': 'inline-block'}),
+            ], style={'width': '37.5%', 'display': 'inline-block', 'marginRight': '1%'}),
         html.Div([
             #input for gene
             html.H3('Gene:', id='gene-headline'),
@@ -97,11 +101,11 @@ app.layout = html.Div([
                 html.Button('1st', id = 'first-percentile-button'),
                 html.Button('99th', id = 'ninty-ninth-percentile-button')
                 ], style = {'display': 'inline-block'})
-        ], style={'width': '8%', 'float': 'right', 'display': 'inline-block', 'marginRight': '1%'}),
-    ], className = 'graphs'),
+        ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
+    ], className = 'graphs', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),
     
 
-])
+], style = {'marginLeft': '2%', 'marginRight': '2%', 'marginTop': '1%', 'marginBottom': '1%'})
 
     
 ##=========================Callback=========================##
@@ -174,8 +178,6 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
                      )
         gene_fig.update_layout(
             autosize = True,
-            minreducedwidth=650,
-            minreducedheight=650,
             title = {
                 'text': '<b>' + gene_value + '</b>',
                 'x': 0.5,
@@ -190,6 +192,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             },
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
+            margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
             )
 
@@ -203,8 +206,6 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         cell_type_fig.update_layout(
             #width = 650, height = 650,
             autosize = True,
-            minreducedwidth=650,
-            minreducedheight=650,
             title = {
                 'text': '<b>Cell Types</b>',
                 'x': 0.5,
@@ -217,6 +218,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
                     'color': '#4C5C75'
                 }
             },
+            margin={'l':10, 'r': 10},
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"

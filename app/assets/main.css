@@ -9,7 +9,10 @@ body {
 }
 
 #headline {
-	display: none;
+	font-size: xx-large;
+	color: #4C5C75;
+	text-align: center;
+	padding: 0px;
 }
 
 #gene-headline {
@@ -50,41 +53,41 @@ body {
 
 .tab-parent .tab-container {
 	border: 2px;
-	border-color: white;
+	border-color: ghostwhite;
 	border-style: solid;
 }
 
 .tab-parent .tab-container .tab {
 	border: 2px;
-	border-color: white;
+	border-color: ghostwhite;
 	border-style: solid;
-	background-color: white;
+	background-color: ghostwhite;
 	padding: 5px 20px 5px 20px;
 }
 
 .tab-parent .tab-container .tab:last-of-type {
 	border: 2px;
-	border-color: white;
+	border-color: ghostwhite;
 	border-style: solid;
-	background-color: white;
+	background-color: ghostwhite;
 	padding: 5px 20px 5px 20px;
 }
 
 .tab-parent .tab-container .tab:hover {
 	border-style: solid;
-	border-color: white;
+	border-color: ghostwhite;
 	background-color: lightgray;
 }
 
 .tab-parent .tab-container .tab:hover:last-of-type {
 	border-style: solid;
-	border-color: white;
+	border-color: ghostwhite;
 	background-color: lightgray;
 }
 
 .tab-parent .tab-container .tab--selected {
 	border: 2px;
-	border-color: white;
+	border-color: ghostwhite;
 	border-style: solid;
 	color: #3F6CB4;
 	font-weight: bold;
@@ -92,7 +95,7 @@ body {
 
 .tab-parent .tab-container .tab--selected:last-of-type{
 	border: 2px;
-	border-color: white;
+	border-color: ghostwhite;
 	border-style: solid;
 	color: #3F6CB4;
 	font-weight: bold;
@@ -100,8 +103,8 @@ body {
 
 .tab-parent .tab-container .tab:last-of-type.tab--selected{
 	border: 2px;
-	border-color: white;
-	border-top: white;
+	border-color: ghostwhite;
+	border-top: ghostwhite;
 	border-style: solid;
 	color: #3F6CB4;
 	font-weight: bold;
