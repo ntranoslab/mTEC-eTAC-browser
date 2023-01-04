@@ -94,8 +94,8 @@ app.layout = html.Div([
                 ),
             html.Br(),
             html.Div([
-                html.Button('1st'),
-                html.Button('99th')
+                html.Button('1st', id = 'first-percentile-button'),
+                html.Button('99th', id = 'ninty-ninth-percentile-button')
                 ], style = {'display': 'inline-block'})
         ], style={'width': '8%', 'float': 'right', 'display': 'inline-block', 'marginRight': '1%'}),
     ], className = 'graphs'),
@@ -118,10 +118,12 @@ app.layout = html.Div([
     Input('genotype-value', 'value'),
     Input('gene-value', 'value'),
     Input('umap-graphic-gene-slider', 'value'),
-    Input('color-scale-dropdown', 'value')
+    Input('color-scale-dropdown', 'value'),
+    Input('first-percentile-button', 'n_clicks'),
+    Input('ninty-ninth-percentile-button', 'n_clicks')
     )
 
-def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_scale_dropdown_value):
+def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
 
     input_id = ctx.triggered_id
     global df
@@ -142,8 +144,18 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
-        lower_slider_value = percentile_values[1] if input_id != 'umap-graphic-gene-slider' else min(umap_graphic_gene_slider)
-        higher_slider_value = percentile_values[0] if input_id != 'umap-graphic-gene-slider' else max(umap_graphic_gene_slider)
+        if input_id == 'umap-graphic-gene-slider':
+            lower_slider_value = min(umap_graphic_gene_slider)
+            higher_slider_value = max(umap_graphic_gene_slider)
+        elif input_id == 'first-percentile-button':
+            lower_slider_value = percentile_values[1]
+            higher_slider_value = max(umap_graphic_gene_slider)
+        elif input_id == 'ninty-ninth-percentile-button':
+            lower_slider_value = min(umap_graphic_gene_slider)
+            higher_slider_value = percentile_values[0]
+        else:
+            lower_slider_value = percentile_values[1]
+            higher_slider_value = percentile_values[0]
 
         gene_fig = px.scatter(dff,
                      #x coordinates
