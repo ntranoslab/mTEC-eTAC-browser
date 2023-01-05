@@ -23,7 +23,6 @@ button{
 	cursor: pointer;
 	font-size: medium;
 	padding: 0px 5px;
-	margin: 2px;
 }
 
 #category {
@@ -53,6 +52,10 @@ button{
 	color: purple;
 }
 
+#home-button {
+	cursor: disabled;
+}
+
 .header {
 	background-color: ghostwhite;
 }
@@ -67,7 +70,13 @@ button{
 
 .page-buttons:hover {
 	background-color: lightgray;
-	color: blue;
+	color: #3F6CB4;
+	font-weight: bold;
+}
+
+.selected-button {
+	padding: 5px 20px 5px 20px;
+	color: lightgray;
 	font-weight: bold;
 }
 

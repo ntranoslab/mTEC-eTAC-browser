@@ -38,13 +38,19 @@ layout = html.Div([
                 target = '_blank'
                 ),
                 html.Div([
-                    dcc.Tabs(id='analyze-tabs', value='mTECs', children=[
-                
-                    dcc.Tab(label='mTECs', value='mTECs'),
-                    dcc.Tab(label='eTACs', value='eTACs'),
-                    dcc.Tab(label='Other', value='Other')
-                    ])
-                ], style = {'float': 'right'}),
+                    html.A(
+                    html.Button('Home', className='page-buttons'),
+                    href='/'
+                    ),
+                    html.A(
+                    html.Button('mTECs', className='selected-button'),
+                    href='/mtecs'
+                    ),
+                    html.A(
+                    html.Button('eTACs', className='page-buttons'),
+                    href='/etacs'
+                    ),
+                ], style = {'float': 'right', 'display': 'inline-block'}),
             ]),
         html.Div([
             html.H3('mTECs', id = 'headline'),

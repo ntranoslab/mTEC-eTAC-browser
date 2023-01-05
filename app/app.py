@@ -15,43 +15,8 @@ import pandas as pd
 app = Dash(__name__, use_pages=True)
 server = app.server
 
-##=========================Global variables=========================##
-#Nolan's computer
-df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
-default_gene = 'Gm26798'
-#For Lab computer
-#df = pd.read_hdf('data/thymus_single_cell_dec_2022.hdf5', index_col=0)
-#default_gene = 'Aire'
-cell_cols_no_genes = ['cell_type', 'genotype' ,'x', 'y']
-genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
-#generate gene list
-gene_list = list(df.columns.unique())
-#remove non-gene columns from gene list
-for i in cell_cols_no_genes:
-    gene_list.remove(i)
-#make gene list into array
-gene_list = np.array(gene_list)
-colorscales = px.colors.named_colorscales()
-
 ##=========================Page Layout=========================##
 app.layout = html.Div([
-    html.Div(
-        [
-            html.Div([
-                dcc.Link(
-                    'Home', href='/'
-                ),
-                html.Br(),
-                dcc.Link(
-                    'mTECs', href='/mtecs'
-                ),
-                html.Br(),
-                dcc.Link(
-                    'eTACs', href='/etacs'
-                ),
-            ])
-        ]
-    ),
 
         dash.page_container,
     ])

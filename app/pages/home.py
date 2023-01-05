@@ -13,7 +13,7 @@ layout = html.Div([
                 ),
                 html.Div([
                     html.A(
-                    html.Button('Home', className='page-buttons'),
+                    html.Button('Home', className='selected-button'),
                     href='/'
                     ),
                     html.A(
@@ -25,14 +25,6 @@ layout = html.Div([
                     href='/etacs'
                     ),
                 ], style = {'float': 'right', 'display': 'inline-block'}),
-                html.Div([
-                    dcc.Tabs(id='analyze-tabs', value='', children=[
-                
-                    dcc.Tab(label='mTECs', value='mTECs'),
-                    dcc.Tab(label='eTACs', value='eTACs'),
-                    dcc.Tab(label='Other', value='Other')
-                    ])
-                ], style = {'float': 'right'}),
             ]),
         html.Div([
             html.H3('Home', id = 'headline'),
