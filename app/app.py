@@ -37,12 +37,19 @@ colorscales = px.colors.named_colorscales()
 app.layout = html.Div([
     html.Div(
         [
-            html.Div(
+            html.Div([
                 dcc.Link(
-                    f"{page['name']} - {page['path']}", href=page["relative_path"]
-                )
-            )
-            for page in dash.page_registry.values()
+                    'Home', href='/'
+                ),
+                html.Br(),
+                dcc.Link(
+                    'mTECs', href='/mtecs'
+                ),
+                html.Br(),
+                dcc.Link(
+                    'eTACs', href='/etacs'
+                ),
+            ])
         ]
     ),
 

@@ -12,7 +12,7 @@ dash.register_page(__name__)
 
 ##=========================Global variables=========================##
 #Nolan's computer
-df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
+df = pd.read_csv('../test-data/WT_KO_thymus_subset_random_genes.csv', index_col=0)
 default_gene = 'Gm26798'
 #For Lab computer
 #df = pd.read_hdf('data/thymus_single_cell_dec_2022.hdf5', index_col=0)
@@ -38,7 +38,7 @@ layout = html.Div([
                 target = '_blank'
                 ),
                 html.Div([
-                    dcc.Tabs(id='analyze-tabs', value='mTECs', children=[
+                    dcc.Tabs(id='analyze-tabs', value='eTACs', children=[
                 
                     dcc.Tab(label='mTECs', value='mTECs'),
                     dcc.Tab(label='eTACs', value='eTACs'),
@@ -47,7 +47,7 @@ layout = html.Div([
                 ], style = {'float': 'right'}),
             ]),
         html.Div([
-            html.H3('mTECs', id = 'headline'),
+            html.H3('eTACs', id = 'headline'),
         ])
     ], className = 'header'),
 
@@ -62,10 +62,10 @@ layout = html.Div([
                 yaxis={'visible': False, 'showticklabels': False},
                 plot_bgcolor = "white",
                 width=650, height=650),
-                id='umap-graphic-gene-mtecs')
+                id='umap-graphic-gene-etacs')
         ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%'}),
         html.Div([
-            dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs')
+            dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider-etacs')
             ], style={'marginBottom': '60px',
                     'marginLeft': '1%',
                     'marginRight': '1.5%',
@@ -76,15 +76,15 @@ layout = html.Div([
                 yaxis={'visible': False, 'showticklabels': False},
                 plot_bgcolor = "white",
                 width=650, height=650),
-                id='umap-graphic-cell-types-mtecs')
+                id='umap-graphic-cell-types-etacs')
             ], style={'width': '37.5%', 'display': 'inline-block', 'marginRight': '1%'}),
         html.Div([
             #input for gene
             html.H3('Gene:', id='gene-headline'),
-            dcc.Input(placeholder = 'Select a gene...', debounce = True, id='gene-value-mtecs'),
+            dcc.Input(placeholder = 'Select a gene...', debounce = True, id='gene-value-etacs'),
             #dropdown for genotype
             html.H3('Genotype:', id='genotype-headline'),
-            dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-mtecs'),
+            dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-etacs'),
             #dropdown for colorscale
             html.H3('Color Scale:', id = 'color-scale-headline'),
             dcc.Dropdown(
@@ -112,17 +112,17 @@ layout = html.Div([
 ##=========================Callback=========================##
 
 @callback(
-    Output('umap-graphic-gene-mtecs', 'figure'),
-    Output('umap-graphic-cell-types-mtecs', 'figure'),
-    Output('gene-value-mtecs', 'value'),
-    Output('genotype-value-mtecs', 'value'),
-    Output('umap-graphic-gene-slider-mtecs', 'min'),
-    Output('umap-graphic-gene-slider-mtecs', 'max'),
-    Output('umap-graphic-gene-slider-mtecs', 'marks'),
-    Output('umap-graphic-gene-slider-mtecs', 'value'),
-    Input('genotype-value-mtecs', 'value'),
-    Input('gene-value-mtecs', 'value'),
-    Input('umap-graphic-gene-slider-mtecs', 'value'),
+    Output('umap-graphic-gene-etacs', 'figure'),
+    Output('umap-graphic-cell-types-etacs', 'figure'),
+    Output('gene-value-etacs', 'value'),
+    Output('genotype-value-etacs', 'value'),
+    Output('umap-graphic-gene-slider-etacs', 'min'),
+    Output('umap-graphic-gene-slider-etacs', 'max'),
+    Output('umap-graphic-gene-slider-etacs', 'marks'),
+    Output('umap-graphic-gene-slider-etacs', 'value'),
+    Input('genotype-value-etacs', 'value'),
+    Input('gene-value-etacs', 'value'),
+    Input('umap-graphic-gene-slider-etacs', 'value'),
     Input('color-scale-dropdown', 'value'),
     Input('first-percentile-button', 'n_clicks'),
     Input('ninty-ninth-percentile-button', 'n_clicks')
@@ -151,7 +151,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
-        if input_id == 'umap-graphic-gene-slider-mtecs':
+        if input_id == 'umap-graphic-gene-slider-etacs':
             lower_slider_value = min(umap_graphic_gene_slider)
             higher_slider_value = max(umap_graphic_gene_slider)
         elif input_id == 'first-percentile-button':
