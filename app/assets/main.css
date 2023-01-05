@@ -8,6 +8,24 @@ body {
 	background-color: ghostwhite;
 }
 
+a:-webkit-any-link{
+	color: #99A6BC;
+	text-decoration: none;
+}
+
+button{
+	font-family: Arial;
+	background-color: ghostwhite;
+	color: #99A6BC;
+	border-width: 2px;
+	border-color: ghostwhite;
+	border-style: solid;
+	cursor: pointer;
+	font-size: medium;
+	padding: 0px 5px;
+	margin: 2px;
+}
+
 #category {
 	display: none;
 }
@@ -41,6 +59,16 @@ body {
 
 .graphs{
 	background-color: white;
+}
+
+.page-buttons {
+	padding: 5px 20px 5px 20px;
+}
+
+.page-buttons:hover {
+	background-color: lightgray;
+	color: blue;
+	font-weight: bold;
 }
 
 .has-value.Select--single>.Select-control .Select-value .Select-value-label {

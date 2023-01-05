@@ -12,7 +12,21 @@ layout = html.Div([
                 target = '_blank'
                 ),
                 html.Div([
-                    dcc.Tabs(id='analyze-tabs', value='mTECs', children=[
+                    html.A(
+                    html.Button('Home', className='page-buttons'),
+                    href='/'
+                    ),
+                    html.A(
+                    html.Button('mTECs', className='page-buttons'),
+                    href='/mtecs'
+                    ),
+                    html.A(
+                    html.Button('eTACs', className='page-buttons'),
+                    href='/etacs'
+                    ),
+                ], style = {'float': 'right', 'display': 'inline-block'}),
+                html.Div([
+                    dcc.Tabs(id='analyze-tabs', value='', children=[
                 
                     dcc.Tab(label='mTECs', value='mTECs'),
                     dcc.Tab(label='eTACs', value='eTACs'),
@@ -24,4 +38,12 @@ layout = html.Div([
             html.H3('Home', id = 'headline'),
         ])
     ], className = 'header'),
+
+    
 ])
+
+
+
+
+
+
