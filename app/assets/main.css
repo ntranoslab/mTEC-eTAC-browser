@@ -59,8 +59,7 @@ button{
 	border-top-left-radius: 5px;
 	border-bottom-left-radius: 5px;
 	padding: 5px 10px;
-	transition: background-color;
-	transition-duration: 0.5s;
+	transition-duration: 0.2s;
 }
 
 #first-percentile-button:hover {
@@ -76,8 +75,7 @@ button{
 	border-top-right-radius: 5px;
 	border-bottom-right-radius:5px;
 	padding: 5px 10px;
-	transition: background-color;
-	transition-duration: 0.5s;
+	transition-duration: 0.2s;
 }
 
 #ninty-ninth-percentile-button:hover {
@@ -91,16 +89,39 @@ button{
 	background-color: ghostwhite;
 }
 
+.home-body {
+	text-align: center;
+	margin-top: 5%;
+	margin-bottom: 15%;
+}
+
+
+.home-buttons {
+	padding: 5px 20px 5px 20px;
+	background-color: white;
+	border-color: white;
+	transition-duration: 0.2s;
+}
+
+.home-buttons:hover {
+	background-color: lightgray;
+	border-color: lightgray;
+	color: #3F6CB4;
+	font-weight: bold;
+}
+
 .page-body{
 	background-color: white;
 }
 
 .page-buttons {
 	padding: 5px 20px 5px 20px;
+	transition-duration: 0.2s;
 }
 
 .page-buttons:hover {
 	background-color: lightgray;
+	border-color: lightgray;
 	color: #3F6CB4;
 	font-weight: bold;
 }
@@ -109,6 +130,8 @@ button{
 	padding: 5px 20px 5px 20px;
 	color: lightgray;
 	font-weight: bold;
+	cursor: not-allowed;
+	display: none;
 }
 
 .has-value.Select--single>.Select-control .Select-value .Select-value-label {
