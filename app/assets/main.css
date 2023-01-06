@@ -52,15 +52,46 @@ button{
 	color: purple;
 }
 
-#home-button {
-	cursor: disabled;
+#first-percentile-button {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	transition: background-color;
+	transition-duration: 0.5s;
 }
+
+#first-percentile-button:hover {
+	background-color: lightgray;
+	font-weight: bold;
+	color: #3F6CB4;
+}
+
+#ninty-ninth-percentile-button {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius:5px;
+	padding: 5px 10px;
+	transition: background-color;
+	transition-duration: 0.5s;
+}
+
+#ninty-ninth-percentile-button:hover {
+	background-color: lightgray;
+	font-weight: bold;
+	color: #3F6CB4;
+}
+
 
 .header {
 	background-color: ghostwhite;
 }
 
-.graphs{
+.page-body{
 	background-color: white;
 }
 

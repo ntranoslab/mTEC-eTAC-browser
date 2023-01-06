@@ -104,7 +104,7 @@ layout = html.Div([
                 html.Button('99th', id = 'ninty-ninth-percentile-button')
                 ], style = {'display': 'inline-block'})
         ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
-    ], className = 'graphs', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),
+    ], className = 'page-body', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),
 
     html.Div([
         html.H3('Description:', id='description-headline'),
