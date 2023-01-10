@@ -67,12 +67,6 @@ layout = html.Div([
                 id='umap-graphic-gene-mtecs')
         ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%'}),
         html.Div([
-            dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs')
-            ], style={'marginBottom': '60px',
-                    'marginLeft': '1%',
-                    'marginRight': '1.5%',
-                    'display': 'inline-block', 'float': 'center'}),
-        html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                 xaxis={'visible': False, 'showticklabels': False},
                 yaxis={'visible': False, 'showticklabels': False},
@@ -94,6 +88,13 @@ layout = html.Div([
                 options = colorscales,
                 value = 'plasma'
                 ),
+            html.H3('Gene Limits:', id = 'slider-headline'),
+            html.Div([
+            dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs')
+            ], style={'marginBottom': '60px',
+                    'marginLeft': '1%',
+                    'marginRight': '1.5%',
+                    'display': 'inline-block', 'float': 'center'}),
             html.Br(),
             html.Div([
                 html.Button('1st', id = 'first-percentile-button'),
