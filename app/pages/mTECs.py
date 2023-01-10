@@ -12,11 +12,11 @@ dash.register_page(__name__)
 
 ##=========================Global variables=========================##
 #Nolan's computer
-df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
-default_gene = 'Gm26798'
+#df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
+#default_gene = 'Gm26798'
 #For Lab computer
-#df = pd.read_hdf('data/thymus_single_cell_dec_2022.hdf5', index_col=0)
-#default_gene = 'Aire'
+df = pd.read_hdf('data/thymus_single_cell_dec_2022.hdf5', index_col=0)
+default_gene = 'Aire'
 cell_cols_no_genes = ['cell_type', 'genotype' ,'x', 'y']
 genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
 #generate gene list
