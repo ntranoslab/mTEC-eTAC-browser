@@ -6,15 +6,27 @@ dash.register_page(__name__, path='/')
 layout = html.Div([
     html.Div([
         html.Div([
-                html.A(
-                html.Img(src='assets/gardner-lab-logo-200w-transparent.png', style={'width': '15%', 'display': 'inline-block'}),
+            html.A(
+                html.Img(src='assets/gardner-lab-logo-200w-transparent.png', id = 'lab-logo'),
                 href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
                 target = '_blank'
                 ),
-            ]),
-        html.Div([
+            ], id = 'lab-logo-link'),
             html.H3('Home', id = 'headline'),
-        ])
+            html.Div([
+                    html.A(
+                    html.Button('Home', className='selected-button'),
+                    href='/'
+                    ),
+                    html.A(
+                    html.Button('mTECs', className='page-buttons'),
+                    href='/mtecs'
+                    ),
+                    html.A(
+                    html.Button('eTACs', className='page-buttons'),
+                    href='/etacs'
+                    ),
+                ], id = 'tabs'),
     ], className = 'header'),
 
     html.Div([

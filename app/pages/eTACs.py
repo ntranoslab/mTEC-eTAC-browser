@@ -32,12 +32,14 @@ colorscales = px.colors.named_colorscales()
 layout = html.Div([
     html.Div([
         html.Div([
-                html.A(
-                html.Img(src='assets/gardner-lab-logo-200w-transparent.png', style={'width': '15%', 'display': 'inline-block'}),
+            html.A(
+                html.Img(src='assets/gardner-lab-logo-200w-transparent.png', id = 'lab-logo'),
                 href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
                 target = '_blank'
                 ),
-                html.Div([
+            ], id = 'lab-logo-link'),
+            html.H3('eTACs', id = 'headline'),
+            html.Div([
                     html.A(
                     html.Button('Home', className='page-buttons'),
                     href='/'
@@ -50,15 +52,8 @@ layout = html.Div([
                     html.Button('eTACs', className='selected-button'),
                     href='/etacs'
                     ),
-                ], style = {'float': 'right', 'display': 'inline-block'}),
-            ]),
-        html.Div([
-            html.H3('eTACs', id = 'headline'),
-        ])
+                ], id = 'tabs'),
     ], className = 'header'),
-
-
-    html.Br(),
 
     html.Div([
         #html.H3('UMAPs', id='graph-name-value'),

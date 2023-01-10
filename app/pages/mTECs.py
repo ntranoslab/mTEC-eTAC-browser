@@ -12,7 +12,8 @@ dash.register_page(__name__)
 
 ##=========================Global variables=========================##
 #Nolan's computer
-df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
+df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv')
+#df = pd.read_hdf('../test-data/thymus_single_cell_dec_2022.hdf5', index_col=0)
 default_gene = 'Gm26798'
 #For Lab computer
 #df = pd.read_hdf('data/thymus_single_cell_dec_2022.hdf5', index_col=0)
@@ -32,12 +33,14 @@ colorscales = px.colors.named_colorscales()
 layout = html.Div([
     html.Div([
         html.Div([
-                html.A(
-                html.Img(src='assets/gardner-lab-logo-200w-transparent.png', style={'width': '15%', 'display': 'inline-block'}),
+            html.A(
+                html.Img(src='assets/gardner-lab-logo-200w-transparent.png', id = 'lab-logo'),
                 href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
                 target = '_blank'
                 ),
-                html.Div([
+            ], id = 'lab-logo-link'),
+            html.H3('mTECs', id = 'headline'),
+            html.Div([
                     html.A(
                     html.Button('Home', className='page-buttons'),
                     href='/'
@@ -50,15 +53,8 @@ layout = html.Div([
                     html.Button('eTACs', className='page-buttons'),
                     href='/etacs'
                     ),
-                ], style = {'float': 'right', 'display': 'inline-block'}),
-            ]),
-        html.Div([
-            html.H3('mTECs', id = 'headline'),
-        ])
+                ], id = 'tabs'),
     ], className = 'header'),
-
-
-    html.Br(),
 
     html.Div([
         #html.H3('UMAPs', id='graph-name-value'),

@@ -29,11 +29,23 @@ button{
 	display: none;
 }
 
+#lab-logo-link {
+	display: block;
+	width: 15%;
+}
+
+#lab-logo {
+	display: block;
+	width: 100%;
+}
+
 #headline {
 	font-size: xx-large;
 	color: #4C5C75;
-	text-align: center;
-	padding: 0px;
+}
+
+#tabs {
+	width: 15%;
 }
 
 #gene-headline {
@@ -86,7 +98,11 @@ button{
 
 
 .header {
+	display: flex;
 	background-color: ghostwhite;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
 }
 
 .home-body {
