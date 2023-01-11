@@ -65,7 +65,7 @@ layout = html.Div([
                 plot_bgcolor = "white",
                 width=650, height=650),
                 id='umap-graphic-gene-mtecs')
-        ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%'}),
+        ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%', 'marginRight': '1%'}),
         html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                 xaxis={'visible': False, 'showticklabels': False},

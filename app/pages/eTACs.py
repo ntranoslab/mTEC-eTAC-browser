@@ -10,6 +10,40 @@ import pandas as pd
 
 dash.register_page(__name__)
 
+layout = html.Div([
+    html.Div([
+        html.Div([
+            html.A(
+                html.Img(src='assets/gardner-lab-logo-200w-transparent.png', id = 'lab-logo'),
+                href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
+                target = '_blank'
+                ),
+            ], id = 'lab-logo-link'),
+            html.H3('eTACs', id = 'headline'),
+            html.Div([
+                    html.A(
+                    html.Button('Home', className='page-buttons'),
+                    href='/'
+                    ),
+                    html.A(
+                    html.Button('mTECs', className='page-buttons'),
+                    href='/mtecs'
+                    ),
+                    html.A(
+                    html.Button('eTACs', className='selected-button'),
+                    href='/etacs'
+                    ),
+                ], id = 'tabs'),
+    ], className = 'header'),
+
+    html.H1('Coming Soon...')
+
+    ])
+
+"""
+Delete comment^ and above layout when ready to publish eTACs
+
+
 ##=========================Global variables=========================##
 #Nolan's computer
 df = pd.read_csv('../test-data/WT_KO_thymus_subset_random_genes.csv')
@@ -65,7 +99,7 @@ layout = html.Div([
                 plot_bgcolor = "white",
                 width=650, height=650),
                 id='umap-graphic-gene-etacs')
-        ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%'}),
+        ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%', 'marginRight': '1%'}),
         html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                 xaxis={'visible': False, 'showticklabels': False},
@@ -251,4 +285,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
     return fig, fig, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+
+"""
+
 
