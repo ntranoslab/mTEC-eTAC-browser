@@ -88,7 +88,7 @@ layout = html.Div([
                 options = colorscales,
                 value = 'plasma'
                 ),
-            html.H3('Gene Limits:', id = 'slider-headline'),
+            html.H3('Color Map:', id = 'slider-headline'),
             html.Div([
                 dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-etacs'),
                 ], style = {'marginLeft': '5px'}),
