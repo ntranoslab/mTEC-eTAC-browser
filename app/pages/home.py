@@ -39,7 +39,7 @@ layout = html.Div([
                 html.H5('Explore our data on this cell population that resides in the thymus, a primary lymphoid organ.'),
                 ], style={'width': '50%', 'height': '100%', 'display': 'inline-grid'}, className = 'home-body'),
                 className='home-buttons'), 
-            href = '/mTECs'),
+            href = '/mtecs'),
 
         html.A(
             html.Button(
