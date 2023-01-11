@@ -46,7 +46,7 @@ Delete comment^ and above layout when ready to publish eTACs
 
 ##=========================Global variables=========================##
 #Nolan's computer
-df = pd.read_csv('../test-data/WT_KO_thymus_subset_random_genes.csv')
+df = pd.read_csv('../test-data/WT_KO_thymus_subset_random_genes.csv', index_col=0)
 #df = pd.read_hdf('../test-data/thymus_single_cell_dec_2022.hdf5', index_col=0)
 default_gene = 'Gm26798'
 #For Lab computer
@@ -167,19 +167,21 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
     input_id = ctx.triggered_id
     global df
     if df is not None:
+        if gene_value is None:
+            gene_value = default_gene
+        #check if gene value is in dataframe
+        gene_value_in_df = gene_value in list(df)
+        #set gene value to be equal to default gene if gene not in dataframe (assuming default gene is in dataframe)
+        if not gene_value_in_df:
+            gene_value = default_gene
+        new_columns = [gene_value] + cell_cols_no_genes
+        dff = df[new_columns].copy(deep=False)
         #set default genotype value to WT
         if genotype_value is None:
             genotype_value = 'WT'
         #filter df to only contain data with chosen genotype
-        dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
+        dff = dff[dff['genotype'] == genotype_value].copy(deep=False) if genotype_value != 'All' else dff
         #set initial gene value to be equal to default gene
-        if gene_value is None:
-            gene_value = default_gene
-        #check if gene value is in dataframe
-        gene_value_in_df = gene_value in list(dff)
-        #set gene value to be equal to default gene if gene not in dataframe (assuming default gene is in dataframe)
-        if not gene_value_in_df:
-            gene_value = default_gene
 
         #percentile slider code
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01])
