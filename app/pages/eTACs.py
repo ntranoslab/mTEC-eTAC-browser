@@ -58,7 +58,7 @@ genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
 gene_list = list(df.columns.unique())
 #remove non-gene columns from gene list
 for i in cell_cols_no_genes:
-    gene_list.remove(i)
+    gene_list.pop()
 #make gene list into array
 gene_list = np.array(gene_list)
 colorscales = px.colors.named_colorscales()
