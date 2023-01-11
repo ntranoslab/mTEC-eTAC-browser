@@ -52,7 +52,11 @@ button{
 	color: #4C5C75;
 }
 
-#gene-value {
+#gene-value-mtecs {
+	width: 95.5%;
+}
+
+#gene-value-etacs {
 	width: 95.5%;
 }
 
@@ -109,7 +113,14 @@ button{
 	color: #3F6CB4;
 }
 
-#umap-graphic-gene-slider {
+#umap-graphic-gene-slider-mtecs {
+	display: inline !important;
+	margin-left: 25px;
+	margin-right: 25px;
+	padding: 0px;
+}
+
+#umap-graphic-gene-slider-etacs {
 	display: inline !important;
 	margin-left: 25px;
 	margin-right: 25px;
