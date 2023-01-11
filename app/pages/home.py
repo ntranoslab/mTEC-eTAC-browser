@@ -31,31 +31,27 @@ layout = html.Div([
 
     html.Div([
 
-        html.Div([
-            html.H3('mTECs'),
-            html.H4('medullary Thymic Epithelial Cells'),
-            html.Br(),
-            html.H5('Explore our data on this cell population that resides in the thymus:'),
-            html.A(
-                    html.Button('mTECs', className='home-buttons'),
-                    href='/mtecs'
-                    ),
-            ], style={'width': '50%', 'height': '100%', 'display': 'inline-block'}, className = 'home-body'),
+        html.A(
+            html.Button(
+                html.Div([
+                html.H3('mTECs'),
+                html.H4('medullary Thymic Epithelial Cells'),
+                html.H5('Explore our data on this cell population that resides in the thymus, a primary lymphoid organ.'),
+                ], style={'width': '50%', 'height': '100%', 'display': 'inline-grid'}, className = 'home-body'),
+                className='home-buttons'), 
+            href = '/mTECs'),
 
-        html.Div([
+        html.A(
+            html.Button(
+                html.Div([
+                html.H3('eTACs'),
+                html.H4('extraThymic Aire-expressing Cells'),
+                html.H5('Explore our data on this cell population that mainly resides in secondary lymphoid organs.'),
+                ], style={'width': '50%', 'height': '100%', 'display': 'inline-grid'}, className = 'home-body'),
+                className='home-buttons'), 
+            href = '/etacs'),
 
-            html.H3('eTACs'),
-            html.H4('extraThymic Aire-expressing Cells'),
-            html.Br(),
-            html.H5('Explore our data on this cell population that mainly resides in secondary lymphoid organs:'),
-            html.A(
-                    html.Button('eTACs', className='home-buttons'),
-                    href='/etacs'
-                    ),
-
-            ], style={'width': '50%', 'display': 'inline-block'}, className = 'home-body'),
-
-        ], className='page-body', style={'margin-left': '-3%', 'margin-right': '-3%', 'height': '100%'}),
+        ], className='page-body', style={'margin-left': '-3%', 'margin-right': '-3%', 'height': '100%', 'display': 'flex', 'justify-content': 'center'}),
 
     
 ])
