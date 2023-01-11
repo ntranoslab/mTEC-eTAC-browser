@@ -77,7 +77,7 @@ layout = html.Div([
         html.Div([
             #input for gene
             html.H3('Gene:', id='gene-headline'),
-            dcc.Input(placeholder = 'Select a gene...', debounce = True, id='gene-value-mtecs'),
+            dcc.Input(placeholder = 'Select a gene...', debounce = True, id='gene-value'),
             #dropdown for genotype
             html.H3('Genotype:', id='genotype-headline'),
             dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-mtecs'),
@@ -90,16 +90,13 @@ layout = html.Div([
                 ),
             html.H3('Gene Limits:', id = 'slider-headline'),
             html.Div([
-            dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs')
-            ], style={'marginBottom': '60px',
-                    'marginLeft': '1%',
-                    'marginRight': '1.5%',
-                    'display': 'inline-block', 'float': 'center'}),
-            html.Br(),
+                dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider'),
+                ], style = {'marginLeft': '5px'}),
+            html.H3('Percentiles:'),
             html.Div([
                 html.Button('1st', id = 'first-percentile-button'),
                 html.Button('99th', id = 'ninty-ninth-percentile-button')
-                ], style = {'display': 'inline-block'})
+                ], style = {'display': 'flex', 'justify-content': 'space-between'})
         ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
     ], className = 'page-body', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),
 
@@ -117,15 +114,15 @@ layout = html.Div([
 @callback(
     Output('umap-graphic-gene-mtecs', 'figure'),
     Output('umap-graphic-cell-types-mtecs', 'figure'),
-    Output('gene-value-mtecs', 'value'),
+    Output('gene-value', 'value'),
     Output('genotype-value-mtecs', 'value'),
-    Output('umap-graphic-gene-slider-mtecs', 'min'),
-    Output('umap-graphic-gene-slider-mtecs', 'max'),
-    Output('umap-graphic-gene-slider-mtecs', 'marks'),
-    Output('umap-graphic-gene-slider-mtecs', 'value'),
+    Output('umap-graphic-gene-slider', 'min'),
+    Output('umap-graphic-gene-slider', 'max'),
+    Output('umap-graphic-gene-slider', 'marks'),
+    Output('umap-graphic-gene-slider', 'value'),
     Input('genotype-value-mtecs', 'value'),
-    Input('gene-value-mtecs', 'value'),
-    Input('umap-graphic-gene-slider-mtecs', 'value'),
+    Input('gene-value', 'value'),
+    Input('umap-graphic-gene-slider', 'value'),
     Input('color-scale-dropdown', 'value'),
     Input('first-percentile-button', 'n_clicks'),
     Input('ninty-ninth-percentile-button', 'n_clicks')
@@ -154,7 +151,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01])
         df_gene_min = min(dff[gene_value])
         df_gene_max = max(dff[gene_value])
-        if input_id == 'umap-graphic-gene-slider-mtecs':
+        if input_id == 'umap-graphic-gene-slider':
             lower_slider_value = min(umap_graphic_gene_slider)
             higher_slider_value = max(umap_graphic_gene_slider)
         elif input_id == 'first-percentile-button':

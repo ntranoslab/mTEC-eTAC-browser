@@ -52,6 +52,10 @@ button{
 	color: #4C5C75;
 }
 
+#gene-value {
+	width: 95.5%;
+}
+
 #genotype-headline {
 	color: #4C5C75;
 }
@@ -72,7 +76,9 @@ button{
 	background-color: white;
 	border-color: lightgray;
 	border-width: 1px;
+	border-top-right-radius: 5px;
 	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
 	border-bottom-left-radius: 5px;
 	padding: 5px 10px;
 	transition-duration: 0.2s;
@@ -89,15 +95,25 @@ button{
 	border-color: lightgray;
 	border-width: 1px;
 	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
 	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
 	padding: 5px 10px;
 	transition-duration: 0.2s;
+	text-align: right;
 }
 
 #ninty-ninth-percentile-button:hover {
 	background-color: lightgray;
 	font-weight: bold;
 	color: #3F6CB4;
+}
+
+#umap-graphic-gene-slider {
+	display: inline !important;
+	margin-left: 25px;
+	margin-right: 25px;
+	padding: 0px;
 }
 
 
