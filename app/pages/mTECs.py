@@ -11,9 +11,6 @@ import pandas as pd
 dash.register_page(__name__)
 
 ##=========================Global variables=========================##
-#Nolan's computer
-#df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
-#default_gene = 'Gm26798'
 #For Lab computer
 df = pd.read_hdf('data/thymus_single_cell_dec_2022.hdf5', index_col=0)
 default_gene = 'Aire'
@@ -32,12 +29,14 @@ colorscales = px.colors.named_colorscales()
 layout = html.Div([
     html.Div([
         html.Div([
-                html.A(
-                html.Img(src='assets/gardner-lab-logo-200w-transparent.png', style={'width': '15%', 'display': 'inline-block'}),
+            html.A(
+                html.Img(src='assets/gardner-lab-logo-200w-transparent.png', id = 'lab-logo'),
                 href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
                 target = '_blank'
                 ),
-                html.Div([
+            ], id = 'lab-logo-link'),
+            html.H3('mTECs', id = 'headline'),
+            html.Div([
                     html.A(
                     html.Button('Home', className='page-buttons'),
                     href='/'
@@ -50,15 +49,8 @@ layout = html.Div([
                     html.Button('eTACs', className='page-buttons'),
                     href='/etacs'
                     ),
-                ], style = {'float': 'right', 'display': 'inline-block'}),
-            ]),
-        html.Div([
-            html.H3('mTECs', id = 'headline'),
-        ])
+                ], id = 'tabs'),
     ], className = 'header'),
-
-
-    html.Br(),
 
     html.Div([
         #html.H3('UMAPs', id='graph-name-value'),
@@ -70,12 +62,6 @@ layout = html.Div([
                 width=650, height=650),
                 id='umap-graphic-gene-mtecs')
         ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%'}),
-        html.Div([
-            dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = True, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs')
-            ], style={'marginBottom': '60px',
-                    'marginLeft': '1%',
-                    'marginRight': '1.5%',
-                    'display': 'inline-block', 'float': 'center'}),
         html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                 xaxis={'visible': False, 'showticklabels': False},
@@ -98,6 +84,13 @@ layout = html.Div([
                 options = colorscales,
                 value = 'plasma'
                 ),
+            html.H3('Gene Limits:', id = 'slider-headline'),
+            html.Div([
+            dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs')
+            ], style={'marginBottom': '60px',
+                    'marginLeft': '1%',
+                    'marginRight': '1.5%',
+                    'display': 'inline-block', 'float': 'center'}),
             html.Br(),
             html.Div([
                 html.Button('1st', id = 'first-percentile-button'),
