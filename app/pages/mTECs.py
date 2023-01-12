@@ -13,8 +13,9 @@ dash.register_page(__name__)
 ##=========================Global variables=========================##
 #Nolan's computer
 df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
-#df = pd.read_hdf('../test-data/thymus_single_cell_dec_2022.hdf5', index_col=0)
 default_gene = 'Gm26798'
+#df = pd.read_hdf('../test-data/thymus_single_cell_dec_2022.hdf5', index_col=0).copy(deep=False)
+#default_gene='Aire'
 #For Lab computer
 #df = pd.read_hdf('data/thymus_single_cell_dec_2022.hdf5', index_col=0)
 #default_gene = 'Aire'
@@ -205,10 +206,11 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             plot_bgcolor = "white"
             )
 
-        cell_type_fig = px.scatter(dff, x='x',
+        cell_type_fig = px.scatter(dff.sort_values(by=['cell_type'], kind='mergesort', ascending=False), x='x',
         #x coordinates
                      y='y',
                      color = 'cell_type',
+                     color_discrete_sequence = px.colors.qualitative.Light24,
                      hover_name = 'cell_type',
                      labels={'cell_type': ''}
                      )

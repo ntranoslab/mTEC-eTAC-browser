@@ -239,10 +239,11 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             plot_bgcolor = "white"
             )
 
-        cell_type_fig = px.scatter(dff, x='x',
+        cell_type_fig = px.scatter(dff.sort_values(by=['cell_type'], kind='mergesort', ascending=False), x='x',
         #x coordinates
                      y='y',
                      color = 'cell_type',
+                     color_discrete_sequence = px.colors.qualitative.Light24,
                      hover_name = 'cell_type',
                      labels={'cell_type': ''}
                      )
