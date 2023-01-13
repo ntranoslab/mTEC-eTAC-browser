@@ -12,20 +12,24 @@ dash.register_page(__name__)
 
 ##=========================Global variables=========================##
 #Nolan's computer
-df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
-default_gene = 'Gm26798'
+#df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
+#default_gene = 'Gm26798'
+
+df_path = '../test-data/thymus_single_cell_dec_2022.hdf5'
 #df = pd.read_hdf('../test-data/thymus_single_cell_dec_2022.hdf5', index_col=0).copy(deep=False)
-#default_gene='Aire'
+default_gene='Aire'
 #For Lab computer
 #df = pd.read_hdf('data/thymus_single_cell_dec_2022.hdf5', index_col=0)
 #default_gene = 'Aire'
 cell_cols_no_genes = ['cell_type', 'genotype' ,'x', 'y']
+df_genes = pd.read_hdf(df_path, index_col = 0, nrows = 1).copy(deep=False)
+df = pd.read_hdf(df_path, usecols = cell_cols_no_genes + [default_gene]).copy(deep=False)
 genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
 #generate gene list
-gene_list = list(df.columns.unique())
+gene_list = list(df_genes.columns.unique())
 #remove non-gene columns from gene list
-for i in cell_cols_no_genes:
-    gene_list.pop()
+#for i in cell_cols_no_genes:
+#    gene_list.pop()
 #make gene list into array
 gene_list = np.array(gene_list)
 colorscales = px.colors.named_colorscales()
@@ -142,7 +146,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         if not gene_value_in_df:
             gene_value = default_gene
         new_columns = [gene_value] + cell_cols_no_genes
-        dff = df[new_columns].copy(deep=False)
+        dff = pd.read_hdf(df_path, usecols = new_columns).copy(deep=False)
         #set default genotype value to WT
         if genotype_value is None:
             genotype_value = 'WT'
