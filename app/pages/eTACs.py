@@ -292,6 +292,3 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
     return fig, fig, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
 """
-
-
->>>>>>> d7f29b506017e7d669357242e0173182513b134f
