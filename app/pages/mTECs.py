@@ -11,16 +11,25 @@ import pandas as pd
 dash.register_page(__name__)
 
 ##=========================Global variables=========================##
+#Nolan's computer
+#df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
+#default_gene = 'Gm26798'
+
+df_path = '../test-data/thymus_single_cell_dec_2022.hdf5'
+#df = pd.read_hdf('../test-data/thymus_single_cell_dec_2022.hdf5', index_col=0).copy(deep=False)
+default_gene='Aire'
 #For Lab computer
-df = pd.read_hdf('data/thymus_single_cell_dec_2022.hdf5', index_col=0)
-default_gene = 'Aire'
+#df = pd.read_hdf('data/thymus_single_cell_dec_2022.hdf5', index_col=0)
+#default_gene = 'Aire'
 cell_cols_no_genes = ['cell_type', 'genotype' ,'x', 'y']
+df_genes = pd.read_hdf(df_path, index_col = 0, nrows = 1).copy(deep=False)
+df = pd.read_hdf(df_path, usecols = cell_cols_no_genes + [default_gene]).copy(deep=False)
 genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
 #generate gene list
-gene_list = list(df.columns.unique())
+gene_list = list(df_genes.columns.unique())
 #remove non-gene columns from gene list
-for i in cell_cols_no_genes:
-    gene_list.remove(i)
+#for i in cell_cols_no_genes:
+#    gene_list.pop()
 #make gene list into array
 gene_list = np.array(gene_list)
 colorscales = px.colors.named_colorscales()
@@ -61,7 +70,7 @@ layout = html.Div([
                 plot_bgcolor = "white",
                 width=650, height=650),
                 id='umap-graphic-gene-mtecs')
-        ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%'}),
+        ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%', 'marginRight': '1%'}),
         html.Div([
             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                 xaxis={'visible': False, 'showticklabels': False},
@@ -84,18 +93,15 @@ layout = html.Div([
                 options = colorscales,
                 value = 'plasma'
                 ),
-            html.H3('Gene Limits:', id = 'slider-headline'),
+            html.H3('Color Map:', id = 'slider-headline'),
             html.Div([
-            dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, verticalHeight = 475, tooltip={'placement': 'right', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs')
-            ], style={'marginBottom': '60px',
-                    'marginLeft': '1%',
-                    'marginRight': '1.5%',
-                    'display': 'inline-block', 'float': 'center'}),
-            html.Br(),
+                dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs'),
+                ], style = {'marginLeft': '5px'}),
+            html.H3('Percentiles:'),
             html.Div([
                 html.Button('1st', id = 'first-percentile-button'),
                 html.Button('99th', id = 'ninty-ninth-percentile-button')
-                ], style = {'display': 'inline-block'})
+                ], style = {'display': 'flex', 'justify-content': 'space-between'})
         ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
     ], className = 'page-body', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),
 
@@ -132,19 +138,21 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
     input_id = ctx.triggered_id
     global df
     if df is not None:
+        if gene_value is None:
+            gene_value = default_gene
+        #check if gene value is in dataframe
+        gene_value_in_df = gene_value in list(df)
+        #set gene value to be equal to default gene if gene not in dataframe (assuming default gene is in dataframe)
+        if not gene_value_in_df:
+            gene_value = default_gene
+        new_columns = [gene_value] + cell_cols_no_genes
+        dff = pd.read_hdf(df_path, usecols = new_columns).copy(deep=False)
         #set default genotype value to WT
         if genotype_value is None:
             genotype_value = 'WT'
         #filter df to only contain data with chosen genotype
-        dff = df[df['genotype'] == genotype_value] if genotype_value != 'All' else df
+        dff = dff[dff['genotype'] == genotype_value].copy(deep=False) if genotype_value != 'All' else dff
         #set initial gene value to be equal to default gene
-        if gene_value is None:
-            gene_value = default_gene
-        #check if gene value is in dataframe
-        gene_value_in_df = gene_value in list(dff)
-        #set gene value to be equal to default gene if gene not in dataframe (assuming default gene is in dataframe)
-        if not gene_value_in_df:
-            gene_value = default_gene
 
         #percentile slider code
         percentile_values = np.quantile(dff[gene_value], [0.99, 0.01])
@@ -196,16 +204,18 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
                     'color': '#4C5C75'
                 }
             },
+            coloraxis_colorbar= {'thicknessmode': 'pixels', 'thickness': 30},
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
             )
 
-        cell_type_fig = px.scatter(dff, x='x',
+        cell_type_fig = px.scatter(dff.sort_values(by=['cell_type'], kind='mergesort', ascending=False), x='x',
         #x coordinates
                      y='y',
                      color = 'cell_type',
+                     color_discrete_sequence = px.colors.qualitative.Light24,
                      hover_name = 'cell_type',
                      labels={'cell_type': ''}
                      )
@@ -224,6 +234,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
                     'color': '#4C5C75'
                 }
             },
+            legend={'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed'},
             margin={'l':10, 'r': 10},
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
@@ -251,3 +262,4 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
     return fig, fig, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
+>>>>>>> d7f29b506017e7d669357242e0173182513b134f
