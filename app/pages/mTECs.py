@@ -200,6 +200,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
                     'color': '#4C5C75'
                 }
             },
+            coloraxis_colorbar= {'thicknessmode': 'pixels', 'thickness': 30},
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             margin={'l': 10, 'r': 10},
@@ -229,6 +230,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
                     'color': '#4C5C75'
                 }
             },
+            legend={'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed'},
             margin={'l':10, 'r': 10},
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
