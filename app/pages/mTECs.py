@@ -40,7 +40,7 @@ layout = html.Div([
                 target = '_blank'
                 ),
             ], id = 'lab-logo-link'),
-            html.H3('mTECs', id = 'headline'),
+            html.H3('Central', id = 'headline'),
             html.Div([
                     html.A(
                     html.Button('Home', className='page-buttons'),
