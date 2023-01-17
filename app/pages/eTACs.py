@@ -169,6 +169,8 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
     if df is not None:
         if gene_value is None:
             gene_value = default_gene
+        #first capitalize gene value
+        gene_value = gene_value.capitalize()
         #check if gene value is in dataframe
         gene_value_in_df = gene_value in list(df)
         #set gene value to be equal to default gene if gene not in dataframe (assuming default gene is in dataframe)
