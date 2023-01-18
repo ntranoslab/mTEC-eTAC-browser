@@ -73,7 +73,7 @@ layout = html.Div([
                 target = '_blank'
                 ),
             ], id = 'lab-logo-link'),
-            html.H3('eTACs', id = 'headline'),
+            html.H3('Periphery', id = 'headline'),
             html.Div([
                     html.A(
                     html.Button('Home', className='page-buttons'),
