@@ -45,7 +45,7 @@ layout = html.Div([
                 target = '_blank'
                 ),
             ], id = 'lab-logo-link'),
-            html.H3('Central', id = 'headline'),
+            html.H3('Thymus', id = 'headline'),
             html.Div([
                     html.A(
                     html.Button('Home', className='page-buttons'),
@@ -61,6 +61,8 @@ layout = html.Div([
                     ),
                 ], id = 'tabs'),
     ], className = 'header'),
+
+    html.Br(),
 
     html.Div([
         #html.H3('UMAPs', id='graph-name-value'),
@@ -98,7 +100,7 @@ layout = html.Div([
             html.Div([
                 dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs'),
                 ], style = {'marginLeft': '5px'}),
-            html.H3('Percentiles:'),
+            html.H4('Percentiles', id = 'percentile-headline'),
             html.Div([
                 html.Button('1st', id = 'first-percentile-button'),
                 html.Button('99th', id = 'ninty-ninth-percentile-button')

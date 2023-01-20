@@ -84,6 +84,12 @@ button{
 	color: #4C5C75;
 }
 
+#percentile-headline {
+	color: #4C5C75;
+	text-align: center;
+	font-size: 1.0625em;
+}
+
 #graph-name-value {
 	color: purple;
 }
