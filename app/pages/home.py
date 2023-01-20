@@ -29,6 +29,8 @@ layout = html.Div([
                 ], id = 'tabs'),
     ], className = 'header'),
 
+    html.Br(),
+
     html.Div([
 
         html.A(
