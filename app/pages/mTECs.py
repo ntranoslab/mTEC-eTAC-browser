@@ -137,8 +137,8 @@ layout = html.Div([
 def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
 
     input_id = ctx.triggered_id
-    global df
-    if df is not None:
+    global metadata
+    if metadata is not None:
         if gene_value is None:
             gene_value = default_gene
         #first lower case gene value
@@ -151,19 +151,17 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             gene_value = default_gene
 
         #table to get gene_value from
-        table = gene_table_dict[gene_value]
+        table = gene_lookup[gene_value]
         #extract gene column from table
         gene_data = pd.read_sql(table, con=engine, columns = [gene_value, 'barcode'])
         #set default genotype value to WT
         if genotype_value is None:
             genotype_value = 'WT'
         #makes genotype value into list of selected genotypes
-        if genotype_value == 'All':
-            genotype_value = genotype_list
+        if genotype_value != 'All':
+            metadata_subset = metadata[metadata.genotype == genotype_value]
         else:
-            genotype_value = [genotype_value]
-        #filters on selected genotype value
-        metadata_subset = metadata[metadata.genotype.isin(genotype_value)]
+            metadata_subset = metadata
 
         #subset expression data on selected cells [gene_value, meta_cols]
         gene_data = pd.merge(gene_data, metadata_subset, on='barcode', how='inner')
