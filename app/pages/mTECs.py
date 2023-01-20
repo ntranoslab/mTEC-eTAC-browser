@@ -22,11 +22,11 @@ host = 'gardner-lab-computer'
 user = 'nolan'
 passwd = '!GARD.ner11'
 engine = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}?local_infile=1")
-default_gene='Aire'
+default_gene='aire'
 
 #metadata_cols = ['cell_type', 'genotype' ,'x', 'y']
 metadata = pd.read_sql('cellmetadata', con=engine)
-with open(f"../assets/{database}_gene_table_lookup.csv") as f:
+with open(f"assets/{database}_gene_table_lookup.csv") as f:
     next(f)  # Skip the header
     reader = csv.reader(f, skipinitialspace=True)
     gene_lookup = dict(reader)

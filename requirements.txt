@@ -132,3 +132,5 @@ xarray==2022.12.0
 xyzservices==2022.9.0
 zipp==3.8.1
 tables
+pymysql
+sqlalchemy
