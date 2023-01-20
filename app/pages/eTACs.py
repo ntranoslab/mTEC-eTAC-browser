@@ -52,12 +52,12 @@ default_gene = 'Gm26798'
 #For Lab computer
 #df = pd.read_hdf('data/thymus_single_cell_dec_2022.hdf5', index_col=0)
 #default_gene = 'Aire'
-cell_cols_no_genes = ['cell_type', 'genotype' ,'x', 'y']
+metadata_cols = ['cell_type', 'genotype' ,'x', 'y']
 genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
 #generate gene list
 gene_list = list(df.columns.unique())
 #remove non-gene columns from gene list
-for i in cell_cols_no_genes:
+for i in metadata_cols:
     gene_list.pop()
 #make gene list into array
 gene_list = np.array(gene_list)
@@ -176,7 +176,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         #set gene value to be equal to default gene if gene not in dataframe (assuming default gene is in dataframe)
         if not gene_value_in_df:
             gene_value = default_gene
-        new_columns = [gene_value] + cell_cols_no_genes
+        new_columns = [gene_value] + metadata_cols
         dff = df[new_columns].copy(deep=False)
         #set default genotype value to WT
         if genotype_value is None:

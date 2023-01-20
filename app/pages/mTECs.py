@@ -5,29 +5,34 @@ from dash import Dash, dcc, html, callback, Input, Output, State, ctx
 import dash
 import plotly.express as px
 import numpy as np
+import sqlalchemy as db
 
 import pandas as pd
+import csv
 
 dash.register_page(__name__)
 
 ##=========================Global variables=========================##
 #Nolan's computer
-df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
-default_gene = 'Gm26798'
-#df = pd.read_hdf('../test-data/thymus_single_cell_dec_2022.hdf5', index_col=0).copy(deep=False)
-#default_gene='Aire'
-#For Lab computer
-#df = pd.read_hdf('data/thymus_single_cell_dec_2022.hdf5', index_col=0)
-#default_gene = 'Aire'
-cell_cols_no_genes = ['cell_type', 'genotype' ,'x', 'y']
-genotype_list = np.insert(df['genotype'].unique(), 0, 'All')
-#generate gene list
-gene_list = list(df.columns.unique())
-#remove non-gene columns from gene list
-for i in cell_cols_no_genes:
-    gene_list.pop()
-#make gene list into array
-gene_list = np.array(gene_list)
+#df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
+#default_gene = 'Gm26798'
+
+database = 'thymus'
+host = 'gardner-lab-computer'
+user = 'nolan'
+passwd = '!GARD.ner11'
+engine = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}?local_infile=1")
+default_gene='Aire'
+
+#metadata_cols = ['cell_type', 'genotype' ,'x', 'y']
+metadata = pd.read_sql('cellmetadata', con=engine)
+with open(f"../assets/{database}_gene_table_lookup.csv") as f:
+    next(f)  # Skip the header
+    reader = csv.reader(f, skipinitialspace=True)
+    gene_lookup = dict(reader)
+gene_list = gene_lookup.keys()
+genotype_list = np.insert(metadata.genotype.unique(), 0, 'All')
+
 colorscales = px.colors.named_colorscales()
 
 ##=========================Page Layout=========================##
@@ -136,26 +141,38 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
     if df is not None:
         if gene_value is None:
             gene_value = default_gene
-        #first capitalize gene value
-        gene_value = gene_value.capitalize()
+        #first lower case gene value
+        gene_value = gene_value.lower()
+
         #check if gene value is in dataframe
-        gene_value_in_df = gene_value in list(df)
+        gene_value_in_df = gene_value in gene_list
         #set gene value to be equal to default gene if gene not in dataframe (assuming default gene is in dataframe)
         if not gene_value_in_df:
             gene_value = default_gene
-        new_columns = [gene_value] + cell_cols_no_genes
-        dff = df[new_columns].copy(deep=False)
+
+        #table to get gene_value from
+        table = gene_table_dict[gene_value]
+        #extract gene column from table
+        gene_data = pd.read_sql(table, con=engine, columns = [gene_value, 'barcode'])
         #set default genotype value to WT
         if genotype_value is None:
             genotype_value = 'WT'
-        #filter df to only contain data with chosen genotype
-        dff = dff[dff['genotype'] == genotype_value].copy(deep=False) if genotype_value != 'All' else dff
+        #makes genotype value into list of selected genotypes
+        if genotype_value == 'All':
+            genotype_value = genotype_list
+        else:
+            genotype_value = [genotype_value]
+        #filters on selected genotype value
+        metadata_subset = metadata[metadata.genotype.isin(genotype_value)]
+
+        #subset expression data on selected cells [gene_value, meta_cols]
+        gene_data = pd.merge(gene_data, metadata_subset, on='barcode', how='inner')
         #set initial gene value to be equal to default gene
 
         #percentile slider code
-        percentile_values = np.quantile(dff[gene_value], [0.99, 0.01])
-        df_gene_min = min(dff[gene_value])
-        df_gene_max = max(dff[gene_value])
+        percentile_values = np.quantile(gene_data[gene_value], [0.99, 0.01])
+        df_gene_min = min(gene_data[gene_value])
+        df_gene_max = max(gene_data[gene_value])
         if input_id == 'umap-graphic-gene-slider-mtecs':
             lower_slider_value = min(umap_graphic_gene_slider)
             higher_slider_value = max(umap_graphic_gene_slider)
@@ -173,7 +190,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         
         #graphs
         #sort dff based on cells highest expressing to lowest expressing gene - makes the gene scatter plot graph highest expressing cells on top of lower expressing cells
-        gene_fig = px.scatter(dff.sort_values(by=[gene_value], kind='mergesort'),
+        gene_fig = px.scatter(gene_data.sort_values(by=[gene_value], kind='mergesort'),
                      #x coordinates
                      x='x',
                      #y coordinates
@@ -209,7 +226,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             plot_bgcolor = "white"
             )
 
-        cell_type_fig = px.scatter(dff.sort_values(by=['cell_type'], kind='mergesort', ascending=False), x='x',
+        cell_type_fig = px.scatter(gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False), x='x',
         #x coordinates
                      y='y',
                      color = 'cell_type',
