@@ -14,8 +14,9 @@ import pandas as pd
 import os
 import sys
 
-app = Dash(__name__, use_pages=True)
-server = app.server
+app = Dash(__name__, use_pages=True,
+    assets_folder = "static", assets_url_path="static")
+application = app.server
 
 ##=========================Page Layout=========================##
 app.layout = html.Div([
@@ -25,7 +26,7 @@ app.layout = html.Div([
 ##=========================Local development only=========================##
 if __name__ == '__main__':
     if 'LOCALDEV' in os.environ:
-        app.run_server(debug=True, port=8080)
+        app.run_server(host='0.0.0.0', debug=True, port=8080)
     else:
-        server.run(host='0.0.0.0', debug=False, port=8080)
+        application.run(port=8080)
 

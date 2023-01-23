@@ -7,7 +7,7 @@ layout = html.Div([
     html.Div([
         html.Div([
             html.A(
-                html.Img(src='assets/gardner-lab-logo-200w-transparent.png', id = 'lab-logo'),
+                html.Img(src='static/gardner-lab-logo-200w-transparent.png', id = 'lab-logo'),
                 href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
                 target = '_blank'
                 ),
@@ -43,7 +43,7 @@ layout = html.Div([
                 className='home-buttons'), 
             href = '/mtecs', id='mtec-home-button'),
 
-        html.Img(src='assets/gardnerhero_0.jpeg', id = 'etac-picture', style = {'width': '50%', 'float': 'right'}),
+        html.Img(src='static/gardnerhero_0.jpeg', id = 'etac-picture', style = {'width': '50%', 'float': 'right'}),
         html.A(
             html.Button(
                 html.Div([
