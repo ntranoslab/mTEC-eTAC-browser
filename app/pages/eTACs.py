@@ -9,6 +9,8 @@ import sqlalchemy as db
 
 import pandas as pd
 import csv
+import os
+import boto3
 
 dash.register_page(__name__)
 
@@ -18,10 +20,12 @@ dash.register_page(__name__)
 #df = pd.read_csv('../test-data/WT_KO_thymus_subset_random_genes.csv', index_col=0)
 #df = pd.read_hdf('../test-data/thymus_single_cell_dec_2022.hdf5', index_col=0)
 database = 'lymphnode'
-host = 'gardner-lab-computer'
-user = 'nolan'
-passwd = '!GARD.ner11'
-engine = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}?local_infile=1")
+ssm = boto3.client('ssm', region_name='us-west-2')
+host = ssm.get_parameter(Name= "RDS_HOSTNAME")['Parameter']['Value']
+user = ssm.get_parameter(Name= "RDS_USERNAME")['Parameter']['Value']
+passwd = ssm.get_parameter(Name= "RDS_PASSWORD", WithDecryption = True)['Parameter']['Value']
+
+engine = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}")
 default_gene='aire'
 
 #metadata_cols = ['cell_type', 'genotype' ,'x', 'y']
@@ -62,6 +66,7 @@ layout = html.Div([
     ], className = 'header'),
 
     html.Br(),
+
 
     html.Div([
         #html.H3('UMAPs', id='graph-name-value'),

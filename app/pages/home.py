@@ -57,4 +57,4 @@ layout = html.Div([
         ], className='page-body', style={'height': '100%', 'display': 'flex', 'justify-content': 'center'}),
 
     
-])
+    ])

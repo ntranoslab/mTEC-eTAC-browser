@@ -9,6 +9,9 @@ import sqlalchemy as db
 
 import pandas as pd
 import csv
+import os
+import boto3
+import sys
 
 dash.register_page(__name__)
 
@@ -16,12 +19,17 @@ dash.register_page(__name__)
 #Nolan's computer
 #df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
 #default_gene = 'Gm26798'
+if 'localdev' in sys.argv:
+    df = pd.read_csv('../test-data/WT_KO_thymus_subset.csv', index_col=0)
+else:
+    database = 'thymus'
+    ssm = boto3.client('ssm', region_name='us-west-2')
+    host = ssm.get_parameter(Name= "RDS_HOSTNAME")['Parameter']['Value']
+    user = ssm.get_parameter(Name= "RDS_USERNAME")['Parameter']['Value']
+    passwd = ssm.get_parameter(Name= "RDS_PASSWORD", WithDecryption = True)['Parameter']['Value']
 
-database = 'thymus'
-host = 'gardner-lab-computer'
-user = 'nolan'
-passwd = '!GARD.ner11'
-engine = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}?local_infile=1")
+    engine = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}")
+
 default_gene='aire'
 
 #metadata_cols = ['cell_type', 'genotype' ,'x', 'y']
