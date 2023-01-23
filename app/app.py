@@ -11,6 +11,8 @@ import plotly.express as px
 import numpy as np
 
 import pandas as pd
+import os
+import sys
 
 app = Dash(__name__, use_pages=True)
 server = app.server
@@ -22,5 +24,8 @@ app.layout = html.Div([
 
 ##=========================Local development only=========================##
 if __name__ == '__main__':
-    server.run(host='0.0.0.0', debug=True, port=8080)
+    if 'LOCALDEV' in os.environ:
+        app.run_server(debug=True, port=8080)
+    else:
+        server.run(host='0.0.0.0', debug=False, port=8080)
 
