@@ -82,6 +82,8 @@ button{
 
 #slider-headline {
 	color: #4C5C75;
+	text-align: center;
+	font-size: 1.0625em;
 }
 
 #percentile-headline {

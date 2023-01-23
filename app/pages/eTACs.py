@@ -17,9 +17,6 @@ dash.register_page(__name__)
 
 
 ##=========================Global variables=========================##
-#Nolan's computer
-#df = pd.read_csv('../test-data/WT_KO_thymus_subset_random_genes.csv', index_col=0)
-#df = pd.read_hdf('../test-data/thymus_single_cell_dec_2022.hdf5', index_col=0)
 database = 'lymphnode'
 if 'LOCALDEV' in os.environ:
     host = 'localhost'
@@ -37,7 +34,6 @@ engine = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}")
 
 default_gene='aire'
 
-#metadata_cols = ['cell_type', 'genotype' ,'x', 'y']
 metadata = pd.read_sql('cellmetadata', con=engine)
 with open(f"static/{database}_gene_table_lookup.csv") as f:
     next(f)  # Skip the header
@@ -78,7 +74,6 @@ layout = html.Div([
 
 
     html.Div([
-        #html.H3('UMAPs', id='graph-name-value'),
         html.Div([
             #input for gene
             html.H3('Gene:', id='gene-headline'),
@@ -87,13 +82,13 @@ layout = html.Div([
             html.H3('Genotype:', id='genotype-headline'),
             dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-etacs'),
             #dropdown for colorscale
-            html.H3('Color Scale:', id = 'color-scale-headline'),
+            html.H3('Color Map:', id = 'color-scale-headline'),
             dcc.Dropdown(
                 id= 'color-scale-dropdown',
                 options = colorscales,
                 value = 'plasma'
                 ),
-            html.H3('Color Map:', id = 'slider-headline'),
+            html.H4('Scale', id = 'slider-headline'),
             html.Div([
                 dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-etacs'),
                 ], style = {'marginLeft': '5px'}),
@@ -252,7 +247,6 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
                      labels={'cell_type': ''}
                      )
         cell_type_fig.update_layout(
-            #width = 650, height = 650,
             autosize = True,
             title = {
                 'text': '<b>Cell Types</b>',
