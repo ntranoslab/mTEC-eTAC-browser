@@ -74,48 +74,104 @@ layout = html.Div([
 
     html.Div([
         html.Div([
-            #input for gene
-            html.H3('Gene:', id='gene-headline'),
-            dcc.Input(placeholder = 'Select a gene...', debounce = True, id='gene-value-mtecs'),
-            #dropdown for genotype
-            html.H3('Genotype:', id='genotype-headline'),
-            dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-mtecs'),
-            #dropdown for colorscale
-            html.H3('Color Map:', id = 'color-scale-headline'),
-            dcc.Dropdown(
-                id= 'color-scale-dropdown',
-                options = colorscales,
-                value = 'plasma'
-                ),
-            html.H4('Scale', id = 'slider-headline'),
+            html.Br(),
+            html.H1('Data Browser', style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
             html.Div([
-                dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs'),
-                ], style = {'marginLeft': '5px'}),
-            html.H4('Percentiles', id = 'percentile-headline'),
+                #input for gene
+                html.H3('Gene:', id='gene-headline'),
+                dcc.Input(placeholder = 'Select a gene...', debounce = True, id='gene-value-mtecs'),
+                #dropdown for genotype
+                html.H3('Genotype:', id='genotype-headline'),
+                dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-mtecs'),
+                #dropdown for colorscale
+                html.H3('Color Map:', id = 'color-scale-headline'),
+                dcc.Dropdown(
+                    id= 'color-scale-dropdown',
+                    options = colorscales,
+                    value = 'plasma'
+                    ),
+                html.H4('Scale', id = 'slider-headline'),
+                html.Div([
+                    dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs'),
+                    ], style = {'marginLeft': '5px'}),
+                html.H4('Percentiles', id = 'percentile-headline'),
+                html.Div([
+                    html.Button('1st', id = 'first-percentile-button'),
+                    html.Button('99th', id = 'ninty-ninth-percentile-button')
+                    ], style = {'display': 'flex', 'justify-content': 'space-between'})
+            ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
             html.Div([
-                html.Button('1st', id = 'first-percentile-button'),
-                html.Button('99th', id = 'ninty-ninth-percentile-button')
-                ], style = {'display': 'flex', 'justify-content': 'space-between'})
-        ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
+                dcc.Loading([
+                    html.Div([
+                        dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                            xaxis={'visible': False, 'showticklabels': False},
+                            yaxis={'visible': False, 'showticklabels': False},
+                            plot_bgcolor = "white",
+                            width=650, height=650),
+                            id='umap-graphic-gene-mtecs')
+                    ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%', 'marginRight': '1%'}),
+                    html.Div([
+                        dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                            xaxis={'visible': False, 'showticklabels': False},
+                            yaxis={'visible': False, 'showticklabels': False},
+                            plot_bgcolor = "white",
+                            width=650, height=650),
+                            id='umap-graphic-cell-types-mtecs')
+                        ], style={'width': '37.5%', 'display': 'inline-block', 'marginRight': '1%'}),
+                ], color='#3F6CB4', type='cube', style={'marginRight': '10%', 'display': 'flex'}),
+            ]),
+        ]),
         html.Div([
-            dcc.Loading([
+            html.Br(),
+            html.H1('Genotype Comparison', style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
+            html.Br(),
+            html.Div([
+                #input for gene
+                html.H3('Gene:', id='gene-headline'),
+                dcc.Input(placeholder = 'Select a gene...', debounce = True, id='genotype-graph-gene-value'),
+                #dropdown for colorscale
+                html.H3('Color Map:', id = 'color-scale-headline'),
+                dcc.Dropdown(
+                    id= 'color-scale-dropdown-genotype',
+                    options = colorscales,
+                    value = 'plasma'
+                    ),
+                html.H4('Scale', id = 'slider-headline'),
                 html.Div([
-                    dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
-                        xaxis={'visible': False, 'showticklabels': False},
-                        yaxis={'visible': False, 'showticklabels': False},
-                        plot_bgcolor = "white",
-                        width=650, height=650),
-                        id='umap-graphic-gene-mtecs')
-                ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%', 'marginRight': '1%'}),
+                    dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='genotype-graph-gene-slider'),
+                    ], style = {'marginLeft': '5px'}),
+                html.H4('Percentiles (from left graph genotype)', id = 'percentile-headline'),
                 html.Div([
-                    dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
-                        xaxis={'visible': False, 'showticklabels': False},
-                        yaxis={'visible': False, 'showticklabels': False},
-                        plot_bgcolor = "white",
-                        width=650, height=650),
-                        id='umap-graphic-cell-types-mtecs')
-                    ], style={'width': '37.5%', 'display': 'inline-block', 'marginRight': '1%'}),
-            ], color='#3F6CB4', type='cube', style={'marginRight': '10%', 'display': 'flex'}),
+                    html.Button('1st', id = 'first-percentile-button-genotype'),
+                    html.Button('99th', id = 'ninty-ninth-percentile-button-genotype')
+                    ], style = {'display': 'flex', 'justify-content': 'space-between'})
+            ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
+            html.Div([
+                html.Div([
+                    dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-left'),
+                    dcc.Loading([
+                        dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                            xaxis={'visible': False, 'showticklabels': False},
+                            yaxis={'visible': False, 'showticklabels': False},
+                            plot_bgcolor = "white",
+                            width=650, height=650),
+                            id='genotype-graph-left')
+                    ], color='#3F6CB4', type='cube', style={'marginRight': '10%', 'display': 'flex'}),
+                ], style={'width': '37.5%', 'marginRight': '1%'}),
+                html.Button('Swap', id='genotype-swap-button'),
+                html.Div([
+                    dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-right'),
+                    dcc.Loading([
+                        dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                            xaxis={'visible': False, 'showticklabels': False},
+                            yaxis={'visible': False, 'showticklabels': False},
+                            plot_bgcolor = "white",
+                            width=650, height=650),
+                            id='genotype-graph-right')
+
+                    ], color='#3F6CB4', type='cube', style={'marginRight': '10%', 'display': 'flex'}),
+                ], style={'width': '37.5%', 'marginLeft': '1%'}),
+            ], style = {'display': 'flex', 'justify-content': 'center'}),
         ]),
     ], className = 'page-body', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),
 

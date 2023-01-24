@@ -133,6 +133,56 @@ button{
 	color: #3F6CB4;
 }
 
+#first-percentile-button-genotype {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	transition-duration: 0.2s;
+}
+
+#first-percentile-button-genotype:hover {
+	background-color: lightgray;
+	font-weight: bold;
+	color: #3F6CB4;
+}
+
+#ninty-ninth-percentile-button-genotype {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	transition-duration: 0.2s;
+	text-align: right;
+}
+
+#ninty-ninth-percentile-button-genotype:hover {
+	background-color: lightgray;
+	font-weight: bold;
+	color: #3F6CB4;
+}
+
+#genotype-swap-button {
+	height: 45px;
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	transition-duration: 0.2s;
+}
+
 #umap-graphic-gene-slider-mtecs {
 	display: inline !important;
 	margin-left: 25px;
@@ -141,6 +191,13 @@ button{
 }
 
 #umap-graphic-gene-slider-etacs {
+	display: inline !important;
+	margin-left: 25px;
+	margin-right: 25px;
+	padding: 0px;
+}
+
+#genotype-graph-gene-slider {
 	display: inline !important;
 	margin-left: 25px;
 	margin-right: 25px;
