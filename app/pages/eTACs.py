@@ -40,7 +40,6 @@ with open(f"static/{database}_gene_table_lookup.csv") as f:
     reader = csv.reader(f, skipinitialspace=True)
     gene_lookup = dict(reader)
 gene_list = gene_lookup.keys()
-genotype_list = np.insert(metadata.genotype.unique(), 0, 'All')
 colorscales = px.colors.named_colorscales()
 
 ##=========================Page Layout=========================##
@@ -78,9 +77,6 @@ layout = html.Div([
             #input for gene
             html.H3('Gene:', id='gene-headline'),
             dcc.Input(placeholder = 'Select a gene...', debounce = True, id='gene-value-etacs'),
-            #dropdown for genotype
-            html.H3('Genotype:', id='genotype-headline'),
-            dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-etacs'),
             #dropdown for colorscale
             html.H3('Color Map:', id = 'color-scale-headline'),
             dcc.Dropdown(
@@ -135,12 +131,10 @@ layout = html.Div([
     Output('umap-graphic-gene-etacs', 'figure'),
     Output('umap-graphic-cell-types-etacs', 'figure'),
     Output('gene-value-etacs', 'value'),
-    Output('genotype-value-etacs', 'value'),
     Output('umap-graphic-gene-slider-etacs', 'min'),
     Output('umap-graphic-gene-slider-etacs', 'max'),
     Output('umap-graphic-gene-slider-etacs', 'marks'),
     Output('umap-graphic-gene-slider-etacs', 'value'),
-    Input('genotype-value-etacs', 'value'),
     Input('gene-value-etacs', 'value'),
     Input('umap-graphic-gene-slider-etacs', 'value'),
     Input('color-scale-dropdown', 'value'),
@@ -148,7 +142,7 @@ layout = html.Div([
     Input('ninty-ninth-percentile-button', 'n_clicks')
     )
 
-def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
+def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
 
     input_id = ctx.triggered_id
     global metadata
@@ -168,17 +162,9 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         table = gene_lookup[gene_value]
         #extract gene column from table
         gene_data = pd.read_sql(table, con=engine, columns = [gene_value, 'barcode'])
-        #set default genotype value to WT
-        if genotype_value is None:
-            genotype_value = 'WT'
-        #makes genotype value into list of selected genotypes
-        if genotype_value != 'All':
-            metadata_subset = metadata[metadata.genotype == genotype_value]
-        else:
-            metadata_subset = metadata
 
         #subset expression data on selected cells [gene_value, meta_cols]
-        gene_data = pd.merge(gene_data, metadata_subset, on='barcode', how='inner')
+        gene_data = pd.merge(gene_data, metadata, on='barcode', how='inner')
         #set initial gene value to be equal to default gene
 
         #percentile slider code
@@ -270,7 +256,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
 
 
 
-        return gene_fig, cell_type_fig, gene_value if gene_value_in_df else 'No Genes Found', genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value if gene_value_in_df else 'No Genes Found', df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
