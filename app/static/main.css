@@ -68,6 +68,10 @@ button{
 	width: 95.5%;
 }
 
+#genotype-graph-gene-value {
+	width: 95.5%;
+}
+
 #gene-value-etacs {
 	width: 95.5%;
 }
@@ -181,6 +185,11 @@ button{
 	border-bottom-left-radius: 5px;
 	padding: 5px 10px;
 	transition-duration: 0.2s;
+}
+
+#genotype-swap-button:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
 }
 
 #umap-graphic-gene-slider-mtecs {
