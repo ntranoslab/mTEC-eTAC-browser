@@ -18,11 +18,10 @@ dash.register_page(__name__)
 
 ##=========================Global variables=========================##
 database = 'lymphnode'
-if 'LOCALDEV' in os.environ:
+if ('LOCALDEV' in os.environ) | ('LOCALDEPLOY' in os.environ):
     host = 'localhost'
     user = 'root'
     passwd = os.environ.get('MYSQLPASSWORD')
-
 else:
     ssm = boto3.client('ssm', region_name='us-west-2')
     host = ssm.get_parameter(Name= "RDS_HOSTNAME")['Parameter']['Value']

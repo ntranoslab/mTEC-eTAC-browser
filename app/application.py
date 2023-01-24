@@ -27,6 +27,8 @@ app.layout = html.Div([
 if __name__ == '__main__':
     if 'LOCALDEV' in os.environ:
         app.run_server(host='0.0.0.0', debug=True, port=8080)
+    elif 'LOCALDEPLOY' in os.environ:
+        app.run_server(host='0.0.0.0', port=8050)
     else:
         application.run(port=8080)
 
