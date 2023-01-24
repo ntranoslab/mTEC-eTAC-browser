@@ -40,7 +40,8 @@ with open(f"static/{database}_gene_table_lookup.csv") as f:
     reader = csv.reader(f, skipinitialspace=True)
     gene_lookup = dict(reader)
 gene_list = gene_lookup.keys()
-colorscales = px.colors.named_colorscales()
+
+colorscales = ['bluered', 'blues', 'cividis', 'dense', 'hot', 'ice', 'inferno', 'magenta', 'magma', 'picnic', 'plasma', 'plotly3', 'purp', 'purples', 'rdpu', 'rdylbu', 'teal', 'viridis']
 
 ##=========================Page Layout=========================##
 layout = html.Div([
