@@ -184,7 +184,8 @@ layout = html.Div([
 ])
 
     
-##=========================Callback=========================##
+##=========================Callbacks=========================##
+#First row of graphs (data browser)
 
 @callback(
     Output('umap-graphic-gene-mtecs', 'figure'),
@@ -342,4 +343,185 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
     return fig, fig, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+
+
+##=========================Callback=========================##
+#Second row of graphs (genotype comparison)
+
+@callback(
+    Output('genotype-graph-left', 'figure'),
+    Output('genotype-graph-right', 'figure'),
+    Output('genotype-value-left', 'value'),
+    Output('genotype-value-right', 'value'),
+    Output('genotype-graph-gene-value', 'value'),
+    Output('genotype-graph-gene-slider', 'min'),
+    Output('genotype-graph-gene-slider', 'max'),
+    Output('genotype-graph-gene-slider', 'marks'),
+    Output('genotype-graph-gene-slider', 'value'),
+    Input('genotype-value-left', 'value'),
+    Input('genotype-value-right', 'value'),
+    Input('genotype-graph-gene-value', 'value'),
+    Input('genotype-graph-gene-slider', 'value'),
+    Input('color-scale-dropdown-genotype', 'value'),
+    Input('first-percentile-button-genotype', 'n_clicks'),
+    Input('ninty-ninth-percentile-button-genotype', 'n_clicks'),
+    Input('genotype-swap-button', 'n_clicks')
+    )
+
+def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype_graph_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, swap_button_click):
+
+    input_id = ctx.triggered_id
+    global metadata
+    if metadata is not None:
+        if gene_value is None:
+            gene_value = default_gene
+        #first lower case gene value
+        gene_value = gene_value.lower()
+
+        #check if gene value is in dataframe
+        gene_value_in_df = gene_value in gene_list
+        #set gene value to be equal to default gene if gene not in dataframe (assuming default gene is in dataframe)
+        if not gene_value_in_df:
+            gene_value = default_gene
+
+        #table to get gene_value from
+        table = gene_lookup[gene_value]
+        #extract gene column from table
+        gene_data = pd.read_sql(table, con=engine, columns = [gene_value, 'barcode'])
+        #set default genotype value to WT
+        genotype_value_left = 'WT' if genotype_value_left is None else genotype_value_left
+        genotype_value_right = 'Aire_KO' if genotype_value_right is None else genotype_value_right
+        #swap genotypes between graphs
+        if input_id == 'genotype-swap-button':
+            genotype_value_temp = genotype_value_left
+            genotype_value_left = genotype_value_right
+            genotype_value_right = genotype_value_temp
+        #makes genotype value into list of selected genotypes
+        if genotype_value_left != 'All':
+            metadata_subset_left = metadata[metadata.genotype == genotype_value_left]
+        else:
+            metadata_subset_left = metadata
+        if genotype_value_right != 'All':
+            metadata_subset_right = metadata[metadata.genotype == genotype_value_right]
+        else:
+            metadata_subset_right = metadata
+
+        #subset expression data on selected cells [gene_value, meta_cols]
+        gene_data_left = pd.merge(gene_data, metadata_subset_left, on='barcode', how='inner')
+        gene_data_right = pd.merge(gene_data, metadata_subset_right, on='barcode', how='inner')
+
+        #percentile slider code
+        percentile_values = np.quantile(gene_data_left[gene_value], [0.99, 0.01])
+        df_gene_min = min(gene_data_left[gene_value])
+        df_gene_max = max(gene_data_left[gene_value])
+        if input_id == 'genotype-graph-gene-slider':
+            lower_slider_value = min(genotype_graph_gene_slider)
+            higher_slider_value = max(genotype_graph_gene_slider)
+        elif input_id == 'first-percentile-button':
+            lower_slider_value = percentile_values[1]
+            higher_slider_value = max(genotype_graph_gene_slider)
+        elif input_id == 'ninty-ninth-percentile-button':
+            lower_slider_value = min(genotype_graph_gene_slider)
+            higher_slider_value = percentile_values[0]
+        else:
+            lower_slider_value = percentile_values[1]
+            higher_slider_value = percentile_values[0]
+
+
+        
+        #graphs
+        #sort dff based on cells highest expressing to lowest expressing gene - makes the gene scatter plot graph highest expressing cells on top of lower expressing cells
+        gene_fig_left = px.scatter(gene_data_left.sort_values(by=[gene_value], kind='mergesort'),
+                     #x coordinates
+                     x='x',
+                     #y coordinates
+                     y='y',
+                     color = gene_value if gene_value != None else default_gene,
+                     hover_name = 'cell_type',
+                     range_color=
+                     #min of color range
+                     [lower_slider_value, 
+                     #max of color range
+                     higher_slider_value],
+                     color_continuous_scale = color_scale_dropdown_value,
+                     labels = {gene_value: ''}
+                     )
+        gene_fig_left.update_layout(
+            autosize = True,
+            title = {
+                'text': '<b>' + gene_value + '</b>',
+                'x': 0.5,
+                'y': 0.95,
+                'xanchor': 'center',
+                'yanchor': 'top',
+                'font': {
+                    'size': 20,
+                    'family': 'Arial',
+                    'color': '#4C5C75'
+                }
+            },
+            coloraxis_colorbar= {'thicknessmode': 'pixels', 'thickness': 30},
+            xaxis={'visible': False, 'showticklabels': False},
+            yaxis={'visible': False, 'showticklabels': False},
+            margin={'l': 10, 'r': 10},
+            plot_bgcolor = "white"
+            )
+
+        gene_fig_right = px.scatter(gene_data_right.sort_values(by=[gene_value], kind='mergesort'),
+                     #x coordinates
+                     x='x',
+                     #y coordinates
+                     y='y',
+                     color = gene_value if gene_value != None else default_gene,
+                     hover_name = 'cell_type',
+                     range_color=
+                     #min of color range
+                     [lower_slider_value, 
+                     #max of color range
+                     higher_slider_value],
+                     color_continuous_scale = color_scale_dropdown_value,
+                     labels = {gene_value: ''}
+                     )
+        gene_fig_right.update_layout(
+            autosize = True,
+            title = {
+                'text': '<b>' + gene_value + '</b>',
+                'x': 0.5,
+                'y': 0.95,
+                'xanchor': 'center',
+                'yanchor': 'top',
+                'font': {
+                    'size': 20,
+                    'family': 'Arial',
+                    'color': '#4C5C75'
+                }
+            },
+            coloraxis_colorbar= {'thicknessmode': 'pixels', 'thickness': 30},
+            xaxis={'visible': False, 'showticklabels': False},
+            yaxis={'visible': False, 'showticklabels': False},
+            margin={'l': 10, 'r': 10},
+            plot_bgcolor = "white"
+            )
+
+        percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
+
+
+
+        return gene_fig_left, gene_fig_right, genotype_value_left, genotype_value_right, gene_value if gene_value_in_df else 'No Genes Found', df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        #gene_slider
+    fig = px.scatter(x=[0],
+                 y=[0],
+                 color_discrete_sequence=['white']
+                 )
+    fig.update_layout(
+        width = 650, height = 650,
+        xaxis={'visible': False, 'showticklabels': False},
+        yaxis={'visible': False, 'showticklabels': False},
+        margin = dict(l=50, r=50, t=50, b=50, pad=4),
+        plot_bgcolor = "white",
+        hovermode = False
+        )
+    default_percentiles = np.quantile([0, 100], [0.99, 0.01])
+    default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
+    return fig, fig, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
