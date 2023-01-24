@@ -99,8 +99,8 @@ layout = html.Div([
                     html.Button('99th', id = 'ninty-ninth-percentile-button')
                     ], style = {'display': 'flex', 'justify-content': 'space-between'})
             ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
-            html.Div([
-                dcc.Loading([
+            dcc.Loading([
+                html.Div([
                     html.Div([
                         dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                             xaxis={'visible': False, 'showticklabels': False},
@@ -108,7 +108,7 @@ layout = html.Div([
                             plot_bgcolor = "white",
                             width=650, height=650),
                             id='umap-graphic-gene-mtecs')
-                    ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%', 'marginRight': '1%'}),
+                    ], style={'width': '45%', 'marginRight': '2.5%'}),
                     html.Div([
                         dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                             xaxis={'visible': False, 'showticklabels': False},
@@ -116,13 +116,13 @@ layout = html.Div([
                             plot_bgcolor = "white",
                             width=650, height=650),
                             id='umap-graphic-cell-types-mtecs')
-                        ], style={'width': '37.5%', 'display': 'inline-block', 'marginRight': '1%'}),
-                ], color='#3F6CB4', type='cube', style={'marginRight': '10%', 'display': 'flex'}),
-            ]),
+                    ], style={'width': '45%', 'marginLeft': '2.5%'}),
+                ], style = {'display': 'flex', 'justify-content': 'center'}),
+            ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
         ]),
         html.Div([
             html.Br(),
-            html.H1('Genotype Comparison', className='graph-titles',style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
+            html.H1('Genotype Comparison', className='graph-titles', style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
             html.Br(),
             html.Div([
                 #input for gene
@@ -145,6 +145,7 @@ layout = html.Div([
                     html.Button('99th', id = 'ninty-ninth-percentile-button-genotype')
                     ], style = {'display': 'flex', 'justify-content': 'space-between'})
             ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
+            html.H3('Reference:', style={'marginLeft': '2.5%'}),
             html.Div([
                 html.Div([
                     dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-left'),
@@ -155,8 +156,8 @@ layout = html.Div([
                             plot_bgcolor = "white",
                             width=650, height=650),
                             id='genotype-graph-left')
-                    ], color='#3F6CB4', type='cube', style={'marginRight': '10%', 'display': 'flex'}),
-                ], style={'width': '37.5%', 'marginRight': '1%'}),
+                    ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
+                ], style={'width': '45%', 'marginLeft': '3%','marginRight': '1%'}),
                 html.Button('Swap', id='genotype-swap-button'),
                 html.Div([
                     dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-right'),
@@ -168,8 +169,8 @@ layout = html.Div([
                             width=650, height=650),
                             id='genotype-graph-right')
 
-                    ], color='#3F6CB4', type='cube', style={'marginRight': '10%', 'display': 'flex'}),
-                ], style={'width': '37.5%', 'marginLeft': '1%'}),
+                    ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
+                ], style={'width': '45%', 'marginLeft': '1%', 'marginRight': '3%'}),
             ], style = {'display': 'flex', 'justify-content': 'center'}),
         ]),
     ], className = 'page-body', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),

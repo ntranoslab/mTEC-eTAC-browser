@@ -73,6 +73,8 @@ layout = html.Div([
 
 
     html.Div([
+        html.Br(),
+        html.H1('Data Browser', className='graph-titles',style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
         html.Div([
             #input for gene
             html.H3('Gene:', id='gene-headline'),
@@ -94,26 +96,26 @@ layout = html.Div([
                 html.Button('99th', id = 'ninty-ninth-percentile-button')
                 ], style = {'display': 'flex', 'justify-content': 'space-between'})
         ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
-        html.Div([
-            dcc.Loading([
+        dcc.Loading([
                 html.Div([
-                    dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
-                        xaxis={'visible': False, 'showticklabels': False},
-                        yaxis={'visible': False, 'showticklabels': False},
-                        plot_bgcolor = "white",
-                        width=650, height=650),
-                        id='umap-graphic-gene-etacs')
-                ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%', 'marginRight': '1%'}),
-                html.Div([
-                    dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
-                        xaxis={'visible': False, 'showticklabels': False},
-                        yaxis={'visible': False, 'showticklabels': False},
-                        plot_bgcolor = "white",
-                        width=650, height=650),
-                        id='umap-graphic-cell-types-etacs')
-                    ], style={'width': '37.5%', 'display': 'inline-block', 'marginRight': '1%'}),
-            ], color='#3F6CB4', type='cube', style={'marginRight': '10%', 'display': 'flex'}),
-        ]),
+                    html.Div([
+                        dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                            xaxis={'visible': False, 'showticklabels': False},
+                            yaxis={'visible': False, 'showticklabels': False},
+                            plot_bgcolor = "white",
+                            width=650, height=650),
+                            id='umap-graphic-gene-etacs')
+                    ], style={'width': '45%', 'marginRight': '1.5%'}),
+                    html.Div([
+                        dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                            xaxis={'visible': False, 'showticklabels': False},
+                            yaxis={'visible': False, 'showticklabels': False},
+                            plot_bgcolor = "white",
+                            width=650, height=650),
+                            id='umap-graphic-cell-types-etacs')
+                    ], style={'width': '45%', 'marginLeft': '1.5%'}),
+                ], style = {'display': 'flex', 'justify-content': 'center'}),
+            ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
     ], className = 'page-body', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),
 
     html.Div([
