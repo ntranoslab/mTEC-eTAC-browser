@@ -12,7 +12,7 @@ layout = html.Div([
                 target = '_blank'
                 ),
             ], id = 'lab-logo-link'),
-            html.H3('Home', id = 'headline'),
+            dcc.Markdown('***Aire*-expressing Cell Atlas**', id = 'headline'),
             html.Div([
                     html.A(
                     html.Button('Home', className='selected-button'),
