@@ -75,7 +75,7 @@ layout = html.Div([
     html.Div([
         html.Div([
             html.Br(),
-            html.H1('Data Browser', style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
+            html.H1('Data Browser', className='graph-titles',style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
             html.Div([
                 #input for gene
                 html.H3('Gene:', id='gene-headline'),
@@ -123,7 +123,7 @@ layout = html.Div([
         ]),
         html.Div([
             html.Br(),
-            html.H1('Genotype Comparison', style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
+            html.H1('Genotype Comparison', className='graph-titles',style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
             html.Br(),
             html.Div([
                 #input for gene
@@ -177,7 +177,7 @@ layout = html.Div([
 
     html.Div([
         html.H3('Description:', id='description-headline'),
-        html.H5('About us and Links to Publications...To be, or not to be: that is the question: Whether tis nobler in the mind to suffer\\The slings and arrows of outrageous fortune,\\Or to take arms against a sea of troubles,\\And by opposing end them?\\To die: to sleep;\\No more; and by a sleep to say we end The heart-ache and the thousand natural shocksThat flesh is heir to, tis a consummation Devoutly to be wishd. // To die, to sleep;To sleep: perchance to dream: ay, theres the rub For in that sleep of death what dreams may come When we have shuffled off this mortal coil,Must give us pause: // theres the respect That makes calamity of so long life;')
+        html.H5('About us and Links to Publications...To be, or not to be: that is the question: Whether tis nobler in the mind to suffer\\The slings and arrows of outrageous fortune,\\Or to take arms against a sea of troubles,\\And by opposing end them?\\To die: to sleep;\\No more; and by a sleep to say we end The heart-ache and the thousand natural shocksThat flesh is heir to, tis a consummation Devoutly to be wishd. // To die, to sleep;To sleep: perchance to dream: ay, theres the rub For in that sleep of death what dreams may come When we have shuffled off this mortal coil,Must give us pause: // theres the respect That makes calamity of so long life;', id = 'description')
         ])
     
 
