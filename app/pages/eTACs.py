@@ -78,7 +78,7 @@ layout = html.Div([
         html.Div([
             #input for gene
             html.H3('Gene:', id='gene-headline'),
-            dcc.Input(placeholder = 'Select a gene...', debounce = True, id='gene-value-etacs'),
+            dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='gene-value-etacs'),
             #dropdown for colorscale
             html.H3('Color Map:', id = 'color-scale-headline'),
             dcc.Dropdown(
