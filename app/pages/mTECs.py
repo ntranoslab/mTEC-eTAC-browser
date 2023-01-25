@@ -151,27 +151,27 @@ layout = html.Div([
                         html.Div([
                             html.H3('Reference Genotype:', style={'marginRight': '2.5%', 'white-space': 'nowrap'}),
                             dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-left', style={'width': '100%'}),
-                        ], style={'display': 'inline-flex', 'width': 'inherit', 'align-items': 'center'}),
+                        ], style={'display': 'inline-flex', 'width': 'inherit', 'align-items': 'center', 'paddingLeft': '22.5%', 'paddingRight': '22.5%', 'width': '50%'}),
                         dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                             xaxis={'visible': False, 'showticklabels': False},
                             yaxis={'visible': False, 'showticklabels': False},
                             plot_bgcolor = "white",
                             width=650, height=650),
                             id='genotype-graph-left'),
-                    ], style={'width': '45%', 'marginLeft': '3%','marginRight': '1%', 'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}),
+                    ], style={'width': '45%', 'marginLeft': '3%','marginRight': '1%'}),
                     html.Button('Swap', id='genotype-swap-button'),
                     html.Div([
                         html.Div([
                             html.H3('Comparison Genotype:', style={'marginRight': '2.5%', 'white-space': 'nowrap'}),
                             dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-right', style={'width': '100%'}),
-                        ], style={'display': 'inline-flex', 'width': 'inherit', 'align-items': 'center'}),
+                        ], style={'display': 'inline-flex', 'width': 'inherit', 'align-items': 'center', 'paddingLeft': '22.5%', 'paddingRight': '22.5%', 'width': '50%'}),
                         dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                             xaxis={'visible': False, 'showticklabels': False},
                             yaxis={'visible': False, 'showticklabels': False},
                             plot_bgcolor = "white",
                             width=650, height=650),
                             id='genotype-graph-right'),
-                    ], style={'width': '45%', 'marginLeft': '1%', 'marginRight': '3%', 'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}),
+                    ], style={'width': '45%', 'marginLeft': '1%', 'marginRight': '3%'}),
                 ], style = {'display': 'flex', 'justify-content': 'center'}),
             ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
         ]),
