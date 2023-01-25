@@ -135,11 +135,11 @@ layout = html.Div([
                     options = colorscales,
                     value = 'plasma'
                     ),
-                html.H4('Scale (both)', id = 'slider-headline'),
+                html.H4('Scale\n(both)', id = 'slider-headline', style={'white-space': 'pre-wrap'}),
                 html.Div([
                     dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='genotype-graph-gene-slider'),
                     ], style = {'marginLeft': '5px'}),
-                html.H4('Percentiles (from reference genotype)', id = 'percentile-headline'),
+                html.H4('Percentiles\n(from reference genotype)', id = 'percentile-headline', style={'white-space': 'pre-wrap'}),
                 html.Div([
                     html.Button('1st', id = 'first-percentile-button-genotype'),
                     html.Button('99th', id = 'ninty-ninth-percentile-button-genotype')
