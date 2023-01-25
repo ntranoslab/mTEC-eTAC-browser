@@ -135,20 +135,22 @@ layout = html.Div([
                     options = colorscales,
                     value = 'plasma'
                     ),
-                html.H4('Scale', id = 'slider-headline'),
+                html.H4('Scale (both)', id = 'slider-headline'),
                 html.Div([
                     dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='genotype-graph-gene-slider'),
                     ], style = {'marginLeft': '5px'}),
-                html.H4('Percentiles (from left graph genotype)', id = 'percentile-headline'),
+                html.H4('Percentiles (from reference genotype)', id = 'percentile-headline'),
                 html.Div([
                     html.Button('1st', id = 'first-percentile-button-genotype'),
                     html.Button('99th', id = 'ninty-ninth-percentile-button-genotype')
                     ], style = {'display': 'flex', 'justify-content': 'space-between'})
             ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
-            html.H3('Reference:', style={'marginLeft': '2.5%'}),
             html.Div([
                 html.Div([
-                    dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-left'),
+                    html.Div([
+                        html.H3('Reference Genotype:', style={'marginRight': '2.5%', 'white-space': 'nowrap'}),
+                        dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-left', style={'width': '100%'}),
+                    ], style={'display': 'inline-flex', 'width': 'inherit', 'align-items': 'center'}),
                     dcc.Loading([
                         dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                             xaxis={'visible': False, 'showticklabels': False},
@@ -157,10 +159,13 @@ layout = html.Div([
                             width=650, height=650),
                             id='genotype-graph-left')
                     ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
-                ], style={'width': '45%', 'marginLeft': '3%','marginRight': '1%'}),
+                ], style={'width': '55%', 'marginLeft': '3%','marginRight': '1%', 'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}),
                 html.Button('Swap', id='genotype-swap-button'),
                 html.Div([
-                    dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-right'),
+                    html.Div([
+                        html.H3('Comparison Genotype:', style={'marginRight': '2.5%', 'white-space': 'nowrap'}),
+                        dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-right', style={'width': '100%'}),
+                    ], style={'display': 'inline-flex', 'width': 'inherit', 'align-items': 'center'}),
                     dcc.Loading([
                         dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                             xaxis={'visible': False, 'showticklabels': False},
@@ -170,7 +175,7 @@ layout = html.Div([
                             id='genotype-graph-right')
 
                     ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
-                ], style={'width': '45%', 'marginLeft': '1%', 'marginRight': '3%'}),
+                ], style={'width': '55%', 'marginLeft': '1%', 'marginRight': '3%', 'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}),
             ], style = {'display': 'flex', 'justify-content': 'center'}),
         ]),
     ], className = 'page-body', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),
