@@ -82,6 +82,12 @@ layout = html.Div([
                 #dropdown for genotype
                 html.H3('Genotype:', id='genotype-headline'),
                 dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-mtecs'),
+                #dropdown for celltype
+                html.H3('Cell Type:', id='cell-type-headline'),
+                dcc.Dropdown([], placeholder = 'Select a cell type...', id='cell-type-value-mtecs'),
+                #dropdown for dataset
+                html.H3('Dataset:', id='dataset-headline'),
+                dcc.Dropdown([], placeholder = 'Select a dataset...', id='dataset-value-mtecs'),
                 #dropdown for colorscale
                 html.H3('Color Map:', id = 'color-scale-headline'),
                 dcc.Dropdown(
