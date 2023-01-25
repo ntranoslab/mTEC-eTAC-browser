@@ -149,9 +149,9 @@ layout = html.Div([
                 html.Div([
                     html.Div([
                         html.Div([
-                            html.H3('Reference Genotype:', style={'marginRight': '2.5%', 'white-space': 'nowrap'}),
-                            dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-left', style={'width': '100%'}),
-                        ], style={'display': 'inline-flex', 'width': 'inherit', 'align-items': 'center', 'paddingLeft': '22.5%', 'paddingRight': '22.5%', 'width': '50%'}),
+                            html.H3('Reference Genotype:', style={'marginRight': '2.5%'}),
+                            dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-left', style={'width': '-webkit-fill-available'}),
+                        ], style={'display': 'inline-flex', 'width': 'inherit', 'align-items': 'center', 'width': '50%', 'paddingLeft': '22.5%'}),
                         dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                             xaxis={'visible': False, 'showticklabels': False},
                             yaxis={'visible': False, 'showticklabels': False},
@@ -162,9 +162,9 @@ layout = html.Div([
                     html.Button('Swap', id='genotype-swap-button'),
                     html.Div([
                         html.Div([
-                            html.H3('Comparison Genotype:', style={'marginRight': '2.5%', 'white-space': 'nowrap'}),
-                            dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-right', style={'width': '100%'}),
-                        ], style={'display': 'inline-flex', 'width': 'inherit', 'align-items': 'center', 'paddingLeft': '22.5%', 'paddingRight': '22.5%', 'width': '50%'}),
+                            html.H3('Comparison Genotype:', style={'marginRight': '2.5%'}),
+                            dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-right', style={'width': '-webkit-fill-available'}),
+                        ], style={'display': 'inline-flex', 'width': 'inherit', 'align-items': 'center', 'width': '50%', 'paddingLeft': '22.5%'}),
                         dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                             xaxis={'visible': False, 'showticklabels': False},
                             yaxis={'visible': False, 'showticklabels': False},
