@@ -1,4 +1,5 @@
 .*
 !/.gitignore
 data
+cache
 __pycache__/
