@@ -114,7 +114,7 @@ layout = html.Div([
                             plot_bgcolor = "white",
                             width=650, height=650),
                             id='umap-graphic-gene-mtecs')
-                    ], style={'width': '45%', 'marginRight': '2.5%'}),
+                    ], style={'width': '30%', 'marginRight': '2.5%'}),
                     html.Div([
                         dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                             xaxis={'visible': False, 'showticklabels': False},
@@ -122,7 +122,15 @@ layout = html.Div([
                             plot_bgcolor = "white",
                             width=650, height=650),
                             id='umap-graphic-cell-types-mtecs')
-                    ], style={'width': '45%', 'marginLeft': '2.5%'}),
+                    ], style={'width': '30%', 'marginLeft': '2.5%'}),
+                    html.Div([
+                        dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                            xaxis={'visible': False, 'showticklabels': False},
+                            yaxis={'visible': False, 'showticklabels': False},
+                            plot_bgcolor = "red",
+                            width=650, height=650),
+                            id='umap-graphic-dataset-mtecs')
+                    ], style={'width': '30%', 'marginRight': '2.5%'}),
                 ], style = {'display': 'flex', 'justify-content': 'center'}),
             ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
         ]),
@@ -200,6 +208,7 @@ layout = html.Div([
 @callback(
     Output('umap-graphic-gene-mtecs', 'figure'),
     Output('umap-graphic-cell-types-mtecs', 'figure'),
+    Output('umap-graphic-dataset-mtecs', 'figure'),
     Output('gene-value-mtecs', 'value'),
     Output('genotype-value-mtecs', 'value'),
     Output('umap-graphic-gene-slider-mtecs', 'min'),
@@ -336,7 +345,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
 
 
 
-        return gene_fig, cell_type_fig, gene_value if gene_value_in_df else 'No Genes Found', genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, cell_type_fig, gene_value if gene_value_in_df else 'No Genes Found', genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -352,7 +361,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+    return fig, fig, fig, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
 
 ##=========================Callback=========================##
