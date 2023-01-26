@@ -93,6 +93,9 @@ layout = html.Div([
                 #dropdown for celltype
                 html.H3('Dataset for cell types:', id='cell-type-headline'),
                 dcc.Dropdown(cell_type_list, placeholder = 'Select a cell type...', value='All', id='cell-type-value-mtecs'),
+                #dropdown for counts vs normalized
+                html.H3('Counts or normalized:', id='counts-normalized-headline'),
+                dcc.Dropdown(['Counts', 'Normalized'], placeholder = 'Select a visualization...', value='Normalized', id='counts-normalized-value-mtecs'),
                 #dropdown for colorscale
                 html.H3('Color Map:', id = 'color-scale-headline'),
                 dcc.Dropdown(
@@ -131,7 +134,7 @@ layout = html.Div([
                 ], style = {'display': 'flex', 'justify-content': 'center'}),
             ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
         ]),
-        html.Div([], style={'marginBottom': '2.5%'}),
+        html.Div([], style={'marginBottom': '10%'}),
         html.Div([
             html.Br(),
             html.H1('Genotype Comparison', className='graph-titles', style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
