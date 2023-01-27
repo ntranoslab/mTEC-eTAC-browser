@@ -20,7 +20,7 @@ database = 'thymus'
 if ('LOCALDEV' in os.environ) | ('LOCALDEPLOY' in os.environ):
     host = 'localhost'
     user = 'root'
-    passwd = os.environ.get('MYSQLPASSWORD')
+    passwd = os.environ.get('MYSQLPASSWORDLOCAL')
 else:
     ssm = boto3.client('ssm', region_name='us-west-2')
     host = ssm.get_parameter(Name= "RDS_HOSTNAME")['Parameter']['Value']
@@ -381,38 +381,6 @@ def update_graph(gene_value, genotype_value, cell_type_value, dataset_value, uma
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
-
-        max_cell_type_number = 0
-
-        for i in gene_data.cell_type.unique():
-            if len(gene_data[gene_data.cell_type == i]) >= max_cell_type_number:
-                max_cell_type_number = len(gene_data[gene_data.cell_type == i])
-
-        for i in gene_data.cell_type.unique():
-            gene_data_cell_type = gene_data[gene_data.cell_type == i]
-            font_size = max((len(gene_data_cell_type) / max_cell_type_number) * 12, 10)
-
-            x_quantiles = np.quantile(gene_data_cell_type.x, [0.75, 0.25])
-            gene_data_cell_type_x_filtered = gene_data_cell_type[(gene_data_cell_type.x < int(x_quantiles[0])) & (gene_data_cell_type.x > int(x_quantiles[1]))]
-            if len(gene_data_cell_type_x_filtered) >= 1:
-                x_avg = sum(gene_data_cell_type_x_filtered.x)/len(gene_data_cell_type_x_filtered.x)
-            else:
-                x_avg = sum(gene_data_cell_type.x)/len(gene_data_cell_type.x)
-
-
-            y_quantiles = np.quantile(gene_data_cell_type.y, [0.75, 0.25])
-            gene_data_cell_type_y_filtered = gene_data_cell_type[(gene_data_cell_type.y < int(y_quantiles[0])) & (gene_data_cell_type.y > int(y_quantiles[1]))]
-            if len(gene_data_cell_type_y_filtered) >= 1:
-                y_avg = sum(gene_data_cell_type_y_filtered.y)/len(gene_data_cell_type_y_filtered.y)
-            else:
-                y_avg = sum(gene_data_cell_type.y)/len(gene_data_cell_type.y)
-
-            cell_type_fig.add_annotation(x = x_avg,
-                y = y_avg,
-                text = i,
-                font={'family': 'Arial', 'size': font_size},
-                align='center',
-                showarrow=False)
 
 
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
