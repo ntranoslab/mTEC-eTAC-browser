@@ -19,9 +19,9 @@ dash.register_page(__name__)
 ##=========================Global variables=========================##
 database = 'lymphnode'
 if ('LOCALDEV' in os.environ) | ('LOCALDEPLOY' in os.environ):
-    host = 'localhost'
-    user = 'root'
-    passwd = os.environ.get('MYSQLPASSWORDLOCAL')
+    host = 'gardner-lab-computer'
+    user = 'nolan'
+    passwd = os.getenv('MYSQLPASSWORD')
 else:
     ssm = boto3.client('ssm', region_name='us-west-2')
     host = ssm.get_parameter(Name= "RDS_HOSTNAME")['Parameter']['Value']
@@ -243,6 +243,12 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
                      color_continuous_scale = color_scale_dropdown_value,
                      labels = {gene_value: ''}
                      )
+        gene_fig.update_traces(
+            marker=dict(
+                size=3, 
+                line=dict(width=0)
+                )
+            )
         gene_fig.update_layout(
             autosize = True,
             title = {
@@ -274,6 +280,12 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
                         hover_name = 'cell_type',
                         labels={'cell_type': ''}
                     )
+        cell_type_fig.update_traces(
+            marker=dict(
+                size=3, 
+                line=dict(width=0)
+                )
+            )
         cell_type_fig.update_layout(
             autosize = True,
             title = {
@@ -288,7 +300,7 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
                     'color': '#4C5C75'
                 }
             },
-            legend={'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed'},
+            legend={'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
             margin={'l':10, 'r': 10},
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},

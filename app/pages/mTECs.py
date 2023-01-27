@@ -20,13 +20,12 @@ database = 'thymus'
 if ('LOCALDEV' in os.environ) | ('LOCALDEPLOY' in os.environ):
     host = 'gardner-lab-computer'
     user = 'nolan'
-    passwd = os.environ.get('MYSQLPASSWORD')
+    passwd = os.getenv('MYSQLPASSWORD')
 else:
     ssm = boto3.client('ssm', region_name='us-west-2')
     host = ssm.get_parameter(Name= "RDS_HOSTNAME")['Parameter']['Value']
     user = ssm.get_parameter(Name= "RDS_USERNAME")['Parameter']['Value']
     passwd = ssm.get_parameter(Name= "RDS_PASSWORD", WithDecryption = True)['Parameter']['Value']
-
 
 engine = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}")
 
@@ -39,9 +38,14 @@ with open(f"static/{database}_gene_table_lookup.csv") as f:
     gene_lookup = dict(reader)
 gene_list = gene_lookup.keys()
 genotype_list = np.insert(metadata.genotype.unique(), 0, 'All')
+default_genotype_value = 'WT'
+
 cell_type_annotations_list = [i for i in metadata.columns if "cell type" in i.lower()]
 default_cell_type_annotation = 'Aggregated cell type'
-dataset_list = ['All']
+
+dataset_list = np.insert(metadata.dataset.unique(), 0, 'All')
+default_dataset_value = 'All'
+
 #Add when dataset added
 #metadata.dataset.unique()
 color_list = ['#1f77b4',
@@ -71,12 +75,6 @@ color_list = ['#1f77b4',
  '#ffed6f',
  'darkred',
  'darkblue']
-
-if len(color_list) >= len(metadata.cell_type.unique()):
-    color_list = color_list[0:len(metadata.cell_type.unique())]
-    color_list.reverse()
-else:
-    color_list.reverse()
 
 colorscales = ['bluered', 'blues', 'cividis', 'dense', 'hot', 'ice', 'inferno', 'magenta', 'magma', 'picnic', 'plasma', 'plotly3', 'purp', 'purples', 'rdpu', 'rdylbu', 'teal', 'viridis']
 
@@ -119,13 +117,13 @@ layout = html.Div([
                 dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='gene-value-mtecs'),
                 #dropdown for dataset
                 html.H3('Dataset:', id='dataset-headline'),
-                dcc.Dropdown(dataset_list, placeholder = 'Select a dataset...', value='All', id='dataset-value-mtecs'),
+                dcc.Dropdown(dataset_list, placeholder = 'Select a dataset...', value='All', id='dataset-value'),
                 #dropdown for genotype
                 html.H3('Genotype:', id='genotype-headline'),
                 dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-mtecs'),
                 #dropdown for celltype annotations
                 html.H3('Cell type annotations:', id='cell-type-annotations-headline'),
-                dcc.Dropdown(cell_type_annotations_list, placeholder = 'Select a cell type...', id='cell-type-annotations-value-mtecs'),
+                dcc.Dropdown(cell_type_annotations_list, placeholder = 'Select a cell type...', id='cell-type-annotations-value'),
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='counts-normalized-headline'),
                 dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', value='Normalized', id='counts-normalized-value-mtecs'),
@@ -244,16 +242,17 @@ layout = html.Div([
     Output('umap-graphic-cell-types-mtecs', 'figure'),
     Output('gene-value-mtecs', 'value'),
     Output('genotype-value-mtecs', 'value'),
+    Output('genotype-value-mtecs', 'options'),
     Output('cell-type-annotations-value', 'value'),
-    Output('dataset-value-mtecs', 'value'),
+    Output('dataset-value', 'value'),
     Output('umap-graphic-gene-slider-mtecs', 'min'),
     Output('umap-graphic-gene-slider-mtecs', 'max'),
     Output('umap-graphic-gene-slider-mtecs', 'marks'),
     Output('umap-graphic-gene-slider-mtecs', 'value'),
     Input('gene-value-mtecs', 'value'),
     Input('genotype-value-mtecs', 'value'),
-    Input('cell-type-annotations-value-mtecs', 'value'),
-    Input('dataset-value-mtecs', 'value'),
+    Input('cell-type-annotations-value', 'value'),
+    Input('dataset-value', 'value'),
     Input('umap-graphic-gene-slider-mtecs', 'value'),
     Input('color-scale-dropdown', 'value'),
     Input('first-percentile-button', 'n_clicks'),
@@ -282,14 +281,27 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, datase
         table = gene_lookup[gene_value]
         #extract gene column from table
         gene_data = pd.read_sql(table, con=engine, columns = [gene_value, 'barcode'])
+
         #set default genotype value to WT
-        if genotype_value is None:
-            genotype_value = 'WT'
-        #makes genotype value into list of selected genotypes
-        if genotype_value != 'All':
-            metadata_subset = metadata[metadata.genotype == genotype_value]
+        if dataset_value is None:
+            dataset_value = default_dataset_value
+        #makes dataset value into list of selected datasets
+        if dataset_value != 'All':
+            metadata_subset = metadata[metadata.dataset == dataset_value]
         else:
             metadata_subset = metadata
+
+        #change genotype dropdown list depending on dataset input value
+        genotype_list_subset = np.insert(metadata_subset.genotype.unique(), 0, 'All')
+
+        #set default genotype value to WT
+        if genotype_value is None or genotype_value not in genotype_list_subset:
+            genotype_value = default_genotype_value
+        #makes genotype value into list of selected genotypes
+        if genotype_value != 'All':
+            metadata_subset = metadata_subset[metadata_subset.genotype == genotype_value]
+        else:
+            metadata_subset = metadata_subset
 
         #subset expression data on selected cells [gene_value, meta_cols]
         gene_data = pd.merge(gene_data, metadata_subset, on='barcode', how='inner')
@@ -321,7 +333,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, datase
                      #y coordinates
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
-                     hover_name = 'cell_type',
+                     hover_name = cell_type_annotations_value,
                      range_color=
                      #min of color range
                      [lower_slider_value, 
@@ -330,6 +342,12 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, datase
                      color_continuous_scale = color_scale_dropdown_value,
                      labels = {gene_value: ''}
                      )
+        gene_fig.update_traces(
+            marker=dict(
+                size=3, 
+                line=dict(width=0)
+                )
+            )
         gene_fig.update_layout(
             autosize = True,
             title = {
@@ -351,16 +369,32 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, datase
             plot_bgcolor = "white"
             )
 
-        cell_type_fig = px.scatter(gene_data.sort_values(by=[cell_type_annotations_value], kind='mergesort', ascending=False),
+        color_list_copy = color_list[0:len(metadata[cell_type_annotations_value].unique())].copy()
+        color_list_copy.reverse()
+
+        gene_data = gene_data.sort_values(by=[cell_type_annotations_value], kind='mergesort', ascending=False)
+
+        if cell_type_annotations_value != default_cell_type_annotation:
+            gene_data_order_other_rows = gene_data[gene_data[cell_type_annotations_value] == 'Other dataset']
+            gene_data = pd.concat([gene_data_order_other_rows, gene_data[gene_data[cell_type_annotations_value] != 'Other dataset']])
+
+        cell_type_fig = px.scatter(gene_data,
                         x='x',
                         #x coordinates
                         y='y',
                         color = cell_type_annotations_value,
-                        color_discrete_sequence = color_list,
-                        color_discrete_map = {'Other': 'lightgray'} if cell_type_annotations_value != default_cell_type_annotation else {},
-                        hover_name = 'cell_type',
-                        labels={'cell_type': ''}
+                        color_discrete_sequence = color_list_copy,
+                        color_discrete_map = {'Other dataset': 'gainsboro'} if cell_type_annotations_value != default_cell_type_annotation else {},
+                        hover_name = cell_type_annotations_value,
+                        labels={cell_type_annotations_value: ''},
                     )
+
+        cell_type_fig.update_traces(
+            marker=dict(
+                size=3, 
+                line=dict(width=0)
+                )
+            )
         cell_type_fig.update_layout(
             autosize = True,
             title = {
@@ -375,7 +409,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, datase
                     'color': '#4C5C75'
                 }
             },
-            legend={'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed'},
+            legend={'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
             margin={'l':10, 'r': 10},
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
@@ -387,7 +421,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, datase
 
 
 
-        return gene_fig, cell_type_fig, gene_value if gene_value_in_df else 'No Genes Found', genotype_value, cell_type_annotations_value, dataset_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value if gene_value_in_df else 'No Genes Found', genotype_value, genotype_list_subset, cell_type_annotations_value, dataset_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -403,7 +437,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, datase
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+    return fig, fig, None, None, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
 
 ##=========================Callback=========================##
@@ -498,7 +532,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
                      #y coordinates
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
-                     hover_name = 'cell_type',
+                     hover_name = default_cell_type_annotation,
                      range_color=
                      #min of color range
                      [lower_slider_value, 
@@ -507,6 +541,12 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
                      color_continuous_scale = color_scale_dropdown_value,
                      labels = {gene_value: ''}
                      )
+        gene_fig_left.update_traces(
+            marker=dict(
+                size=3, 
+                line=dict(width=0)
+                )
+            )
         gene_fig_left.update_layout(
             autosize = True,
             title = {
@@ -534,7 +574,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
                      #y coordinates
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
-                     hover_name = 'cell_type',
+                     hover_name = default_cell_type_annotation,
                      range_color=
                      #min of color range
                      [lower_slider_value, 
@@ -543,6 +583,12 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
                      color_continuous_scale = color_scale_dropdown_value,
                      labels = {gene_value: ''}
                      )
+        gene_fig_right.update_traces(
+            marker=dict(
+                size=3, 
+                line=dict(width=0)
+                )
+            )
         gene_fig_right.update_layout(
             autosize = True,
             title = {
