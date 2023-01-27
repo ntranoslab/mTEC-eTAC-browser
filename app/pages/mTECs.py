@@ -18,9 +18,9 @@ dash.register_page(__name__)
 ##=========================Global variables=========================##
 database = 'thymus'
 if ('LOCALDEV' in os.environ) | ('LOCALDEPLOY' in os.environ):
-    host = 'localhost'
-    user = 'root'
-    passwd = os.environ.get('MYSQLPASSWORDLOCAL')
+    host = 'gardner-lab-computer'
+    user = 'nolan'
+    passwd = os.environ.get('MYSQLPASSWORD')
 else:
     ssm = boto3.client('ssm', region_name='us-west-2')
     host = ssm.get_parameter(Name= "RDS_HOSTNAME")['Parameter']['Value']
@@ -39,8 +39,8 @@ with open(f"static/{database}_gene_table_lookup.csv") as f:
     gene_lookup = dict(reader)
 gene_list = gene_lookup.keys()
 genotype_list = np.insert(metadata.genotype.unique(), 0, 'All')
-#replace when cell type is changed
-cell_type_list = np.insert(metadata.cell_type.unique(), 0, 'All')
+cell_type_annotations_list = [i for i in metadata.columns if "cell type" in i.lower()]
+default_cell_type_annotation = 'Aggregated cell type'
 dataset_list = ['All']
 #Add when dataset added
 #metadata.dataset.unique()
@@ -123,9 +123,9 @@ layout = html.Div([
                 #dropdown for genotype
                 html.H3('Genotype:', id='genotype-headline'),
                 dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-mtecs'),
-                #dropdown for celltype
-                html.H3('Dataset for cell types:', id='cell-type-headline'),
-                dcc.Dropdown(cell_type_list, placeholder = 'Select a cell type...', value='All', id='cell-type-value-mtecs'),
+                #dropdown for celltype annotations
+                html.H3('Cell type annotations:', id='cell-type-annotations-headline'),
+                dcc.Dropdown(cell_type_annotations_list, placeholder = 'Select a cell type...', id='cell-type-annotations-value-mtecs'),
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='counts-normalized-headline'),
                 dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', value='Normalized', id='counts-normalized-value-mtecs'),
@@ -244,7 +244,7 @@ layout = html.Div([
     Output('umap-graphic-cell-types-mtecs', 'figure'),
     Output('gene-value-mtecs', 'value'),
     Output('genotype-value-mtecs', 'value'),
-    Output('cell-type-value-mtecs', 'value'),
+    Output('cell-type-annotations-value', 'value'),
     Output('dataset-value-mtecs', 'value'),
     Output('umap-graphic-gene-slider-mtecs', 'min'),
     Output('umap-graphic-gene-slider-mtecs', 'max'),
@@ -252,7 +252,7 @@ layout = html.Div([
     Output('umap-graphic-gene-slider-mtecs', 'value'),
     Input('gene-value-mtecs', 'value'),
     Input('genotype-value-mtecs', 'value'),
-    Input('cell-type-value-mtecs', 'value'),
+    Input('cell-type-annotations-value-mtecs', 'value'),
     Input('dataset-value-mtecs', 'value'),
     Input('umap-graphic-gene-slider-mtecs', 'value'),
     Input('color-scale-dropdown', 'value'),
@@ -260,13 +260,15 @@ layout = html.Div([
     Input('ninty-ninth-percentile-button', 'n_clicks')
     )
 
-def update_graph(gene_value, genotype_value, cell_type_value, dataset_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
+def update_graph(gene_value, genotype_value, cell_type_annotations_value, dataset_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
 
     input_id = ctx.triggered_id
     global metadata
     if metadata is not None:
         if gene_value is None:
             gene_value = default_gene
+        if cell_type_annotations_value is None:
+            cell_type_annotations_value = default_cell_type_annotation
         #first lower case gene value
         gene_value = gene_value.lower()
 
@@ -288,8 +290,6 @@ def update_graph(gene_value, genotype_value, cell_type_value, dataset_value, uma
             metadata_subset = metadata[metadata.genotype == genotype_value]
         else:
             metadata_subset = metadata
-
-        #if cell_type_value != 'All' metadata_subset = metadata[metadata.dataset == dataset_value] else metadata_subset = metadata_subset
 
         #subset expression data on selected cells [gene_value, meta_cols]
         gene_data = pd.merge(gene_data, metadata_subset, on='barcode', how='inner')
@@ -351,13 +351,13 @@ def update_graph(gene_value, genotype_value, cell_type_value, dataset_value, uma
             plot_bgcolor = "white"
             )
 
-        cell_type_fig = px.scatter(gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False),
+        cell_type_fig = px.scatter(gene_data.sort_values(by=[cell_type_annotations_value], kind='mergesort', ascending=False),
                         x='x',
                         #x coordinates
                         y='y',
-                        color = 'cell_type',
+                        color = cell_type_annotations_value,
                         color_discrete_sequence = color_list,
-                        #color_discrete_map = {'Other': 'lightgray'},
+                        color_discrete_map = {'Other': 'lightgray'} if cell_type_annotations_value != default_cell_type_annotation else {},
                         hover_name = 'cell_type',
                         labels={'cell_type': ''}
                     )
@@ -387,7 +387,7 @@ def update_graph(gene_value, genotype_value, cell_type_value, dataset_value, uma
 
 
 
-        return gene_fig, cell_type_fig, gene_value if gene_value_in_df else 'No Genes Found', genotype_value, cell_type_value, dataset_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value if gene_value_in_df else 'No Genes Found', genotype_value, cell_type_annotations_value, dataset_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
