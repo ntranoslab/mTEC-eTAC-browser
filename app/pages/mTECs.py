@@ -74,10 +74,7 @@ color_list = ['#1f77b4',
 
 if len(color_list) >= len(metadata.cell_type.unique()):
     color_list = color_list[0:len(metadata.cell_type.unique())]
-    print(color_list)
-    print(len(color_list))
     color_list.reverse()
-    print(color_list)
 else:
     color_list.reverse()
 
@@ -314,8 +311,6 @@ def update_graph(gene_value, genotype_value, cell_type_value, dataset_value, uma
         else:
             lower_slider_value = percentile_values[1]
             higher_slider_value = percentile_values[0]
-
-        print(gene_data)
 
         
         #graphs

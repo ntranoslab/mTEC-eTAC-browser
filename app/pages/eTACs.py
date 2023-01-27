@@ -67,7 +67,7 @@ color_list = ['#1f77b4',
  '#ffed6f',
  'darkred',
  'darkblue']
- 
+
 if len(color_list) >= len(metadata.cell_type.unique()):
     color_list = color_list[0:len(metadata.cell_type.unique())]
     color_list.reverse()
@@ -294,6 +294,32 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
+
+        max_cell_type = 'Aire'
+        max_cell_type_number = 0
+
+        for i in gene_data.cell_type.unique():
+            if len(gene_data[gene_data.cell_type == i]) >= max_cell_type_number:
+                max_cell_type_number = len(gene_data[gene_data.cell_type == i])
+                max_cell_type = i
+
+        for i in gene_data.cell_type.unique():
+            gene_data_cell_type = gene_data[gene_data.cell_type == i]
+            font_size = max((len(gene_data_cell_type) / max_cell_type_number) * 12, 6)
+            x_quantiles = np.quantile(gene_data_cell_type.x, [0.75, 0.25])
+            y_quantiles = np.quantile(gene_data_cell_type.y, [0.75, 0.25])
+            gene_data_cell_type_x_filtered = gene_data_cell_type[(gene_data_cell_type.x < int(x_quantiles[0])) & (gene_data_cell_type.x > int(x_quantiles[1]))]
+            gene_data_cell_type_y_filtered = gene_data_cell_type[(gene_data_cell_type.y < int(y_quantiles[0])) & (gene_data_cell_type.y > int(y_quantiles[1]))]
+            x_avg = sum(gene_data_cell_type_x_filtered.x)/len(gene_data_cell_type_x_filtered.x)
+            y_avg = sum(gene_data_cell_type_y_filtered.y)/len(gene_data_cell_type_y_filtered.y)
+
+            cell_type_fig.add_annotation(x = x_avg,
+                y = y_avg,
+                text = i,
+                font={'family': 'Arial', 'size': font_size},
+                align='center',
+                showarrow=False)
+
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
 
 
