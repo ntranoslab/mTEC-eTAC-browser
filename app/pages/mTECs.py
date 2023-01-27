@@ -44,6 +44,42 @@ cell_type_list = np.insert(metadata.cell_type.unique(), 0, 'All')
 dataset_list = ['All']
 #Add when dataset added
 #metadata.dataset.unique()
+color_list = ['#1f77b4',
+ '#aec7e8',
+ '#ff7f0e',
+ '#ffbb78',
+ '#2ca02c',
+ '#98df8a',
+ '#d62728',
+ '#ff9896',
+ '#9467bd',
+ '#c5b0d5',
+ '#8c564b',
+ '#c49c94',
+ '#e377c2',
+ '#f7b6d2',
+ '#7f7f7f',
+ '#bcbd22',
+ '#dbdb8d',
+ '#17becf',
+ '#8dd3c7',
+ '#bebada',
+ '#fb8072',
+ '#b3de69',
+ '#bc80bd',
+ '#ccebc5',
+ '#ffed6f',
+ 'darkred',
+ 'darkblue']
+
+if len(color_list) >= len(metadata.cell_type.unique()):
+    color_list = color_list[0:len(metadata.cell_type.unique())]
+    print(color_list)
+    print(len(color_list))
+    color_list.reverse()
+    print(color_list)
+else:
+    color_list.reverse()
 
 colorscales = ['bluered', 'blues', 'cividis', 'dense', 'hot', 'ice', 'inferno', 'magenta', 'magma', 'picnic', 'plasma', 'plotly3', 'purp', 'purples', 'rdpu', 'rdylbu', 'teal', 'viridis']
 
@@ -94,8 +130,8 @@ layout = html.Div([
                 html.H3('Dataset for cell types:', id='cell-type-headline'),
                 dcc.Dropdown(cell_type_list, placeholder = 'Select a cell type...', value='All', id='cell-type-value-mtecs'),
                 #dropdown for counts vs normalized
-                html.H3('Counts or normalized:', id='counts-normalized-headline'),
-                dcc.Dropdown(['Counts', 'Normalized'], placeholder = 'Select a visualization...', value='Normalized', id='counts-normalized-value-mtecs'),
+                html.H3('Expression data:', id='counts-normalized-headline'),
+                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', value='Normalized', id='counts-normalized-value-mtecs'),
                 #dropdown for colorscale
                 html.H3('Color Map:', id = 'color-scale-headline'),
                 dcc.Dropdown(
@@ -279,6 +315,7 @@ def update_graph(gene_value, genotype_value, cell_type_value, dataset_value, uma
             lower_slider_value = percentile_values[1]
             higher_slider_value = percentile_values[0]
 
+        print(gene_data)
 
         
         #graphs
@@ -319,14 +356,16 @@ def update_graph(gene_value, genotype_value, cell_type_value, dataset_value, uma
             plot_bgcolor = "white"
             )
 
-        cell_type_fig = px.scatter(gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False), x='x',
-        #x coordinates
-                     y='y',
-                     color = 'cell_type',
-                     color_discrete_sequence = px.colors.qualitative.Light24,
-                     hover_name = 'cell_type',
-                     labels={'cell_type': ''}
-                     )
+        cell_type_fig = px.scatter(gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False),
+                        x='x',
+                        #x coordinates
+                        y='y',
+                        color = 'cell_type',
+                        color_discrete_sequence = color_list,
+                        #color_discrete_map = {'Other': 'lightgray'},
+                        hover_name = 'cell_type',
+                        labels={'cell_type': ''}
+                    )
         cell_type_fig.update_layout(
             autosize = True,
             title = {
@@ -347,6 +386,14 @@ def update_graph(gene_value, genotype_value, cell_type_value, dataset_value, uma
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
+
+        for i in gene_data.cell_type.unique():
+            gene_data_cell_type = gene_data[gene_data.cell_type == i]
+            cell_type_fig.add_annotation(x = sum(gene_data_cell_type.x)/len(gene_data_cell_type.x),
+                y = sum(gene_data_cell_type.y)/len(gene_data_cell_type.y),
+                text = i,
+                font={'family': 'Arial'},
+                showarrow=False)
 
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
 

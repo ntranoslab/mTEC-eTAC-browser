@@ -40,6 +40,41 @@ with open(f"static/{database}_gene_table_lookup.csv") as f:
     gene_lookup = dict(reader)
 gene_list = gene_lookup.keys()
 
+color_list = ['#1f77b4',
+ '#aec7e8',
+ '#ff7f0e',
+ '#ffbb78',
+ '#2ca02c',
+ '#98df8a',
+ '#d62728',
+ '#ff9896',
+ '#9467bd',
+ '#c5b0d5',
+ '#8c564b',
+ '#c49c94',
+ '#e377c2',
+ '#f7b6d2',
+ '#7f7f7f',
+ '#bcbd22',
+ '#dbdb8d',
+ '#17becf',
+ '#8dd3c7',
+ '#bebada',
+ '#fb8072',
+ '#b3de69',
+ '#bc80bd',
+ '#ccebc5',
+ '#ffed6f',
+ 'darkred',
+ 'darkblue']
+ 
+if len(color_list) >= len(metadata.cell_type.unique()):
+    color_list = color_list[0:len(metadata.cell_type.unique())]
+    color_list.reverse()
+else:
+    color_list.reverse()
+
+
 colorscales = ['bluered', 'blues', 'cividis', 'dense', 'hot', 'ice', 'inferno', 'magenta', 'magma', 'picnic', 'plasma', 'plotly3', 'purp', 'purples', 'rdpu', 'rdylbu', 'teal', 'viridis']
 
 ##=========================Page Layout=========================##
@@ -79,6 +114,9 @@ layout = html.Div([
             #input for gene
             html.H3('Gene:', id='gene-headline'),
             dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='gene-value-etacs'),
+            #dropdown for counts vs normalized
+            html.H3('Expression data:', id='counts-normalized-headline'),
+            dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', value='Normalized', id='counts-normalized-value-etacs'),
             #dropdown for colorscale
             html.H3('Color Map:', id = 'color-scale-headline'),
             dcc.Dropdown(
@@ -226,14 +264,16 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
             plot_bgcolor = "white"
             )
 
-        cell_type_fig = px.scatter(gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False), x='x',
-        #x coordinates
-                     y='y',
-                     color = 'cell_type',
-                     color_discrete_sequence = px.colors.qualitative.Light24,
-                     hover_name = 'cell_type',
-                     labels={'cell_type': ''}
-                     )
+        cell_type_fig = px.scatter(gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False),
+                        x='x',
+                        #x coordinates
+                        y='y',
+                        color = 'cell_type',
+                        color_discrete_sequence = color_list,
+                        #color_discrete_map = {'Other': 'lightgray'}, 
+                        hover_name = 'cell_type',
+                        labels={'cell_type': ''}
+                    )
         cell_type_fig.update_layout(
             autosize = True,
             title = {
