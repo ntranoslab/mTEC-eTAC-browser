@@ -19,9 +19,9 @@ dash.register_page(__name__)
 ##=========================Global variables=========================##
 database = 'lymphnode'
 if ('LOCALDEV' in os.environ) | ('LOCALDEPLOY' in os.environ):
-    host = 'localhost'
-    user = 'root'
-    passwd = os.environ.get('MYSQLPASSWORDLOCAL')
+    host = 'gardner-lab-computer'
+    user = 'nolan'
+    passwd = os.getenv('MYSQLPASSWORD')
 else:
     ssm = boto3.client('ssm', region_name='us-west-2')
     host = ssm.get_parameter(Name= "RDS_HOSTNAME")['Parameter']['Value']
@@ -30,8 +30,11 @@ else:
 
 
 engine = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}")
+engine_counts = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}_counts")
 
 default_gene='aire'
+
+default_expression_data_value = 'Normalized'
 
 metadata = pd.read_sql('cellmetadata', con=engine)
 with open(f"static/{database}_gene_table_lookup.csv") as f:
@@ -115,8 +118,8 @@ layout = html.Div([
             html.H3('Gene:', id='gene-headline'),
             dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='gene-value-etacs'),
             #dropdown for counts vs normalized
-            html.H3('Expression data:', id='counts-normalized-headline'),
-            dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', value='Normalized', id='counts-normalized-value-etacs'),
+            html.H3('Expression data:', id='expression-data-headline'),
+            dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-etacs'),
             #dropdown for colorscale
             html.H3('Color Map:', id = 'color-scale-headline'),
             dcc.Dropdown(
@@ -171,18 +174,20 @@ layout = html.Div([
     Output('umap-graphic-gene-etacs', 'figure'),
     Output('umap-graphic-cell-types-etacs', 'figure'),
     Output('gene-value-etacs', 'value'),
+    Output('expression-data-value-etacs', 'value'),
     Output('umap-graphic-gene-slider-etacs', 'min'),
     Output('umap-graphic-gene-slider-etacs', 'max'),
     Output('umap-graphic-gene-slider-etacs', 'marks'),
     Output('umap-graphic-gene-slider-etacs', 'value'),
     Input('gene-value-etacs', 'value'),
+    Input('expression-data-value-etacs', 'value'),
     Input('umap-graphic-gene-slider-etacs', 'value'),
     Input('color-scale-dropdown', 'value'),
     Input('first-percentile-button', 'n_clicks'),
     Input('ninty-ninth-percentile-button', 'n_clicks')
     )
 
-def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
+def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
 
     input_id = ctx.triggered_id
     global metadata
@@ -200,8 +205,11 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
 
         #table to get gene_value from
         table = gene_lookup[gene_value]
+        
+        if expression_data_value is None:
+            expression_data_value = default_expression_data_value
         #extract gene column from table
-        gene_data = pd.read_sql(table, con=engine, columns = [gene_value, 'barcode'])
+        gene_data = pd.read_sql(table, con=engine if expression_data_value == 'Normalized' else engine_counts, columns = [gene_value, 'barcode'])
 
         #subset expression data on selected cells [gene_value, meta_cols]
         gene_data = pd.merge(gene_data, metadata, on='barcode', how='inner')
@@ -243,6 +251,12 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
                      color_continuous_scale = color_scale_dropdown_value,
                      labels = {gene_value: ''}
                      )
+        gene_fig.update_traces(
+            marker=dict(
+                size=3, 
+                line=dict(width=0)
+                )
+            )
         gene_fig.update_layout(
             autosize = True,
             title = {
@@ -274,6 +288,12 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
                         hover_name = 'cell_type',
                         labels={'cell_type': ''}
                     )
+        cell_type_fig.update_traces(
+            marker=dict(
+                size=3, 
+                line=dict(width=0)
+                )
+            )
         cell_type_fig.update_layout(
             autosize = True,
             title = {
@@ -288,7 +308,7 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
                     'color': '#4C5C75'
                 }
             },
-            legend={'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed'},
+            legend={'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
             margin={'l':10, 'r': 10},
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
@@ -299,7 +319,7 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
 
 
 
-        return gene_fig, cell_type_fig, gene_value if gene_value_in_df else 'No Genes Found', df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value, expression_data_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -315,5 +335,5 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+    return fig, fig, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
