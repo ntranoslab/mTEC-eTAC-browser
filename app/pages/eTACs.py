@@ -295,13 +295,11 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
             plot_bgcolor = "white"
             )
 
-        max_cell_type = 'Aire'
         max_cell_type_number = 0
 
         for i in gene_data.cell_type.unique():
             if len(gene_data[gene_data.cell_type == i]) >= max_cell_type_number:
                 max_cell_type_number = len(gene_data[gene_data.cell_type == i])
-                max_cell_type = i
 
         for i in gene_data.cell_type.unique():
             gene_data_cell_type = gene_data[gene_data.cell_type == i]
