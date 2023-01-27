@@ -42,6 +42,7 @@ button{
 #headline {
 	font-size: xx-large;
 	color: #4C5C75;
+	cursor: default;
 }
 
 #tabs {
@@ -62,10 +63,16 @@ button{
 
 #gene-headline {
 	color: #4C5C75;
+	cursor: default;
 }
 
 #gene-value-mtecs {
 	width: 95.5%;
+}
+
+#genotype-graph-gene-value {
+	width: 95.5%;
+	cursor: default;
 }
 
 #gene-value-etacs {
@@ -74,22 +81,41 @@ button{
 
 #genotype-headline {
 	color: #4C5C75;
+	cursor: default;
+}
+
+#cell-type-annotations-headline {
+	color: #4C5C75;
+	cursor: default;
+}
+
+#dataset-headline {
+	color: #4C5C75;
+	cursor: default;
+}
+
+#counts-normalized-headline {
+	color: #4C5C75;
+	cursor: default;
 }
 
 #color-scale-headline {
 	color: #4C5C75;
+	cursor: default;
 }
 
 #slider-headline {
 	color: #4C5C75;
 	text-align: center;
 	font-size: 1.0625em;
+	cursor: default;
 }
 
 #percentile-headline {
 	color: #4C5C75;
 	text-align: center;
 	font-size: 1.0625em;
+	cursor: default;
 }
 
 #graph-name-value {
@@ -183,6 +209,11 @@ button{
 	transition-duration: 0.2s;
 }
 
+#genotype-swap-button:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
+}
+
 #umap-graphic-gene-slider-mtecs {
 	display: inline !important;
 	margin-left: 25px;
@@ -204,6 +235,14 @@ button{
 	padding: 0px;
 }
 
+#description-headline {
+	cursor: default;
+}
+
+#description {
+	cursor: default;
+}
+
 
 .header {
 	display: flex;
@@ -211,6 +250,10 @@ button{
 	justify-content: space-between;
 	align-items: center;
 	flex-wrap: wrap;
+}
+
+.graph-titles {
+	cursor: default;
 }
 
 
