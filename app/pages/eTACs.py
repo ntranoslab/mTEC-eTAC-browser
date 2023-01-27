@@ -21,7 +21,7 @@ database = 'lymphnode'
 if ('LOCALDEV' in os.environ) | ('LOCALDEPLOY' in os.environ):
     host = 'localhost'
     user = 'root'
-    passwd = os.environ.get('MYSQLPASSWORD')
+    passwd = os.environ.get('MYSQLPASSWORDLOCAL')
 else:
     ssm = boto3.client('ssm', region_name='us-west-2')
     host = ssm.get_parameter(Name= "RDS_HOSTNAME")['Parameter']['Value']
@@ -39,6 +39,41 @@ with open(f"static/{database}_gene_table_lookup.csv") as f:
     reader = csv.reader(f, skipinitialspace=True)
     gene_lookup = dict(reader)
 gene_list = gene_lookup.keys()
+
+color_list = ['#1f77b4',
+ '#aec7e8',
+ '#ff7f0e',
+ '#ffbb78',
+ '#2ca02c',
+ '#98df8a',
+ '#d62728',
+ '#ff9896',
+ '#9467bd',
+ '#c5b0d5',
+ '#8c564b',
+ '#c49c94',
+ '#e377c2',
+ '#f7b6d2',
+ '#7f7f7f',
+ '#bcbd22',
+ '#dbdb8d',
+ '#17becf',
+ '#8dd3c7',
+ '#bebada',
+ '#fb8072',
+ '#b3de69',
+ '#bc80bd',
+ '#ccebc5',
+ '#ffed6f',
+ 'darkred',
+ 'darkblue']
+
+if len(color_list) >= len(metadata.cell_type.unique()):
+    color_list = color_list[0:len(metadata.cell_type.unique())]
+    color_list.reverse()
+else:
+    color_list.reverse()
+
 
 colorscales = ['bluered', 'blues', 'cividis', 'dense', 'hot', 'ice', 'inferno', 'magenta', 'magma', 'picnic', 'plasma', 'plotly3', 'purp', 'purples', 'rdpu', 'rdylbu', 'teal', 'viridis']
 
@@ -73,10 +108,15 @@ layout = html.Div([
 
 
     html.Div([
+        html.Br(),
+        html.H1('Data Browser', className='graph-titles',style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
         html.Div([
             #input for gene
             html.H3('Gene:', id='gene-headline'),
-            dcc.Input(placeholder = 'Select a gene...', debounce = True, id='gene-value-etacs'),
+            dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='gene-value-etacs'),
+            #dropdown for counts vs normalized
+            html.H3('Expression data:', id='counts-normalized-headline'),
+            dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', value='Normalized', id='counts-normalized-value-etacs'),
             #dropdown for colorscale
             html.H3('Color Map:', id = 'color-scale-headline'),
             dcc.Dropdown(
@@ -94,31 +134,31 @@ layout = html.Div([
                 html.Button('99th', id = 'ninty-ninth-percentile-button')
                 ], style = {'display': 'flex', 'justify-content': 'space-between'})
         ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
-        html.Div([
-            dcc.Loading([
+        dcc.Loading([
                 html.Div([
-                    dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
-                        xaxis={'visible': False, 'showticklabels': False},
-                        yaxis={'visible': False, 'showticklabels': False},
-                        plot_bgcolor = "white",
-                        width=650, height=650),
-                        id='umap-graphic-gene-etacs')
-                ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%', 'marginRight': '1%'}),
-                html.Div([
-                    dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
-                        xaxis={'visible': False, 'showticklabels': False},
-                        yaxis={'visible': False, 'showticklabels': False},
-                        plot_bgcolor = "white",
-                        width=650, height=650),
-                        id='umap-graphic-cell-types-etacs')
-                    ], style={'width': '37.5%', 'display': 'inline-block', 'marginRight': '1%'}),
-            ], color='#3F6CB4', type='cube', style={'marginRight': '10%', 'display': 'flex'}),
-        ]),
+                    html.Div([
+                        dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                            xaxis={'visible': False, 'showticklabels': False},
+                            yaxis={'visible': False, 'showticklabels': False},
+                            plot_bgcolor = "white",
+                            width=650, height=650),
+                            id='umap-graphic-gene-etacs')
+                    ], style={'width': '45%', 'marginRight': '1.5%'}),
+                    html.Div([
+                        dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                            xaxis={'visible': False, 'showticklabels': False},
+                            yaxis={'visible': False, 'showticklabels': False},
+                            plot_bgcolor = "white",
+                            width=650, height=650),
+                            id='umap-graphic-cell-types-etacs')
+                    ], style={'width': '45%', 'marginLeft': '1.5%'}),
+                ], style = {'display': 'flex', 'justify-content': 'center'}),
+            ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
     ], className = 'page-body', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),
 
     html.Div([
         html.H3('Description:', id='description-headline'),
-        html.H5('About us and Links to Publications...To be, or not to be: that is the question: Whether tis nobler in the mind to suffer\\The slings and arrows of outrageous fortune,\\Or to take arms against a sea of troubles,\\And by opposing end them?\\To die: to sleep;\\No more; and by a sleep to say we end The heart-ache and the thousand natural shocksThat flesh is heir to, tis a consummation Devoutly to be wishd. // To die, to sleep;To sleep: perchance to dream: ay, theres the rub For in that sleep of death what dreams may come When we have shuffled off this mortal coil,Must give us pause: // theres the respect That makes calamity of so long life;')
+        html.H5('About us and Links to Publications...To be, or not to be: that is the question: Whether tis nobler in the mind to suffer\\The slings and arrows of outrageous fortune,\\Or to take arms against a sea of troubles,\\And by opposing end them?\\To die: to sleep;\\No more; and by a sleep to say we end The heart-ache and the thousand natural shocksThat flesh is heir to, tis a consummation Devoutly to be wishd. // To die, to sleep;To sleep: perchance to dream: ay, theres the rub For in that sleep of death what dreams may come When we have shuffled off this mortal coil,Must give us pause: // theres the respect That makes calamity of so long life;', id = 'description')
         ])
     
 
@@ -224,14 +264,16 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
             plot_bgcolor = "white"
             )
 
-        cell_type_fig = px.scatter(gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False), x='x',
-        #x coordinates
-                     y='y',
-                     color = 'cell_type',
-                     color_discrete_sequence = px.colors.qualitative.Light24,
-                     hover_name = 'cell_type',
-                     labels={'cell_type': ''}
-                     )
+        cell_type_fig = px.scatter(gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False),
+                        x='x',
+                        #x coordinates
+                        y='y',
+                        color = 'cell_type',
+                        color_discrete_sequence = color_list,
+                        #color_discrete_map = {'Other': 'lightgray'}, 
+                        hover_name = 'cell_type',
+                        labels={'cell_type': ''}
+                    )
         cell_type_fig.update_layout(
             autosize = True,
             title = {
@@ -252,6 +294,7 @@ def update_graph(gene_value, umap_graphic_gene_slider, color_scale_dropdown_valu
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
+
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
 
 

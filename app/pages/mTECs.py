@@ -20,7 +20,7 @@ database = 'thymus'
 if ('LOCALDEV' in os.environ) | ('LOCALDEPLOY' in os.environ):
     host = 'localhost'
     user = 'root'
-    passwd = os.environ.get('MYSQLPASSWORD')
+    passwd = os.environ.get('MYSQLPASSWORDLOCAL')
 else:
     ssm = boto3.client('ssm', region_name='us-west-2')
     host = ssm.get_parameter(Name= "RDS_HOSTNAME")['Parameter']['Value']
@@ -39,6 +39,44 @@ with open(f"static/{database}_gene_table_lookup.csv") as f:
     gene_lookup = dict(reader)
 gene_list = gene_lookup.keys()
 genotype_list = np.insert(metadata.genotype.unique(), 0, 'All')
+#replace when cell type is changed
+cell_type_list = np.insert(metadata.cell_type.unique(), 0, 'All')
+dataset_list = ['All']
+#Add when dataset added
+#metadata.dataset.unique()
+color_list = ['#1f77b4',
+ '#aec7e8',
+ '#ff7f0e',
+ '#ffbb78',
+ '#2ca02c',
+ '#98df8a',
+ '#d62728',
+ '#ff9896',
+ '#9467bd',
+ '#c5b0d5',
+ '#8c564b',
+ '#c49c94',
+ '#e377c2',
+ '#f7b6d2',
+ '#7f7f7f',
+ '#bcbd22',
+ '#dbdb8d',
+ '#17becf',
+ '#8dd3c7',
+ '#bebada',
+ '#fb8072',
+ '#b3de69',
+ '#bc80bd',
+ '#ccebc5',
+ '#ffed6f',
+ 'darkred',
+ 'darkblue']
+
+if len(color_list) >= len(metadata.cell_type.unique()):
+    color_list = color_list[0:len(metadata.cell_type.unique())]
+    color_list.reverse()
+else:
+    color_list.reverse()
 
 colorscales = ['bluered', 'blues', 'cividis', 'dense', 'hot', 'ice', 'inferno', 'magenta', 'magma', 'picnic', 'plasma', 'plotly3', 'purp', 'purples', 'rdpu', 'rdylbu', 'teal', 'viridis']
 
@@ -74,14 +112,23 @@ layout = html.Div([
     html.Div([
         html.Div([
             html.Br(),
-            html.H1('Data Browser', style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
+            html.H1('Data Browser', className='graph-titles',style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
             html.Div([
                 #input for gene
                 html.H3('Gene:', id='gene-headline'),
-                dcc.Input(placeholder = 'Select a gene...', debounce = True, id='gene-value-mtecs'),
+                dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='gene-value-mtecs'),
+                #dropdown for dataset
+                html.H3('Dataset:', id='dataset-headline'),
+                dcc.Dropdown(dataset_list, placeholder = 'Select a dataset...', value='All', id='dataset-value-mtecs'),
                 #dropdown for genotype
                 html.H3('Genotype:', id='genotype-headline'),
                 dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-mtecs'),
+                #dropdown for celltype
+                html.H3('Dataset for cell types:', id='cell-type-headline'),
+                dcc.Dropdown(cell_type_list, placeholder = 'Select a cell type...', value='All', id='cell-type-value-mtecs'),
+                #dropdown for counts vs normalized
+                html.H3('Expression data:', id='counts-normalized-headline'),
+                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', value='Normalized', id='counts-normalized-value-mtecs'),
                 #dropdown for colorscale
                 html.H3('Color Map:', id = 'color-scale-headline'),
                 dcc.Dropdown(
@@ -99,8 +146,8 @@ layout = html.Div([
                     html.Button('99th', id = 'ninty-ninth-percentile-button')
                     ], style = {'display': 'flex', 'justify-content': 'space-between'})
             ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
-            html.Div([
-                dcc.Loading([
+            dcc.Loading([
+                html.Div([
                     html.Div([
                         dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                             xaxis={'visible': False, 'showticklabels': False},
@@ -108,7 +155,7 @@ layout = html.Div([
                             plot_bgcolor = "white",
                             width=650, height=650),
                             id='umap-graphic-gene-mtecs')
-                    ], style={'width': '37.5%', 'display': 'inline-block', 'marginLeft': '2%', 'marginRight': '1%'}),
+                    ], style={'width': '45%', 'marginRight': '2.5%'}),
                     html.Div([
                         dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                             xaxis={'visible': False, 'showticklabels': False},
@@ -116,18 +163,19 @@ layout = html.Div([
                             plot_bgcolor = "white",
                             width=650, height=650),
                             id='umap-graphic-cell-types-mtecs')
-                        ], style={'width': '37.5%', 'display': 'inline-block', 'marginRight': '1%'}),
-                ], color='#3F6CB4', type='cube', style={'marginRight': '10%', 'display': 'flex'}),
-            ]),
+                    ], style={'width': '45%', 'marginRight': '2.5%'}),
+                ], style = {'display': 'flex', 'justify-content': 'center'}),
+            ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
         ]),
+        html.Div([], style={'marginBottom': '10%'}),
         html.Div([
             html.Br(),
-            html.H1('Genotype Comparison', style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
+            html.H1('Genotype Comparison', className='graph-titles', style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
             html.Br(),
             html.Div([
                 #input for gene
                 html.H3('Gene:', id='gene-headline'),
-                dcc.Input(placeholder = 'Select a gene...', debounce = True, id='genotype-graph-gene-value'),
+                dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='genotype-graph-gene-value'),
                 #dropdown for colorscale
                 html.H3('Color Map:', id = 'color-scale-headline'),
                 dcc.Dropdown(
@@ -135,11 +183,11 @@ layout = html.Div([
                     options = colorscales,
                     value = 'plasma'
                     ),
-                html.H4('Scale', id = 'slider-headline'),
+                html.H4('Scale\n(both)', id = 'slider-headline', style={'white-space': 'pre-wrap'}),
                 html.Div([
                     dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='genotype-graph-gene-slider'),
                     ], style = {'marginLeft': '5px'}),
-                html.H4('Percentiles (from left graph genotype)', id = 'percentile-headline'),
+                html.H4('Percentiles\n(from reference genotype)', id = 'percentile-headline', style={'white-space': 'pre-wrap'}),
                 html.Div([
                     html.Button('1st', id = 'first-percentile-button-genotype'),
                     html.Button('99th', id = 'ninty-ninth-percentile-button-genotype')
@@ -147,36 +195,41 @@ layout = html.Div([
             ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
             html.Div([
                 html.Div([
-                    dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-left'),
-                    dcc.Loading([
-                        dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
-                            xaxis={'visible': False, 'showticklabels': False},
-                            yaxis={'visible': False, 'showticklabels': False},
-                            plot_bgcolor = "white",
-                            width=650, height=650),
-                            id='genotype-graph-left')
-                    ], color='#3F6CB4', type='cube', style={'marginRight': '10%', 'display': 'flex'}),
-                ], style={'width': '37.5%', 'marginRight': '1%'}),
+                    html.H3('Reference Genotype:', style={'marginLeft': '2.5%', 'marginRight': '2.5%'}),
+                    dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-left', style={'width': '100%'}),
+                ], style={'display': 'inline-flex', 'align-items': 'center'}),
                 html.Button('Swap', id='genotype-swap-button'),
                 html.Div([
-                    dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-right'),
-                    dcc.Loading([
+                    html.H3('Comparison Genotype:', style={'marginLeft': '2.5%', 'marginRight': '2.5%'}),
+                    dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-right', style={'width': '100%'}),
+                ], style={'display': 'inline-flex', 'align-items': 'center'}),
+            ], style = {'display': 'flex', 'justify-content': 'space-evenly', 'align-items': 'center'}),
+            dcc.Loading([
+                html.Div([
+                    html.Div([
                         dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                             xaxis={'visible': False, 'showticklabels': False},
                             yaxis={'visible': False, 'showticklabels': False},
                             plot_bgcolor = "white",
                             width=650, height=650),
-                            id='genotype-graph-right')
-
-                    ], color='#3F6CB4', type='cube', style={'marginRight': '10%', 'display': 'flex'}),
-                ], style={'width': '37.5%', 'marginLeft': '1%'}),
-            ], style = {'display': 'flex', 'justify-content': 'center'}),
+                            id='genotype-graph-left'),
+                    ], style={'width': '45%', 'marginLeft': '3%','marginRight': '1%'}),
+                    html.Div([
+                        dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                            xaxis={'visible': False, 'showticklabels': False},
+                            yaxis={'visible': False, 'showticklabels': False},
+                            plot_bgcolor = "white",
+                            width=650, height=650),
+                            id='genotype-graph-right'),
+                    ], style={'width': '45%', 'marginLeft': '1%', 'marginRight': '3%'}),
+                ], style = {'display': 'flex', 'justify-content': 'center'}),
+            ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
         ]),
     ], className = 'page-body', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),
 
     html.Div([
         html.H3('Description:', id='description-headline'),
-        html.H5('About us and Links to Publications...To be, or not to be: that is the question: Whether tis nobler in the mind to suffer\\The slings and arrows of outrageous fortune,\\Or to take arms against a sea of troubles,\\And by opposing end them?\\To die: to sleep;\\No more; and by a sleep to say we end The heart-ache and the thousand natural shocksThat flesh is heir to, tis a consummation Devoutly to be wishd. // To die, to sleep;To sleep: perchance to dream: ay, theres the rub For in that sleep of death what dreams may come When we have shuffled off this mortal coil,Must give us pause: // theres the respect That makes calamity of so long life;')
+        html.H5('About us and Links to Publications...To be, or not to be: that is the question: Whether tis nobler in the mind to suffer\\The slings and arrows of outrageous fortune,\\Or to take arms against a sea of troubles,\\And by opposing end them?\\To die: to sleep;\\No more; and by a sleep to say we end The heart-ache and the thousand natural shocksThat flesh is heir to, tis a consummation Devoutly to be wishd. // To die, to sleep;To sleep: perchance to dream: ay, theres the rub For in that sleep of death what dreams may come When we have shuffled off this mortal coil,Must give us pause: // theres the respect That makes calamity of so long life;', id = 'description')
         ])
     
 
@@ -191,19 +244,23 @@ layout = html.Div([
     Output('umap-graphic-cell-types-mtecs', 'figure'),
     Output('gene-value-mtecs', 'value'),
     Output('genotype-value-mtecs', 'value'),
+    Output('cell-type-value-mtecs', 'value'),
+    Output('dataset-value-mtecs', 'value'),
     Output('umap-graphic-gene-slider-mtecs', 'min'),
     Output('umap-graphic-gene-slider-mtecs', 'max'),
     Output('umap-graphic-gene-slider-mtecs', 'marks'),
     Output('umap-graphic-gene-slider-mtecs', 'value'),
-    Input('genotype-value-mtecs', 'value'),
     Input('gene-value-mtecs', 'value'),
+    Input('genotype-value-mtecs', 'value'),
+    Input('cell-type-value-mtecs', 'value'),
+    Input('dataset-value-mtecs', 'value'),
     Input('umap-graphic-gene-slider-mtecs', 'value'),
     Input('color-scale-dropdown', 'value'),
     Input('first-percentile-button', 'n_clicks'),
     Input('ninty-ninth-percentile-button', 'n_clicks')
     )
 
-def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
+def update_graph(gene_value, genotype_value, cell_type_value, dataset_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
 
     input_id = ctx.triggered_id
     global metadata
@@ -232,6 +289,8 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         else:
             metadata_subset = metadata
 
+        #if cell_type_value != 'All' metadata_subset = metadata[metadata.dataset == dataset_value] else metadata_subset = metadata_subset
+
         #subset expression data on selected cells [gene_value, meta_cols]
         gene_data = pd.merge(gene_data, metadata_subset, on='barcode', how='inner')
         #set initial gene value to be equal to default gene
@@ -252,7 +311,6 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         else:
             lower_slider_value = percentile_values[1]
             higher_slider_value = percentile_values[0]
-
 
         
         #graphs
@@ -293,14 +351,16 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             plot_bgcolor = "white"
             )
 
-        cell_type_fig = px.scatter(gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False), x='x',
-        #x coordinates
-                     y='y',
-                     color = 'cell_type',
-                     color_discrete_sequence = px.colors.qualitative.Light24,
-                     hover_name = 'cell_type',
-                     labels={'cell_type': ''}
-                     )
+        cell_type_fig = px.scatter(gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False),
+                        x='x',
+                        #x coordinates
+                        y='y',
+                        color = 'cell_type',
+                        color_discrete_sequence = color_list,
+                        #color_discrete_map = {'Other': 'lightgray'},
+                        hover_name = 'cell_type',
+                        labels={'cell_type': ''}
+                    )
         cell_type_fig.update_layout(
             autosize = True,
             title = {
@@ -321,11 +381,13 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
+
+
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
 
 
 
-        return gene_fig, cell_type_fig, gene_value if gene_value_in_df else 'No Genes Found', genotype_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value if gene_value_in_df else 'No Genes Found', genotype_value, cell_type_value, dataset_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -341,7 +403,7 @@ def update_graph(genotype_value, gene_value, umap_graphic_gene_slider, color_sca
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+    return fig, fig, None, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
 
 ##=========================Callback=========================##
