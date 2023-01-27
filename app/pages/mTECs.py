@@ -28,6 +28,7 @@ else:
     passwd = ssm.get_parameter(Name= "RDS_PASSWORD", WithDecryption = True)['Parameter']['Value']
 
 engine = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}")
+engine_counts = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}_counts")
 
 default_gene='aire'
 
@@ -45,6 +46,8 @@ default_cell_type_annotation = 'Aggregated cell type'
 
 dataset_list = np.insert(metadata.dataset.unique(), 0, 'All')
 default_dataset_value = 'All'
+
+default_expression_data_value = 'Normalized'
 
 #Add when dataset added
 #metadata.dataset.unique()
@@ -125,8 +128,8 @@ layout = html.Div([
                 html.H3('Cell type annotations:', id='cell-type-annotations-headline'),
                 dcc.Dropdown(cell_type_annotations_list, placeholder = 'Select a cell type...', id='cell-type-annotations-value'),
                 #dropdown for counts vs normalized
-                html.H3('Expression data:', id='counts-normalized-headline'),
-                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', value='Normalized', id='counts-normalized-value-mtecs'),
+                html.H3('Expression data:', id='expression-data-headline'),
+                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-mtecs'),
                 #dropdown for colorscale
                 html.H3('Color Map:', id = 'color-scale-headline'),
                 dcc.Dropdown(
@@ -244,6 +247,7 @@ layout = html.Div([
     Output('genotype-value-mtecs', 'value'),
     Output('genotype-value-mtecs', 'options'),
     Output('cell-type-annotations-value', 'value'),
+    Output('expression-data-value-mtecs', 'value'),
     Output('dataset-value', 'value'),
     Output('umap-graphic-gene-slider-mtecs', 'min'),
     Output('umap-graphic-gene-slider-mtecs', 'max'),
@@ -252,6 +256,7 @@ layout = html.Div([
     Input('gene-value-mtecs', 'value'),
     Input('genotype-value-mtecs', 'value'),
     Input('cell-type-annotations-value', 'value'),
+    Input('expression-data-value-mtecs', 'value'),
     Input('dataset-value', 'value'),
     Input('umap-graphic-gene-slider-mtecs', 'value'),
     Input('color-scale-dropdown', 'value'),
@@ -259,7 +264,7 @@ layout = html.Div([
     Input('ninty-ninth-percentile-button', 'n_clicks')
     )
 
-def update_graph(gene_value, genotype_value, cell_type_annotations_value, dataset_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
+def update_graph(gene_value, genotype_value, cell_type_annotations_value, expression_data_value, dataset_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
 
     input_id = ctx.triggered_id
     global metadata
@@ -279,8 +284,11 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, datase
 
         #table to get gene_value from
         table = gene_lookup[gene_value]
+
+        if expression_data_value is None:
+            expression_data_value = default_expression_data_value
         #extract gene column from table
-        gene_data = pd.read_sql(table, con=engine, columns = [gene_value, 'barcode'])
+        gene_data = pd.read_sql(table, con=engine if expression_data_value == 'Normalized' else engine_counts, columns = [gene_value, 'barcode'])
 
         #set default genotype value to WT
         if dataset_value is None:
@@ -421,7 +429,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, datase
 
 
 
-        return gene_fig, cell_type_fig, gene_value if gene_value_in_df else 'No Genes Found', genotype_value, genotype_list_subset, cell_type_annotations_value, dataset_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value, genotype_value, genotype_list_subset, cell_type_annotations_value, expression_data_value, dataset_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -437,7 +445,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, datase
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+    return fig, fig, None, None, None, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
 
 ##=========================Callback=========================##
@@ -614,7 +622,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
 
 
 
-        return gene_fig_left, gene_fig_right, genotype_value_left, genotype_value_right, gene_value if gene_value_in_df else 'No Genes Found', df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig_left, gene_fig_right, genotype_value_left, genotype_value_right, gene_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
