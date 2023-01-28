@@ -240,14 +240,16 @@ layout = html.Div([
     Input('umap-graphic-gene-slider-mtecs', 'value'),
     Input('color-scale-dropdown', 'value'),
     Input('first-percentile-button', 'n_clicks'),
-    Input('ninty-ninth-percentile-button', 'n_clicks')
+    Input('ninty-ninth-percentile-button', 'n_clicks'),
+    Input('umap-graphic-cell-types-mtecs', 'restyleData'),
     )
 
-def update_graph(gene_value, genotype_value, cell_type_annotations_value, expression_data_value, dataset_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
+def update_graph(gene_value, genotype_value, cell_type_annotations_value, expression_data_value, dataset_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, cell_type_fig_restyle_data):
 
     input_id = ctx.triggered_id
     global metadata
     if metadata is not None:
+        #set initial gene value to be equal to default gene
         if gene_value is None:
             gene_value = default_gene
         if cell_type_annotations_value is None:
@@ -292,7 +294,6 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
 
         #subset expression data on selected cells [gene_value, meta_cols]
         gene_data = pd.merge(gene_data, metadata_subset, on='barcode', how='inner')
-        #set initial gene value to be equal to default gene
 
         #percentile slider code
         percentile_values = np.quantile(gene_data[gene_value], [0.99, 0.01])
@@ -311,6 +312,39 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             lower_slider_value = percentile_values[1]
             higher_slider_value = percentile_values[0]
 
+
+        color_list_copy = color_list[0:len(metadata_subset[cell_type_annotations_value].unique())].copy()
+        color_list_copy.reverse()
+
+        gene_data = gene_data.sort_values(by=[cell_type_annotations_value], kind='mergesort', ascending=False)
+
+        if cell_type_annotations_value != default_cell_type_annotation:
+            gene_data_order_other_rows = gene_data[gene_data[cell_type_annotations_value] == 'Other dataset']
+            gene_data = pd.concat([gene_data_order_other_rows, gene_data[gene_data[cell_type_annotations_value] != 'Other dataset']])
+
+        #print(metadata)
+        #print(metadata_subset)
+        # print(metadata[cell_type_annotations_value].unique())
+        # print(metadata_subset[cell_type_annotations_value].unique())
+        # print(gene_data[cell_type_annotations_value].unique())
+        
+        
+
+        # visible_indexes = []
+        # visible_cell_types = []
+        # gene_data_cell_types = gene_data[cell_type_annotations_value].unique()
+        # list(gene_data_cell_types).reverse()
+        # print(gene_data_cell_types)
+        # if cell_type_fig_restyle_data != None:
+        #     cell_fig_visible = cell_type_fig_restyle_data[0]['visible']
+        #     for i in range(len(cell_fig_visible)):
+        #         if cell_fig_visible[i] == True:
+        #             visible_indexes.append(i)
+        #             visible_cell_types.append(gene_data_cell_types[i])
+
+        # print(visible_indexes)
+        # print(visible_cell_types)
+
         
         #graphs
         #sort dff based on cells highest expressing to lowest expressing gene - makes the gene scatter plot graph highest expressing cells on top of lower expressing cells
@@ -321,13 +355,14 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
                      hover_name = cell_type_annotations_value,
+                     hover_data = {'x': False, 'y': False, cell_type_annotations_value: False},
                      range_color=
                      #min of color range
                      [lower_slider_value, 
                      #max of color range
                      higher_slider_value],
                      color_continuous_scale = color_scale_dropdown_value,
-                     labels = {gene_value: ''}
+                     labels = {gene_value: gene_value + ' expression'}
                      )
         gene_fig.update_traces(
             marker=dict(
@@ -356,15 +391,6 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             plot_bgcolor = "white"
             )
 
-        color_list_copy = color_list[0:len(metadata[cell_type_annotations_value].unique())].copy()
-        color_list_copy.reverse()
-
-        gene_data = gene_data.sort_values(by=[cell_type_annotations_value], kind='mergesort', ascending=False)
-
-        if cell_type_annotations_value != default_cell_type_annotation:
-            gene_data_order_other_rows = gene_data[gene_data[cell_type_annotations_value] == 'Other dataset']
-            gene_data = pd.concat([gene_data_order_other_rows, gene_data[gene_data[cell_type_annotations_value] != 'Other dataset']])
-
         cell_type_fig = px.scatter(gene_data,
                         x='x',
                         #x coordinates
@@ -373,7 +399,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                         color_discrete_sequence = color_list_copy,
                         color_discrete_map = {'Other dataset': 'gainsboro'} if cell_type_annotations_value != default_cell_type_annotation else {},
                         hover_name = cell_type_annotations_value,
-                        labels={cell_type_annotations_value: ''},
+                        hover_data = {'x': False, 'y': False, cell_type_annotations_value: False}
                     )
 
         cell_type_fig.update_traces(
@@ -520,13 +546,14 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
                      hover_name = default_cell_type_annotation,
+                     hover_data = {'x': False, 'y': False, default_cell_type_annotation: False},
                      range_color=
                      #min of color range
                      [lower_slider_value, 
                      #max of color range
                      higher_slider_value],
                      color_continuous_scale = color_scale_dropdown_value,
-                     labels = {gene_value: ''}
+                     labels = {gene_value: gene_value + ' expression'}
                      )
         gene_fig_left.update_traces(
             marker=dict(
@@ -562,13 +589,14 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
                      hover_name = default_cell_type_annotation,
+                     hover_data = {'x': False, 'y': False, default_cell_type_annotation: False},
                      range_color=
                      #min of color range
                      [lower_slider_value, 
                      #max of color range
                      higher_slider_value],
                      color_continuous_scale = color_scale_dropdown_value,
-                     labels = {gene_value: ''}
+                     labels = {gene_value: gene_value + ' expression'}
                      )
         gene_fig_right.update_traces(
             marker=dict(

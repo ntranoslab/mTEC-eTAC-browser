@@ -192,6 +192,7 @@ def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, co
     input_id = ctx.triggered_id
     global metadata
     if metadata is not None:
+        #set initial gene value to be equal to default gene
         if gene_value is None:
             gene_value = default_gene
         #first lower case gene value
@@ -213,7 +214,6 @@ def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, co
 
         #subset expression data on selected cells [gene_value, meta_cols]
         gene_data = pd.merge(gene_data, metadata, on='barcode', how='inner')
-        #set initial gene value to be equal to default gene
 
         #percentile slider code
         percentile_values = np.quantile(gene_data[gene_value], [0.99, 0.01])
@@ -243,13 +243,14 @@ def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, co
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
                      hover_name = 'cell_type',
+                     hover_data = {'x': False, 'y': False, 'cell_type': False},
                      range_color=
                      #min of color range
                      [lower_slider_value, 
                      #max of color range
                      higher_slider_value],
                      color_continuous_scale = color_scale_dropdown_value,
-                     labels = {gene_value: ''}
+                     labels = {gene_value: gene_value + ' expression'}
                      )
         gene_fig.update_traces(
             marker=dict(
@@ -286,7 +287,7 @@ def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, co
                         color_discrete_sequence = color_list,
                         #color_discrete_map = {'Other': 'lightgray'}, 
                         hover_name = 'cell_type',
-                        labels={'cell_type': ''}
+                        hover_data = {'x': False, 'y': False, 'cell_type': False}
                     )
         cell_type_fig.update_traces(
             marker=dict(
