@@ -41,8 +41,8 @@ gene_list = gene_lookup.keys()
 genotype_list = np.insert(metadata.genotype.unique(), 0, 'All')
 default_genotype_value = 'WT'
 
-cell_type_annotations_list = [i for i in metadata.columns if "cell type" in i.lower()]
-default_cell_type_annotation = 'Aggregated cell type'
+cell_type_annotations_list = ["Aggregated", "Miller"]
+default_cell_type_annotation = 'Aggregated'
 
 dataset_list = np.insert(metadata.dataset.unique(), 0, 'All')
 default_dataset_value = 'All'
@@ -51,35 +51,14 @@ default_expression_data_value = 'Normalized'
 
 #Add when dataset added
 #metadata.dataset.unique()
-color_list = ['#1f77b4',
- '#aec7e8',
- '#ff7f0e',
- '#ffbb78',
- '#2ca02c',
- '#98df8a',
- '#d62728',
- '#ff9896',
- '#9467bd',
- '#c5b0d5',
- '#8c564b',
- '#c49c94',
- '#e377c2',
- '#f7b6d2',
- '#7f7f7f',
- '#bcbd22',
- '#dbdb8d',
- '#17becf',
- '#8dd3c7',
- '#bebada',
- '#fb8072',
- '#b3de69',
- '#bc80bd',
- '#ccebc5',
- '#ffed6f',
- 'darkred',
- 'darkblue']
+color_list = [
+    '#1f77b4', '#aec7e8','#ff7f0e','#ffbb78','#2ca02c','#98df8a','#d62728','#ff9896','#9467bd','#c5b0d5','#8c564b',
+    '#c49c94','#e377c2','#f7b6d2','#7f7f7f','#bcbd22','#dbdb8d','#17becf','#8dd3c7','#bebada','#fb8072','#b3de69',
+    '#bc80bd','#ccebc5','#ffed6f','darkred','darkblue'
+]
 
-colorscales = ['bluered', 'blues', 'cividis', 'dense', 'hot', 'ice', 'inferno', 'magenta', 'magma', 'picnic', 'plasma', 'plotly3', 'purp', 'purples', 'rdpu', 'rdylbu', 'teal', 'viridis']
+colorscales = ['bluered', 'blues', 'cividis', 'dense', 'hot', 'ice', 'inferno', 'magenta', 'magma', 'picnic', 'plasma',
+               'plotly3', 'purp', 'purples', 'rdpu', 'rdylbu', 'teal', 'viridis']
 
 ##=========================Page Layout=========================##
 layout = html.Div([
