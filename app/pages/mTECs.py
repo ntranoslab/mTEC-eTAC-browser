@@ -247,6 +247,7 @@ layout = html.Div([
     Output('cell-type-annotations-value', 'value'),
     Output('expression-data-value-mtecs', 'value'),
     Output('dataset-value', 'value'),
+    Output('dot-size-slider-data-browser-mtecs', 'value'),
     Output('umap-graphic-gene-slider-mtecs', 'min'),
     Output('umap-graphic-gene-slider-mtecs', 'max'),
     Output('umap-graphic-gene-slider-mtecs', 'marks'),
@@ -256,6 +257,7 @@ layout = html.Div([
     Input('cell-type-annotations-value', 'value'),
     Input('expression-data-value-mtecs', 'value'),
     Input('dataset-value', 'value'),
+    Input('dot-size-slider-data-browser-mtecs', 'value'),
     Input('umap-graphic-gene-slider-mtecs', 'value'),
     Input('color-scale-dropdown', 'value'),
     Input('first-percentile-button', 'n_clicks'),
@@ -263,7 +265,7 @@ layout = html.Div([
     Input('umap-graphic-cell-types-mtecs', 'restyleData'),
     )
 
-def update_graph(gene_value, genotype_value, cell_type_annotations_value, expression_data_value, dataset_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, cell_type_fig_restyle_data):
+def update_graph(gene_value, genotype_value, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, cell_type_fig_restyle_data):
 
     input_id = ctx.triggered_id
     global metadata
@@ -331,6 +333,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             lower_slider_value = percentile_values[1]
             higher_slider_value = percentile_values[0]
 
+        dot_size_slider_value = dot_size_slider_value if dot_size_slider_value != None else 3
 
         color_list_copy = color_list[0:len(metadata_subset[cell_type_annotations_value].unique())].copy()
         color_list_copy.reverse()
@@ -384,7 +387,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                      )
         gene_fig.update_traces(
             marker=dict(
-                size=3, 
+                size=dot_size_slider_value,
                 line=dict(width=0)
                 )
             )
@@ -422,7 +425,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
 
         cell_type_fig.update_traces(
             marker=dict(
-                size=3, 
+                size=dot_size_slider_value,
                 line=dict(width=0)
                 )
             )
@@ -455,7 +458,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
 
 
 
-        return gene_fig, cell_type_fig, gene_value, genotype_value, genotype_list_subset, cell_type_annotations_value, expression_data_value, dataset_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value, genotype_value, genotype_list_subset, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -471,7 +474,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, None, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+    return fig, fig, None, None, None, None, None, None, 3, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
 
 ##=========================Callback=========================##
@@ -484,6 +487,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
     Output('genotype-value-right', 'value'),
     Output('genotype-graph-gene-value', 'value'),
     Output('expression-data-value-genotype', 'value'),
+    Output('dot-size-slider-genotype', 'value'),
     Output('genotype-graph-gene-slider', 'min'),
     Output('genotype-graph-gene-slider', 'max'),
     Output('genotype-graph-gene-slider', 'marks'),
@@ -492,6 +496,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
     Input('genotype-value-right', 'value'),
     Input('genotype-graph-gene-value', 'value'),
     Input('expression-data-value-genotype', 'value'),
+    Input('dot-size-slider-genotype', 'value'),
     Input('genotype-graph-gene-slider', 'value'),
     Input('color-scale-dropdown-genotype', 'value'),
     Input('first-percentile-button-genotype', 'n_clicks'),
@@ -499,7 +504,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
     Input('genotype-swap-button', 'n_clicks')
     )
 
-def update_graph(genotype_value_left, genotype_value_right, gene_value, expression_data_value, genotype_graph_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, swap_button_click):
+def update_graph(genotype_value_left, genotype_value_right, gene_value, expression_data_value, dot_size_slider_value, genotype_graph_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, swap_button_click):
 
     input_id = ctx.triggered_id
     global metadata
@@ -562,6 +567,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
             lower_slider_value = percentile_values[1]
             higher_slider_value = percentile_values[0]
 
+        dot_size_slider_value = dot_size_slider_value if dot_size_slider_value != None else 3
 
         
         #graphs
@@ -584,7 +590,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
                      )
         gene_fig_left.update_traces(
             marker=dict(
-                size=3, 
+                size=dot_size_slider_value, 
                 line=dict(width=0)
                 )
             )
@@ -627,7 +633,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
                      )
         gene_fig_right.update_traces(
             marker=dict(
-                size=3, 
+                size=dot_size_slider_value, 
                 line=dict(width=0)
                 )
             )
@@ -656,7 +662,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
 
 
 
-        return gene_fig_left, gene_fig_right, genotype_value_left, genotype_value_right, gene_value, expression_data_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig_left, gene_fig_right, genotype_value_left, genotype_value_right, gene_value, expression_data_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -672,5 +678,5 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+    return fig, fig, None, None, None, None, 3, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
