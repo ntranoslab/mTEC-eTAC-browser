@@ -120,6 +120,11 @@ layout = html.Div([
             #dropdown for counts vs normalized
             html.H3('Expression data:', id='expression-data-headline'),
             dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-etacs'),
+            #slideer for dot size
+            html.H3('Dot size', id = 'dot-size-headline'),
+            html.Div([
+                dcc.Slider(min=3, max=10, step=1, marks=None, included=False, vertical=False, tooltip={'placement': 'top', 'always_visible': True}, id='dot-size-slider-data-browser-etacs'),
+                ], style = {'marginLeft': '-12%','width': '122%'}),
             #dropdown for colorscale
             html.H3('Color Map:', id = 'color-scale-headline'),
             dcc.Dropdown(
@@ -175,23 +180,27 @@ layout = html.Div([
     Output('umap-graphic-cell-types-etacs', 'figure'),
     Output('gene-value-etacs', 'value'),
     Output('expression-data-value-etacs', 'value'),
+    Output('dot-size-slider-data-browser-etacs', 'value'),
     Output('umap-graphic-gene-slider-etacs', 'min'),
     Output('umap-graphic-gene-slider-etacs', 'max'),
     Output('umap-graphic-gene-slider-etacs', 'marks'),
     Output('umap-graphic-gene-slider-etacs', 'value'),
     Input('gene-value-etacs', 'value'),
     Input('expression-data-value-etacs', 'value'),
+    Input('dot-size-slider-data-browser-etacs', 'value'),
     Input('umap-graphic-gene-slider-etacs', 'value'),
     Input('color-scale-dropdown', 'value'),
     Input('first-percentile-button', 'n_clicks'),
-    Input('ninty-ninth-percentile-button', 'n_clicks')
+    Input('ninty-ninth-percentile-button', 'n_clicks'),
+    Input('umap-graphic-cell-types-etacs', 'restyleData')
     )
 
-def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
+def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, cell_type_fig_restyle_data):
 
     input_id = ctx.triggered_id
     global metadata
     if metadata is not None:
+        #set initial gene value to be equal to default gene
         if gene_value is None:
             gene_value = default_gene
         #first lower case gene value
@@ -213,7 +222,6 @@ def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, co
 
         #subset expression data on selected cells [gene_value, meta_cols]
         gene_data = pd.merge(gene_data, metadata, on='barcode', how='inner')
-        #set initial gene value to be equal to default gene
 
         #percentile slider code
         percentile_values = np.quantile(gene_data[gene_value], [0.99, 0.01])
@@ -232,28 +240,53 @@ def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, co
             lower_slider_value = percentile_values[1]
             higher_slider_value = percentile_values[0]
 
+        dot_size_slider_value = dot_size_slider_value if dot_size_slider_value != None else 3
 
+
+        gene_data = gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False)
+
+        visible_cell_types = []
+        gene_data_cell_types = gene_data['cell_type'].unique()
+        list(gene_data_cell_types).reverse()
+        if cell_type_fig_restyle_data != None and input_id == 'umap-graphic-cell-types-etacs':
+            cell_fig_visible = cell_type_fig_restyle_data[0]['visible']
+            if len(cell_fig_visible) > 1:
+                for i in range(len(cell_fig_visible)):
+                    if cell_fig_visible[i] == True:
+                        visible_cell_types.append(gene_data_cell_types[i])
+            elif len(cell_fig_visible) == 1:
+                visible_cell_types = list(gene_data_cell_types)
+                if cell_type_fig_restyle_data[0]['visible'][0] == 'legendonly':
+                    visible_cell_types.pop(cell_type_fig_restyle_data[1][0])
+        else:
+            visible_cell_types = gene_data_cell_types
+
+        gene_data_filtered = pd.DataFrame()
+
+        for i in visible_cell_types:
+            gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data['cell_type'] == i]])
         
         #graphs
         #sort dff based on cells highest expressing to lowest expressing gene - makes the gene scatter plot graph highest expressing cells on top of lower expressing cells
-        gene_fig = px.scatter(gene_data.sort_values(by=[gene_value], kind='mergesort'),
+        gene_fig = px.scatter(gene_data_filtered.sort_values(by=[gene_value], kind='mergesort'),
                      #x coordinates
                      x='x',
                      #y coordinates
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
                      hover_name = 'cell_type',
+                     hover_data = {'x': False, 'y': False, 'cell_type': False},
                      range_color=
                      #min of color range
                      [lower_slider_value, 
                      #max of color range
                      higher_slider_value],
                      color_continuous_scale = color_scale_dropdown_value,
-                     labels = {gene_value: ''}
+                     labels = {gene_value: gene_value + ' expression'}
                      )
         gene_fig.update_traces(
             marker=dict(
-                size=3, 
+                size=dot_size_slider_value, 
                 line=dict(width=0)
                 )
             )
@@ -277,8 +310,11 @@ def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, co
             margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
             )
+        gene_fig.update_coloraxes(
+            colorbar_title_text=''
+            )
 
-        cell_type_fig = px.scatter(gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False),
+        cell_type_fig = px.scatter(gene_data,
                         x='x',
                         #x coordinates
                         y='y',
@@ -286,11 +322,11 @@ def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, co
                         color_discrete_sequence = color_list,
                         #color_discrete_map = {'Other': 'lightgray'}, 
                         hover_name = 'cell_type',
-                        labels={'cell_type': ''}
+                        hover_data = {'x': False, 'y': False, 'cell_type': False}
                     )
         cell_type_fig.update_traces(
             marker=dict(
-                size=3, 
+                size=dot_size_slider_value, 
                 line=dict(width=0)
                 )
             )
@@ -308,18 +344,22 @@ def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, co
                     'color': '#4C5C75'
                 }
             },
-            legend={'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
+            legend={'title': '', 'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
             margin={'l':10, 'r': 10},
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
             )
 
+        cell_type_fig.for_each_trace(
+            lambda trace: trace.update(visible='legendonly') if trace.name not in visible_cell_types else (),
+            )
+
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
 
 
 
-        return gene_fig, cell_type_fig, gene_value, expression_data_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value, expression_data_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -335,5 +375,5 @@ def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, co
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+    return fig, fig, None, None, None, 3, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 

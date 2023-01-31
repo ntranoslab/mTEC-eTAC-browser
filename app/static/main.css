@@ -99,6 +99,11 @@ button{
 	cursor: default;
 }
 
+#dot-size-headline {
+	color: #4C5C75;
+	cursor: default;
+}
+
 #color-scale-headline {
 	color: #4C5C75;
 	cursor: default;

@@ -109,22 +109,11 @@ layout = html.Div([
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='expression-data-headline'),
                 dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-mtecs'),
-                #dropdown for colorscale
-                html.H3('Color Map:', id = 'color-scale-headline'),
-                dcc.Dropdown(
-                    id= 'color-scale-dropdown',
-                    options = colorscales,
-                    value = 'plasma'
-                    ),
-                html.H4('Scale', id = 'slider-headline'),
+                #slideer for dot size
+                html.H3('Dot size', id = 'dot-size-headline'),
                 html.Div([
-                    dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs'),
-                    ], style = {'marginLeft': '5px'}),
-                html.H4('Percentiles', id = 'percentile-headline'),
-                html.Div([
-                    html.Button('1st', id = 'first-percentile-button'),
-                    html.Button('99th', id = 'ninty-ninth-percentile-button')
-                    ], style = {'display': 'flex', 'justify-content': 'space-between'})
+                    dcc.Slider(min=3, max=10, step=1, marks=None, included=False, vertical=False, tooltip={'placement': 'top', 'always_visible': True}, id='dot-size-slider-data-browser-mtecs'),
+                    ], style = {'marginLeft': '-12%','width': '122%'}),
             ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
             dcc.Loading([
                 html.Div([
@@ -147,6 +136,29 @@ layout = html.Div([
                 ], style = {'display': 'flex', 'justify-content': 'center'}),
             ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
         ]),
+        html.Div([
+            html.Div([
+                html.H3('Color Map:', id = 'color-scale-headline', style = {'text-align': 'center'}),
+                dcc.Dropdown(
+                    id= 'color-scale-dropdown',
+                    options = colorscales,
+                    value = 'plasma'
+                ),
+            ], style = {'width': '27.5%'}),
+            html.Div([
+                html.H4('Scale', id = 'slider-headline'),
+                html.Div([
+                    dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs'),
+                ], style = {'marginLeft': '5px'}),
+            ], style = {'width': '27.5%'}),
+            html.Div([
+                html.H4('Percentiles', id = 'percentile-headline'),
+                    html.Div([
+                        html.Button('1st', id = 'first-percentile-button'),
+                        html.Button('99th', id = 'ninty-ninth-percentile-button')
+                    ], style = {'display': 'flex', 'justify-content': 'space-between'})
+            ], style = {'width': '27.5%'}),
+        ], style={'marginLeft': '2.5%','display': 'flex', 'justify-content': 'space-evenly', 'width': '35%'}),
         html.Div([], style={'marginBottom': '10%'}),
         html.Div([
             html.Br(),
@@ -156,6 +168,14 @@ layout = html.Div([
                 #input for gene
                 html.H3('Gene:', id='gene-headline'),
                 dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='genotype-graph-gene-value'),
+                #dropdown for counts vs normalized
+                html.H3('Expression data:', id='expression-data-headline'),
+                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-genotype'),
+                #slideer for dot size
+                html.H3('Dot size', id = 'dot-size-headline'),
+                html.Div([
+                    dcc.Slider(min=3, max=10, step=1, marks=None, included=False, vertical=False, tooltip={'placement': 'top', 'always_visible': True}, id='dot-size-slider-genotype'),
+                    ], style = {'marginLeft': '-12%','width': '122%'}),
                 #dropdown for colorscale
                 html.H3('Color Map:', id = 'color-scale-headline'),
                 dcc.Dropdown(
@@ -228,6 +248,7 @@ layout = html.Div([
     Output('cell-type-annotations-value', 'value'),
     Output('expression-data-value-mtecs', 'value'),
     Output('dataset-value', 'value'),
+    Output('dot-size-slider-data-browser-mtecs', 'value'),
     Output('umap-graphic-gene-slider-mtecs', 'min'),
     Output('umap-graphic-gene-slider-mtecs', 'max'),
     Output('umap-graphic-gene-slider-mtecs', 'marks'),
@@ -237,17 +258,20 @@ layout = html.Div([
     Input('cell-type-annotations-value', 'value'),
     Input('expression-data-value-mtecs', 'value'),
     Input('dataset-value', 'value'),
+    Input('dot-size-slider-data-browser-mtecs', 'value'),
     Input('umap-graphic-gene-slider-mtecs', 'value'),
     Input('color-scale-dropdown', 'value'),
     Input('first-percentile-button', 'n_clicks'),
-    Input('ninty-ninth-percentile-button', 'n_clicks')
+    Input('ninty-ninth-percentile-button', 'n_clicks'),
+    Input('umap-graphic-cell-types-mtecs', 'restyleData'),
     )
 
-def update_graph(gene_value, genotype_value, cell_type_annotations_value, expression_data_value, dataset_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
+def update_graph(gene_value, genotype_value, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, cell_type_fig_restyle_data):
 
     input_id = ctx.triggered_id
     global metadata
     if metadata is not None:
+        #set initial gene value to be equal to default gene
         if gene_value is None:
             gene_value = default_gene
         if cell_type_annotations_value is None:
@@ -292,7 +316,6 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
 
         #subset expression data on selected cells [gene_value, meta_cols]
         gene_data = pd.merge(gene_data, metadata_subset, on='barcode', how='inner')
-        #set initial gene value to be equal to default gene
 
         #percentile slider code
         percentile_values = np.quantile(gene_data[gene_value], [0.99, 0.01])
@@ -311,27 +334,61 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             lower_slider_value = percentile_values[1]
             higher_slider_value = percentile_values[0]
 
+        dot_size_slider_value = dot_size_slider_value if dot_size_slider_value != None else 3
+
+        color_list_copy = color_list[0:len(metadata_subset[cell_type_annotations_value].unique())].copy()
+        color_list_copy.reverse()
+
+        gene_data = gene_data.sort_values(by=[cell_type_annotations_value], kind='mergesort', ascending=False)
+
+        if cell_type_annotations_value != default_cell_type_annotation:
+            gene_data_order_other_rows = gene_data[gene_data[cell_type_annotations_value] == 'Other dataset']
+            gene_data = pd.concat([gene_data_order_other_rows, gene_data[gene_data[cell_type_annotations_value] != 'Other dataset']])
+        
+        
+        visible_cell_types = []
+        gene_data_cell_types = gene_data[cell_type_annotations_value].unique()
+        list(gene_data_cell_types).reverse()
+        if cell_type_fig_restyle_data != None and input_id == 'umap-graphic-cell-types-mtecs':
+            cell_fig_visible = cell_type_fig_restyle_data[0]['visible']
+            if len(cell_fig_visible) > 1:
+                for i in range(len(cell_fig_visible)):
+                    if cell_fig_visible[i] == True:
+                        visible_cell_types.append(gene_data_cell_types[i])
+            elif len(cell_fig_visible) == 1:
+                visible_cell_types = list(gene_data_cell_types)
+                if cell_type_fig_restyle_data[0]['visible'][0] == 'legendonly':
+                    visible_cell_types.pop(cell_type_fig_restyle_data[1][0])
+        else:
+            visible_cell_types = gene_data_cell_types
+
+        gene_data_filtered = pd.DataFrame()
+
+        for i in visible_cell_types:
+            gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data[cell_type_annotations_value] == i]])
+
         
         #graphs
         #sort dff based on cells highest expressing to lowest expressing gene - makes the gene scatter plot graph highest expressing cells on top of lower expressing cells
-        gene_fig = px.scatter(gene_data.sort_values(by=[gene_value], kind='mergesort'),
+        gene_fig = px.scatter(gene_data_filtered.sort_values(by=[gene_value], kind='mergesort'),
                      #x coordinates
                      x='x',
                      #y coordinates
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
                      hover_name = cell_type_annotations_value,
+                     hover_data = {'x': False, 'y': False, cell_type_annotations_value: False},
                      range_color=
                      #min of color range
                      [lower_slider_value, 
                      #max of color range
                      higher_slider_value],
                      color_continuous_scale = color_scale_dropdown_value,
-                     labels = {gene_value: ''}
+                     labels = {gene_value: gene_value + ' expression'}
                      )
         gene_fig.update_traces(
             marker=dict(
-                size=3, 
+                size=dot_size_slider_value,
                 line=dict(width=0)
                 )
             )
@@ -355,15 +412,9 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
             )
-
-        color_list_copy = color_list[0:len(metadata[cell_type_annotations_value].unique())].copy()
-        color_list_copy.reverse()
-
-        gene_data = gene_data.sort_values(by=[cell_type_annotations_value], kind='mergesort', ascending=False)
-
-        if cell_type_annotations_value != default_cell_type_annotation:
-            gene_data_order_other_rows = gene_data[gene_data[cell_type_annotations_value] == 'Other dataset']
-            gene_data = pd.concat([gene_data_order_other_rows, gene_data[gene_data[cell_type_annotations_value] != 'Other dataset']])
+        gene_fig.update_coloraxes(
+            colorbar_title_text=''
+            )
 
         cell_type_fig = px.scatter(gene_data,
                         x='x',
@@ -373,12 +424,12 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                         color_discrete_sequence = color_list_copy,
                         color_discrete_map = {'Other dataset': 'gainsboro'} if cell_type_annotations_value != default_cell_type_annotation else {},
                         hover_name = cell_type_annotations_value,
-                        labels={cell_type_annotations_value: ''},
+                        hover_data = {'x': False, 'y': False, cell_type_annotations_value: False}
                     )
 
         cell_type_fig.update_traces(
             marker=dict(
-                size=3, 
+                size=dot_size_slider_value,
                 line=dict(width=0)
                 )
             )
@@ -396,11 +447,14 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                     'color': '#4C5C75'
                 }
             },
-            legend={'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
+            legend={'title': '', 'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
             margin={'l':10, 'r': 10},
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
+            )
+        cell_type_fig.for_each_trace(
+            lambda trace: trace.update(visible='legendonly') if trace.name not in visible_cell_types else (),
             )
 
 
@@ -408,7 +462,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
 
 
 
-        return gene_fig, cell_type_fig, gene_value, genotype_value, genotype_list_subset, cell_type_annotations_value, expression_data_value, dataset_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value, genotype_value, genotype_list_subset, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -424,7 +478,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, None, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+    return fig, fig, None, None, None, None, None, None, 3, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
 
 ##=========================Callback=========================##
@@ -436,6 +490,8 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
     Output('genotype-value-left', 'value'),
     Output('genotype-value-right', 'value'),
     Output('genotype-graph-gene-value', 'value'),
+    Output('expression-data-value-genotype', 'value'),
+    Output('dot-size-slider-genotype', 'value'),
     Output('genotype-graph-gene-slider', 'min'),
     Output('genotype-graph-gene-slider', 'max'),
     Output('genotype-graph-gene-slider', 'marks'),
@@ -443,6 +499,8 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
     Input('genotype-value-left', 'value'),
     Input('genotype-value-right', 'value'),
     Input('genotype-graph-gene-value', 'value'),
+    Input('expression-data-value-genotype', 'value'),
+    Input('dot-size-slider-genotype', 'value'),
     Input('genotype-graph-gene-slider', 'value'),
     Input('color-scale-dropdown-genotype', 'value'),
     Input('first-percentile-button-genotype', 'n_clicks'),
@@ -450,7 +508,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
     Input('genotype-swap-button', 'n_clicks')
     )
 
-def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype_graph_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, swap_button_click):
+def update_graph(genotype_value_left, genotype_value_right, gene_value, expression_data_value, dot_size_slider_value, genotype_graph_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, swap_button_click):
 
     input_id = ctx.triggered_id
     global metadata
@@ -468,8 +526,12 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
 
         #table to get gene_value from
         table = gene_lookup[gene_value]
+
+        if expression_data_value is None:
+            expression_data_value = default_expression_data_value
         #extract gene column from table
-        gene_data = pd.read_sql(table, con=engine, columns = [gene_value, 'barcode'])
+        gene_data = pd.read_sql(table, con=engine if expression_data_value == 'Normalized' else engine_counts, columns = [gene_value, 'barcode'])
+
         #set default genotype value to WT
         genotype_value_left = 'WT' if genotype_value_left is None else genotype_value_left
         genotype_value_right = 'Aire_KO' if genotype_value_right is None else genotype_value_right
@@ -509,6 +571,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
             lower_slider_value = percentile_values[1]
             higher_slider_value = percentile_values[0]
 
+        dot_size_slider_value = dot_size_slider_value if dot_size_slider_value != None else 3
 
         
         #graphs
@@ -520,17 +583,18 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
                      hover_name = default_cell_type_annotation,
+                     hover_data = {'x': False, 'y': False, default_cell_type_annotation: False},
                      range_color=
                      #min of color range
                      [lower_slider_value, 
                      #max of color range
                      higher_slider_value],
                      color_continuous_scale = color_scale_dropdown_value,
-                     labels = {gene_value: ''}
+                     labels = {gene_value: gene_value + ' expression'}
                      )
         gene_fig_left.update_traces(
             marker=dict(
-                size=3, 
+                size=dot_size_slider_value, 
                 line=dict(width=0)
                 )
             )
@@ -553,6 +617,9 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
             yaxis={'visible': False, 'showticklabels': False},
             margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
+            ),
+        gene_fig_left.update_coloraxes(
+            colorbar_title_text=''
             )
 
         gene_fig_right = px.scatter(gene_data_right.sort_values(by=[gene_value], kind='mergesort'),
@@ -562,17 +629,18 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
                      hover_name = default_cell_type_annotation,
+                     hover_data = {'x': False, 'y': False, default_cell_type_annotation: False},
                      range_color=
                      #min of color range
                      [lower_slider_value, 
                      #max of color range
                      higher_slider_value],
                      color_continuous_scale = color_scale_dropdown_value,
-                     labels = {gene_value: ''}
+                     labels = {gene_value: gene_value + ' expression'}
                      )
         gene_fig_right.update_traces(
             marker=dict(
-                size=3, 
+                size=dot_size_slider_value, 
                 line=dict(width=0)
                 )
             )
@@ -596,12 +664,15 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
             margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
             )
+        gene_fig_right.update_coloraxes(
+            colorbar_title_text=''
+            )
 
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
 
 
 
-        return gene_fig_left, gene_fig_right, genotype_value_left, genotype_value_right, gene_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig_left, gene_fig_right, genotype_value_left, genotype_value_right, gene_value, expression_data_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -617,5 +688,5 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+    return fig, fig, None, None, None, None, 3, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
