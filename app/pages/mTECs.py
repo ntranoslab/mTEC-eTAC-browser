@@ -330,25 +330,43 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         
         
 
-        # visible_indexes = []
-        # visible_cell_types = []
-        # gene_data_cell_types = gene_data[cell_type_annotations_value].unique()
-        # list(gene_data_cell_types).reverse()
-        # print(gene_data_cell_types)
-        # if cell_type_fig_restyle_data != None:
-        #     cell_fig_visible = cell_type_fig_restyle_data[0]['visible']
-        #     for i in range(len(cell_fig_visible)):
-        #         if cell_fig_visible[i] == True:
-        #             visible_indexes.append(i)
-        #             visible_cell_types.append(gene_data_cell_types[i])
+        visible_cell_types = []
+        gene_data_cell_types = gene_data[cell_type_annotations_value].unique()
+        list(gene_data_cell_types).reverse()
+        if cell_type_fig_restyle_data != None:
+            cell_fig_visible = cell_type_fig_restyle_data[0]['visible']
+            print(cell_type_fig_restyle_data)
+            print(cell_fig_visible)
+            if len(cell_fig_visible) > 1:
+                for i in range(len(cell_fig_visible)):
+                    if cell_fig_visible[i] == True:
+                        visible_cell_types.append(gene_data_cell_types[i])
+            elif len(cell_fig_visible) == 1:
+                visible_cell_types.append(gene_data_cell_types[cell_type_fig_restyle_data[1][0]])
+        else:
+            visible_cell_types = gene_data_cell_types.copy()
 
         # print(visible_indexes)
-        # print(visible_cell_types)
+        #print(visible_cell_types)
+        gene_data_copy = pd.DataFrame()
+
+        for i in visible_cell_types:
+            gene_data_copy = pd.concat([gene_data_copy, gene_data[gene_data[cell_type_annotations_value] == i]])
+            print(gene_data_copy)
+
+        #gene_data_filtered = None
+        # for i in gene_data[cell_type_annotations_value].unique():
+        #     if i in visible_cell_types:
+        #         print(gene_data[cell_type_annotations_value == i])
+                #gene_data_filtered = gene_data[cell_type_annotations_value == i]
+            #gene_data_filtered.append(i)
+        #print(gene_data[gene_data[cell_type_annotations_value] == 'Aire+ mTECs' or 'cTECs'])
+        #print(gene_data_filtered)
 
         
         #graphs
         #sort dff based on cells highest expressing to lowest expressing gene - makes the gene scatter plot graph highest expressing cells on top of lower expressing cells
-        gene_fig = px.scatter(gene_data.sort_values(by=[gene_value], kind='mergesort'),
+        gene_fig = px.scatter(gene_data_copy.sort_values(by=[gene_value], kind='mergesort'),
                      #x coordinates
                      x='x',
                      #y coordinates
@@ -391,6 +409,10 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             plot_bgcolor = "white"
             )
 
+        # gene_fig.for_each_trace(
+        #     lambda trace: trace.update(visible= 'legendonly') if trace.hovertext not in visible_cell_types else print(trace.name + ' hi'),
+        #     )
+
         cell_type_fig = px.scatter(gene_data,
                         x='x',
                         #x coordinates
@@ -427,6 +449,9 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
+            )
+        cell_type_fig.for_each_trace(
+            lambda trace: trace.update(visible='legendonly') if trace.name not in visible_cell_types else (),
             )
 
 
