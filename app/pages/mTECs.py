@@ -138,26 +138,27 @@ layout = html.Div([
         ]),
         html.Div([
             html.Div([
-                html.H4('Scale', id = 'slider-headline'),
-                html.Div([
-                    dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs'),
-                ], style = {'marginLeft': '5px'}),
-                html.H4('Percentiles', id = 'percentile-headline'),
-                html.Div([
-                    html.Button('1st', id = 'first-percentile-button'),
-                    html.Button('99th', id = 'ninty-ninth-percentile-button')
-                ], style = {'display': 'flex', 'justify-content': 'space-between'})
-            ], style = {'float': 'right', 'width': '11%', 'marginRight': '72%'}),
-            html.Div([
-                #dropdown for colorscale
                 html.H3('Color Map:', id = 'color-scale-headline', style = {'text-align': 'center'}),
                 dcc.Dropdown(
                     id= 'color-scale-dropdown',
                     options = colorscales,
                     value = 'plasma'
                 ),
-            ], style = {'width': '11%', 'marginRight': '2%'}),
-        ], style = {'marginLeft': '5.5%'}),
+            ], style = {'width': '27.5%'}),
+            html.Div([
+                html.H4('Scale', id = 'slider-headline'),
+                html.Div([
+                    dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs'),
+                ], style = {'marginLeft': '5px'}),
+            ], style = {'width': '27.5%'}),
+            html.Div([
+                html.H4('Percentiles', id = 'percentile-headline'),
+                    html.Div([
+                        html.Button('1st', id = 'first-percentile-button'),
+                        html.Button('99th', id = 'ninty-ninth-percentile-button')
+                    ], style = {'display': 'flex', 'justify-content': 'space-between'})
+            ], style = {'width': '27.5%'}),
+        ], style={'marginLeft': '2.5%','display': 'flex', 'justify-content': 'space-evenly', 'width': '35%'}),
         html.Div([], style={'marginBottom': '10%'}),
         html.Div([
             html.Br(),
