@@ -123,8 +123,8 @@ layout = html.Div([
             #slideer for dot size
             html.H3('Dot size', id = 'dot-size-headline'),
             html.Div([
-                dcc.Slider(min=3, max=10, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='dot-size-slider-data-browser-etacs'),
-                ], style = {'marginLeft': '5px'}),
+                dcc.Slider(min=3, max=10, step=1, marks=None, included=False, vertical=False, tooltip={'placement': 'top', 'always_visible': True}, id='dot-size-slider-data-browser-etacs'),
+                ], style = {'marginLeft': '-12%','width': '122%'}),
             #dropdown for colorscale
             html.H3('Color Map:', id = 'color-scale-headline'),
             dcc.Dropdown(
