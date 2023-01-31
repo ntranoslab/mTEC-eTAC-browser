@@ -317,6 +317,9 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
             margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
             )
+        gene_fig.update_coloraxes(
+            colorbar_title_text=''
+            )
 
         cell_type_fig = px.scatter(gene_data,
                         x='x',
@@ -348,7 +351,7 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
                     'color': '#4C5C75'
                 }
             },
-            legend={'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
+            legend={'title': '', 'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
             margin={'l':10, 'r': 10},
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},

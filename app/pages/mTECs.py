@@ -412,6 +412,9 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
             )
+        gene_fig.update_coloraxes(
+            colorbar_title_text=''
+            )
 
         cell_type_fig = px.scatter(gene_data,
                         x='x',
@@ -444,7 +447,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                     'color': '#4C5C75'
                 }
             },
-            legend={'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
+            legend={'title': '', 'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
             margin={'l':10, 'r': 10},
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
@@ -614,6 +617,9 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
             yaxis={'visible': False, 'showticklabels': False},
             margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
+            ),
+        gene_fig_left.update_coloraxes(
+            colorbar_title_text=''
             )
 
         gene_fig_right = px.scatter(gene_data_right.sort_values(by=[gene_value], kind='mergesort'),
@@ -657,6 +663,9 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
             yaxis={'visible': False, 'showticklabels': False},
             margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
+            )
+        gene_fig_right.update_coloraxes(
+            colorbar_title_text=''
             )
 
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
