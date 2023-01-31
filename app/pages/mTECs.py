@@ -156,6 +156,9 @@ layout = html.Div([
                 #input for gene
                 html.H3('Gene:', id='gene-headline'),
                 dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='genotype-graph-gene-value'),
+                #dropdown for counts vs normalized
+                html.H3('Expression data:', id='expression-data-headline'),
+                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-genotype'),
                 #dropdown for colorscale
                 html.H3('Color Map:', id = 'color-scale-headline'),
                 dcc.Dropdown(
@@ -464,6 +467,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
     Output('genotype-value-left', 'value'),
     Output('genotype-value-right', 'value'),
     Output('genotype-graph-gene-value', 'value'),
+    Output('expression-data-value-genotype', 'value'),
     Output('genotype-graph-gene-slider', 'min'),
     Output('genotype-graph-gene-slider', 'max'),
     Output('genotype-graph-gene-slider', 'marks'),
@@ -471,6 +475,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
     Input('genotype-value-left', 'value'),
     Input('genotype-value-right', 'value'),
     Input('genotype-graph-gene-value', 'value'),
+    Input('expression-data-value-genotype', 'value'),
     Input('genotype-graph-gene-slider', 'value'),
     Input('color-scale-dropdown-genotype', 'value'),
     Input('first-percentile-button-genotype', 'n_clicks'),
@@ -478,7 +483,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
     Input('genotype-swap-button', 'n_clicks')
     )
 
-def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype_graph_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, swap_button_click):
+def update_graph(genotype_value_left, genotype_value_right, gene_value, expression_data_value, genotype_graph_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, swap_button_click):
 
     input_id = ctx.triggered_id
     global metadata
@@ -496,8 +501,12 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
 
         #table to get gene_value from
         table = gene_lookup[gene_value]
+
+        if expression_data_value is None:
+            expression_data_value = default_expression_data_value
         #extract gene column from table
-        gene_data = pd.read_sql(table, con=engine, columns = [gene_value, 'barcode'])
+        gene_data = pd.read_sql(table, con=engine if expression_data_value == 'Normalized' else engine_counts, columns = [gene_value, 'barcode'])
+
         #set default genotype value to WT
         genotype_value_left = 'WT' if genotype_value_left is None else genotype_value_left
         genotype_value_right = 'Aire_KO' if genotype_value_right is None else genotype_value_right
@@ -631,7 +640,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
 
 
 
-        return gene_fig_left, gene_fig_right, genotype_value_left, genotype_value_right, gene_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig_left, gene_fig_right, genotype_value_left, genotype_value_right, gene_value, expression_data_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -647,5 +656,5 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, genotype
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+    return fig, fig, None, None, None, None, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
 
