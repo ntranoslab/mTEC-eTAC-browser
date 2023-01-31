@@ -323,7 +323,6 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             gene_data = pd.concat([gene_data_order_other_rows, gene_data[gene_data[cell_type_annotations_value] != 'Other dataset']])
         
         
-
         visible_cell_types = []
         gene_data_cell_types = gene_data[cell_type_annotations_value].unique()
         list(gene_data_cell_types).reverse()
@@ -334,7 +333,9 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                     if cell_fig_visible[i] == True:
                         visible_cell_types.append(gene_data_cell_types[i])
             elif len(cell_fig_visible) == 1:
-                visible_cell_types.append(gene_data_cell_types[cell_type_fig_restyle_data[1][0]])
+                visible_cell_types = list(gene_data_cell_types)
+                if cell_type_fig_restyle_data[0]['visible'][0] == 'legendonly':
+                    visible_cell_types.pop(cell_type_fig_restyle_data[1][0])
         else:
             visible_cell_types = gene_data_cell_types.copy()
 
@@ -342,7 +343,6 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
 
         for i in visible_cell_types:
             gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data[cell_type_annotations_value] == i]])
-            print(gene_data_filtered)
 
         
         #graphs
