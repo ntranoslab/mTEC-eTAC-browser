@@ -109,22 +109,11 @@ layout = html.Div([
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='expression-data-headline'),
                 dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-mtecs'),
-                #dropdown for colorscale
-                html.H3('Color Map:', id = 'color-scale-headline'),
-                dcc.Dropdown(
-                    id= 'color-scale-dropdown',
-                    options = colorscales,
-                    value = 'plasma'
-                    ),
-                html.H4('Scale', id = 'slider-headline'),
+                #slideer for dot size
+                html.H3('Dot size', id = 'dot-size-headline'),
                 html.Div([
-                    dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs'),
+                    dcc.Slider(min=3, max=10, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='dot-size-slider-data-browser-mtecs'),
                     ], style = {'marginLeft': '5px'}),
-                html.H4('Percentiles', id = 'percentile-headline'),
-                html.Div([
-                    html.Button('1st', id = 'first-percentile-button'),
-                    html.Button('99th', id = 'ninty-ninth-percentile-button')
-                    ], style = {'display': 'flex', 'justify-content': 'space-between'})
             ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
             dcc.Loading([
                 html.Div([
@@ -147,6 +136,28 @@ layout = html.Div([
                 ], style = {'display': 'flex', 'justify-content': 'center'}),
             ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
         ]),
+        html.Div([
+            html.Div([
+                html.H4('Scale', id = 'slider-headline'),
+                html.Div([
+                    dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs'),
+                ], style = {'marginLeft': '5px'}),
+                html.H4('Percentiles', id = 'percentile-headline'),
+                html.Div([
+                    html.Button('1st', id = 'first-percentile-button'),
+                    html.Button('99th', id = 'ninty-ninth-percentile-button')
+                ], style = {'display': 'flex', 'justify-content': 'space-between'})
+            ], style = {'float': 'right', 'width': '11%', 'marginRight': '72%'}),
+            html.Div([
+                #dropdown for colorscale
+                html.H3('Color Map:', id = 'color-scale-headline', style = {'text-align': 'center'}),
+                dcc.Dropdown(
+                    id= 'color-scale-dropdown',
+                    options = colorscales,
+                    value = 'plasma'
+                ),
+            ], style = {'width': '11%', 'marginRight': '2%'}),
+        ], style = {'marginLeft': '5.5%'}),
         html.Div([], style={'marginBottom': '10%'}),
         html.Div([
             html.Br(),
@@ -159,6 +170,11 @@ layout = html.Div([
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='expression-data-headline'),
                 dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-genotype'),
+                #slideer for dot size
+                html.H3('Dot size', id = 'dot-size-headline'),
+                html.Div([
+                    dcc.Slider(min=3, max=10, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='dot-size-slider-genotype'),
+                    ], style = {'marginLeft': '5px'}),
                 #dropdown for colorscale
                 html.H3('Color Map:', id = 'color-scale-headline'),
                 dcc.Dropdown(

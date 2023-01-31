@@ -120,6 +120,11 @@ layout = html.Div([
             #dropdown for counts vs normalized
             html.H3('Expression data:', id='expression-data-headline'),
             dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-etacs'),
+            #slideer for dot size
+            html.H3('Dot size', id = 'dot-size-headline'),
+            html.Div([
+                dcc.Slider(min=3, max=10, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='dot-size-slider-data-browser-etacs'),
+                ], style = {'marginLeft': '5px'}),
             #dropdown for colorscale
             html.H3('Color Map:', id = 'color-scale-headline'),
             dcc.Dropdown(
