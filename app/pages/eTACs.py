@@ -184,10 +184,11 @@ layout = html.Div([
     Input('umap-graphic-gene-slider-etacs', 'value'),
     Input('color-scale-dropdown', 'value'),
     Input('first-percentile-button', 'n_clicks'),
-    Input('ninty-ninth-percentile-button', 'n_clicks')
+    Input('ninty-ninth-percentile-button', 'n_clicks'),
+    Input('umap-graphic-cell-types-etacs', 'restyleData')
     )
 
-def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click):
+def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, cell_type_fig_restyle_data):
 
     input_id = ctx.triggered_id
     global metadata
@@ -233,10 +234,39 @@ def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, co
             higher_slider_value = percentile_values[0]
 
 
+        gene_data = gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False)
+        print(gene_data['cell_type'].unique())
+
+
+        visible_cell_types = []
+        gene_data_cell_types = gene_data['cell_type'].unique()
+        list(gene_data_cell_types).reverse()
+        if cell_type_fig_restyle_data != None and input_id == 'umap-graphic-cell-types-etacs':
+            cell_fig_visible = cell_type_fig_restyle_data[0]['visible']
+            if len(cell_fig_visible) > 1:
+                for i in range(len(cell_fig_visible)):
+                    if cell_fig_visible[i] == True:
+                        visible_cell_types.append(gene_data_cell_types[i])
+            elif len(cell_fig_visible) == 1:
+                visible_cell_types = list(gene_data_cell_types)
+                if cell_type_fig_restyle_data[0]['visible'][0] == 'legendonly':
+                    visible_cell_types.pop(cell_type_fig_restyle_data[1][0])
+        else:
+            visible_cell_types = gene_data_cell_types
+
+        gene_data_filtered = pd.DataFrame()
+
+        for i in visible_cell_types:
+            gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data['cell_type'] == i]])
+
+        print(visible_cell_types)
+        print(gene_data_filtered)
+
+
         
         #graphs
         #sort dff based on cells highest expressing to lowest expressing gene - makes the gene scatter plot graph highest expressing cells on top of lower expressing cells
-        gene_fig = px.scatter(gene_data.sort_values(by=[gene_value], kind='mergesort'),
+        gene_fig = px.scatter(gene_data_filtered.sort_values(by=[gene_value], kind='mergesort'),
                      #x coordinates
                      x='x',
                      #y coordinates
@@ -279,7 +309,7 @@ def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, co
             plot_bgcolor = "white"
             )
 
-        cell_type_fig = px.scatter(gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False),
+        cell_type_fig = px.scatter(gene_data,
                         x='x',
                         #x coordinates
                         y='y',
@@ -314,6 +344,10 @@ def update_graph(gene_value, expression_data_value, umap_graphic_gene_slider, co
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False},
             plot_bgcolor = "white"
+            )
+
+        cell_type_fig.for_each_trace(
+            lambda trace: trace.update(visible='legendonly') if trace.name not in visible_cell_types else (),
             )
 
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
