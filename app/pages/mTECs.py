@@ -326,7 +326,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         visible_cell_types = []
         gene_data_cell_types = gene_data[cell_type_annotations_value].unique()
         list(gene_data_cell_types).reverse()
-        if cell_type_fig_restyle_data != None:
+        if cell_type_fig_restyle_data != None and input_id == 'umap-graphic-cell-types-mtecs':
             cell_fig_visible = cell_type_fig_restyle_data[0]['visible']
             if len(cell_fig_visible) > 1:
                 for i in range(len(cell_fig_visible)):
@@ -337,7 +337,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                 if cell_type_fig_restyle_data[0]['visible'][0] == 'legendonly':
                     visible_cell_types.pop(cell_type_fig_restyle_data[1][0])
         else:
-            visible_cell_types = gene_data_cell_types.copy()
+            visible_cell_types = gene_data_cell_types
 
         gene_data_filtered = pd.DataFrame()
 
