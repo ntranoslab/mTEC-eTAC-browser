@@ -244,8 +244,6 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
 
 
         gene_data = gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False)
-        print(gene_data['cell_type'].unique())
-
 
         visible_cell_types = []
         gene_data_cell_types = gene_data['cell_type'].unique()
@@ -267,11 +265,6 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
 
         for i in visible_cell_types:
             gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data['cell_type'] == i]])
-
-        print(visible_cell_types)
-        print(gene_data_filtered)
-
-
         
         #graphs
         #sort dff based on cells highest expressing to lowest expressing gene - makes the gene scatter plot graph highest expressing cells on top of lower expressing cells
