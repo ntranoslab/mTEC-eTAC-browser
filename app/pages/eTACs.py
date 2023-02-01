@@ -15,7 +15,6 @@ import sys
 
 dash.register_page(__name__)
 
-
 ##=========================Global variables=========================##
 database = 'lymphnode'
 if ('LOCALDEV' in os.environ) | ('LOCALDEPLOY' in os.environ):
@@ -250,7 +249,7 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
         elif input_id == 'ninty-ninth-percentile-button':
             lower_slider_value = min(umap_graphic_gene_slider)
             higher_slider_value = percentile_values[0]
-        elif input_id == 'umap-graphic-cell-types-etacs':
+        elif (input_id == 'umap-graphic-cell-types-etacs') | (input_id == 'dot-size-slider-data-browser-etacs'):
             lower_slider_value = min(umap_graphic_gene_slider) if umap_graphic_gene_slider != None else percentile_values[1]
             higher_slider_value = max(umap_graphic_gene_slider) if umap_graphic_gene_slider != None else percentile_values[0]
         else:

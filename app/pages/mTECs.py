@@ -165,7 +165,7 @@ layout = html.Div([
             ], style = {'marginLeft': '15%', 'width': '20%'}),
         ], style={'marginLeft': '2.5%','display': 'flex', 'justify-content': 'space-evenly', 'width': '62.5%'}),
         html.Div([], style={'marginBottom': '5%'}),
-        html.Hr([]),
+        html.Hr([], style = {'border-top': '2px', 'marginRight': '2.5%', 'marginLeft': '2.5%'}),
         html.Div([], style={'marginBottom': '5%'}),
         html.Div([
             html.Br(),
@@ -338,7 +338,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         elif input_id == 'ninty-ninth-percentile-button':
             lower_slider_value = min(umap_graphic_gene_slider)
             higher_slider_value = percentile_values[0]
-        elif input_id == 'umap-graphic-cell-types-mtecs':
+        elif (input_id == 'umap-graphic-cell-types-mtecs') |  (input_id == 'dot-size-slider-data-browser-mtecs'):
             lower_slider_value = min(umap_graphic_gene_slider) if umap_graphic_gene_slider != None else percentile_values[1]
             higher_slider_value = max(umap_graphic_gene_slider) if umap_graphic_gene_slider != None else percentile_values[0]
         else:
@@ -579,6 +579,9 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
         elif input_id == 'ninty-ninth-percentile-button':
             lower_slider_value = min(genotype_graph_gene_slider)
             higher_slider_value = percentile_values[0]
+        elif input_id == 'dot-size-slider-genotype':
+            lower_slider_value = min(genotype_graph_gene_slider) if genotype_graph_gene_slider != None else percentile_values[1]
+            higher_slider_value = max(genotype_graph_gene_slider) if genotype_graph_gene_slider != None else percentile_values[0]
         else:
             lower_slider_value = percentile_values[1]
             higher_slider_value = percentile_values[0]
