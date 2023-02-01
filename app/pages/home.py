@@ -36,6 +36,7 @@ layout = html.Div([
         html.A(
             html.Button(
                 html.Div([
+                #html.Img(src='static/mtecs.png', style = {'width': '50%'}),
                 html.H3('Thymus'),
                 html.H4('medullary Thymic Epithelial Cells'),
                 html.H5('Explore our data on this cell population that resides in the thymus, a primary lymphoid organ.'),
@@ -47,6 +48,7 @@ layout = html.Div([
         html.A(
             html.Button(
                 html.Div([
+                #html.Img(src='static/etacs.png', style = {'width': '50%'}),
                 html.H3('Lymph Nodes'),
                 html.H4('extraThymic Aire-expressing Cells'),
                 html.H5('Explore our data on this cell population that mainly resides in secondary lymphoid organs.'),
