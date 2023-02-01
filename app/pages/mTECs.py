@@ -330,6 +330,9 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         elif input_id == 'ninty-ninth-percentile-button':
             lower_slider_value = min(umap_graphic_gene_slider)
             higher_slider_value = percentile_values[0]
+        elif input_id == 'umap-graphic-cell-types-mtecs':
+            lower_slider_value = min(umap_graphic_gene_slider) if umap_graphic_gene_slider != None else percentile_values[1]
+            higher_slider_value = max(umap_graphic_gene_slider) if umap_graphic_gene_slider != None else percentile_values[0]
         else:
             lower_slider_value = percentile_values[1]
             higher_slider_value = percentile_values[0]
