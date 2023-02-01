@@ -103,9 +103,6 @@ layout = html.Div([
                 #dropdown for genotype
                 html.H3('Genotype:', id='genotype-headline'),
                 dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-mtecs'),
-                #dropdown for celltype annotations
-                html.H3('Cell type annotations:', id='cell-type-annotations-headline'),
-                dcc.Dropdown(cell_type_annotations_list, placeholder = 'Select a cell type...', id='cell-type-annotations-value'),
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='expression-data-headline'),
                 dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-mtecs'),
@@ -144,22 +141,29 @@ layout = html.Div([
                     options = colorscales,
                     value = 'plasma'
                 ),
-            ], style = {'width': '27.5%'}),
+            ], style = {'width': '15%'}),
             html.Div([
                 html.H4('Scale', id = 'slider-headline'),
                 html.Div([
                     dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-mtecs'),
                 ], style = {'marginLeft': '5px'}),
-            ], style = {'width': '27.5%'}),
+            ], style = {'marginLeft': '2%', 'width': '15%'}),
             html.Div([
                 html.H4('Percentiles', id = 'percentile-headline'),
                     html.Div([
                         html.Button('1st', id = 'first-percentile-button'),
                         html.Button('99th', id = 'ninty-ninth-percentile-button')
                     ], style = {'display': 'flex', 'justify-content': 'space-between'})
-            ], style = {'width': '27.5%'}),
-        ], style={'marginLeft': '2.5%','display': 'flex', 'justify-content': 'space-evenly', 'width': '35%'}),
-        html.Div([], style={'marginBottom': '10%'}),
+            ], style = {'marginLeft': '2%', 'width': '15%'}),
+            #dropdown for celltype annotations
+            html.Div([
+                html.H3('Cell type annotations:', id='cell-type-annotations-headline', style = {'text-align': 'center'}),
+                dcc.Dropdown(cell_type_annotations_list, placeholder = 'Select a cell type...', id='cell-type-annotations-value'),
+            ], style = {'marginLeft': '25%', 'width': '20%'}),
+        ], style={'marginLeft': '2.5%','display': 'flex', 'justify-content': 'space-evenly', 'width': '67.5%'}),
+        html.Div([], style={'marginBottom': '5%'}),
+        html.Hr([]),
+        html.Div([], style={'marginBottom': '5%'}),
         html.Div([
             html.Br(),
             html.H1('Genotype Comparison', className='graph-titles', style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),

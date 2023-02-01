@@ -111,57 +111,67 @@ layout = html.Div([
 
 
     html.Div([
-        html.Br(),
-        html.H1('Data Browser', className='graph-titles',style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
         html.Div([
-            #input for gene
-            html.H3('Gene:', id='gene-headline'),
-            dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='gene-value-etacs'),
-            #dropdown for counts vs normalized
-            html.H3('Expression data:', id='expression-data-headline'),
-            dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-etacs'),
-            #slideer for dot size
-            html.H3('Dot size', id = 'dot-size-headline'),
+            html.Br(),
+            html.H1('Data Browser', className='graph-titles',style={'marginLeft': '2.5%', 'color': '#3F6CB4'}),
             html.Div([
-                dcc.Slider(min=3, max=10, step=1, marks=None, included=False, vertical=False, tooltip={'placement': 'top', 'always_visible': True}, id='dot-size-slider-data-browser-etacs'),
-                ], style = {'marginLeft': '-12%','width': '122%'}),
-            #dropdown for colorscale
-            html.H3('Color Map:', id = 'color-scale-headline'),
-            dcc.Dropdown(
-                id= 'color-scale-dropdown',
-                options = colorscales,
-                value = 'plasma'
-                ),
-            html.H4('Scale', id = 'slider-headline'),
-            html.Div([
-                dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-etacs'),
-                ], style = {'marginLeft': '5px'}),
-            html.H4('Percentiles', id = 'percentile-headline'),
-            html.Div([
-                html.Button('1st', id = 'first-percentile-button'),
-                html.Button('99th', id = 'ninty-ninth-percentile-button')
-                ], style = {'display': 'flex', 'justify-content': 'space-between'})
-        ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
-        dcc.Loading([
+                #input for gene
+                html.H3('Gene:', id='gene-headline'),
+                dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='gene-value-etacs'),
+                #dropdown for counts vs normalized
+                html.H3('Expression data:', id='expression-data-headline'),
+                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-etacs'),
+                #slideer for dot size
+                html.H3('Dot size', id = 'dot-size-headline'),
                 html.Div([
+                    dcc.Slider(min=3, max=10, step=1, marks=None, included=False, vertical=False, tooltip={'placement': 'top', 'always_visible': True}, id='dot-size-slider-data-browser-etacs'),
+                    ], style = {'marginLeft': '-12%','width': '122%'}),
+            ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
+            dcc.Loading([
                     html.Div([
-                        dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
-                            xaxis={'visible': False, 'showticklabels': False},
-                            yaxis={'visible': False, 'showticklabels': False},
-                            plot_bgcolor = "white",
-                            width=650, height=650),
-                            id='umap-graphic-gene-etacs')
-                    ], style={'width': '45%', 'marginRight': '1.5%'}),
+                        html.Div([
+                            dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                                xaxis={'visible': False, 'showticklabels': False},
+                                yaxis={'visible': False, 'showticklabels': False},
+                                plot_bgcolor = "white",
+                                width=650, height=650),
+                                id='umap-graphic-gene-etacs')
+                        ], style={'width': '45%', 'marginRight': '1.5%'}),
+                        html.Div([
+                            dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
+                                xaxis={'visible': False, 'showticklabels': False},
+                                yaxis={'visible': False, 'showticklabels': False},
+                                plot_bgcolor = "white",
+                                width=650, height=650),
+                                id='umap-graphic-cell-types-etacs')
+                        ], style={'width': '45%', 'marginLeft': '1.5%'}),
+                    ], style = {'display': 'flex', 'justify-content': 'center'}),
+                ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
+        ]),
+        html.Div([
+            html.Div([
+                html.H3('Color Map:', id = 'color-scale-headline', style = {'text-align': 'center'}),
+                dcc.Dropdown(
+                    id= 'color-scale-dropdown',
+                    options = colorscales,
+                    value = 'plasma'
+                ),
+            ], style = {'width': '27.5%'}),
+            html.Div([
+                html.H4('Scale', id = 'slider-headline'),
+                html.Div([
+                    dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-etacs'),
+                ], style = {'marginLeft': '5px'}),
+            ], style = {'width': '27.5%'}),
+            html.Div([
+                html.H4('Percentiles', id = 'percentile-headline'),
                     html.Div([
-                        dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
-                            xaxis={'visible': False, 'showticklabels': False},
-                            yaxis={'visible': False, 'showticklabels': False},
-                            plot_bgcolor = "white",
-                            width=650, height=650),
-                            id='umap-graphic-cell-types-etacs')
-                    ], style={'width': '45%', 'marginLeft': '1.5%'}),
-                ], style = {'display': 'flex', 'justify-content': 'center'}),
-            ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
+                        html.Button('1st', id = 'first-percentile-button'),
+                        html.Button('99th', id = 'ninty-ninth-percentile-button')
+                    ], style = {'display': 'flex', 'justify-content': 'space-between'})
+            ], style = {'width': '27.5%'}),
+        ], style={'marginLeft': '2.5%','display': 'flex', 'justify-content': 'space-evenly', 'width': '35%'}),
+
     ], className = 'page-body', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),
 
     html.Div([
