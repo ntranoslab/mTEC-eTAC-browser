@@ -172,7 +172,7 @@ layout = html.Div([
                         html.Button('1st', id = 'first-percentile-button'),
                         html.Button('99th', id = 'ninty-ninth-percentile-button')
                     ], style = {'display': 'flex', 'justify-content': 'space-between'})
-            ], style = {'width': '27.5%'}),
+            ], style = {'width': '27.5%', 'marginBottom': '10%'}),
         ], style={'marginLeft': '2.5%','display': 'flex', 'justify-content': 'space-evenly', 'width': '35%'}),
 
     ], className = 'page-body', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),

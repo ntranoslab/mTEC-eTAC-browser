@@ -162,8 +162,8 @@ layout = html.Div([
             html.Div([
                 html.H3('Cell type annotations:', id='cell-type-annotations-headline', style = {'text-align': 'center'}),
                 dcc.Dropdown(cell_type_annotations_list, placeholder = 'Select a cell type...', id='cell-type-annotations-value'),
-            ], style = {'marginLeft': '25%', 'width': '20%'}),
-        ], style={'marginLeft': '2.5%','display': 'flex', 'justify-content': 'space-evenly', 'width': '67.5%'}),
+            ], style = {'marginLeft': '15%', 'width': '20%'}),
+        ], style={'marginLeft': '2.5%','display': 'flex', 'justify-content': 'space-evenly', 'width': '62.5%'}),
         html.Div([], style={'marginBottom': '5%'}),
         html.Hr([]),
         html.Div([], style={'marginBottom': '5%'}),
