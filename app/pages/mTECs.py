@@ -433,7 +433,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                         y='y',
                         color = cell_type_annotations_value,
                         color_discrete_sequence = color_list_copy,
-                        color_discrete_map = {'Other dataset': 'gainsboro'} if cell_type_annotations_value != default_cell_type_annotation else {},
+                        color_discrete_map = {'Other dataset': 'gainsboro'} if (cell_type_annotations_value != default_cell_type_annotation) & ((genotype_value == 'WT') | (genotype_value == 'All')) else {},
                         hover_name = cell_type_annotations_value,
                         hover_data = {'x': False, 'y': False, cell_type_annotations_value: False}
                     )
