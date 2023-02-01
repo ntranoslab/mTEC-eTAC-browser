@@ -395,7 +395,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                      #max of color range
                      higher_slider_value],
                      color_continuous_scale = color_scale_dropdown_value,
-                     labels = {gene_value: gene_value + ' expression'}
+                     labels = {gene_value: gene_value.capitalize() + ' expression'}
                      )
         gene_fig.update_traces(
             marker=dict(
@@ -605,7 +605,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
                      #max of color range
                      higher_slider_value],
                      color_continuous_scale = color_scale_dropdown_value,
-                     labels = {gene_value: gene_value + ' expression'}
+                     labels = {gene_value: gene_value.capitalize() + ' expression'}
                      )
         gene_fig_left.update_traces(
             marker=dict(
@@ -651,7 +651,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
                      #max of color range
                      higher_slider_value],
                      color_continuous_scale = color_scale_dropdown_value,
-                     labels = {gene_value: gene_value + ' expression'}
+                     labels = {gene_value: gene_value.capitalize() + ' expression'}
                      )
         gene_fig_right.update_traces(
             marker=dict(

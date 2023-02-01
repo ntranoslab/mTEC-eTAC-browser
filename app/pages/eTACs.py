@@ -298,7 +298,7 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
                      #max of color range
                      higher_slider_value],
                      color_continuous_scale = color_scale_dropdown_value,
-                     labels = {gene_value: gene_value + ' expression'}
+                     labels = {gene_value: gene_value.capitalize() + ' expression'}
                      )
         gene_fig.update_traces(
             marker=dict(
