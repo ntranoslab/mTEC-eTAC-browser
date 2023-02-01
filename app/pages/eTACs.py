@@ -42,6 +42,9 @@ with open(f"static/{database}_gene_table_lookup.csv") as f:
     reader = csv.reader(f, skipinitialspace=True)
     gene_lookup = dict(reader)
 gene_list = gene_lookup.keys()
+gene_list = list(gene_list)
+for i in range(len(gene_list)):
+    gene_list[i] = gene_list[i].capitalize()
 
 color_list = ['#1f77b4',
  '#aec7e8',
@@ -117,7 +120,7 @@ layout = html.Div([
             html.Div([
                 #input for gene
                 html.H3('Gene:', id='gene-headline'),
-                dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='gene-value-etacs'),
+                dcc.Dropdown(gene_list, placeholder = 'Select a gene...', id='gene-value-etacs'),
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='expression-data-headline'),
                 dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-etacs'),
@@ -213,14 +216,15 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
         #set initial gene value to be equal to default gene
         if gene_value is None:
             gene_value = default_gene
-        #first lower case gene value
-        gene_value = gene_value.lower()
 
         #check if gene value is in dataframe
         gene_value_in_df = gene_value in gene_list
         #set gene value to be equal to default gene if gene not in dataframe (assuming default gene is in dataframe)
         if not gene_value_in_df:
             gene_value = default_gene
+
+        #first lower case gene value
+        gene_value = gene_value.lower()
 
         #table to get gene_value from
         table = gene_lookup[gene_value]
@@ -246,6 +250,9 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
         elif input_id == 'ninty-ninth-percentile-button':
             lower_slider_value = min(umap_graphic_gene_slider)
             higher_slider_value = percentile_values[0]
+        elif input_id == 'umap-graphic-cell-types-etacs':
+            lower_slider_value = min(umap_graphic_gene_slider) if umap_graphic_gene_slider != None else percentile_values[1]
+            higher_slider_value = max(umap_graphic_gene_slider) if umap_graphic_gene_slider != None else percentile_values[0]
         else:
             lower_slider_value = percentile_values[1]
             higher_slider_value = percentile_values[0]
@@ -303,7 +310,7 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
         gene_fig.update_layout(
             autosize = True,
             title = {
-                'text': '<b>' + gene_value + '</b>',
+                'text': '<b>' + gene_value.capitalize() + '</b>',
                 'x': 0.5,
                 'y': 0.95,
                 'xanchor': 'center',
@@ -369,7 +376,7 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
 
 
 
-        return gene_fig, cell_type_fig, gene_value, expression_data_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value.capitalize(), expression_data_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],

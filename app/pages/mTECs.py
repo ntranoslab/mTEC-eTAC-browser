@@ -30,7 +30,7 @@ else:
 engine = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}")
 engine_counts = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}_counts")
 
-default_gene='aire'
+default_gene='Aire'
 
 metadata = pd.read_sql('cellmetadata', con=engine)
 with open(f"static/{database}_gene_table_lookup.csv") as f:
@@ -38,6 +38,9 @@ with open(f"static/{database}_gene_table_lookup.csv") as f:
     reader = csv.reader(f, skipinitialspace=True)
     gene_lookup = dict(reader)
 gene_list = gene_lookup.keys()
+gene_list = list(gene_list)
+for i in range(len(gene_list)):
+    gene_list[i] = gene_list[i].capitalize()
 genotype_list = np.insert(metadata.genotype.unique(), 0, 'All')
 default_genotype_value = 'WT'
 
@@ -96,7 +99,7 @@ layout = html.Div([
             html.Div([
                 #input for gene
                 html.H3('Gene:', id='gene-headline'),
-                dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='gene-value-mtecs'),
+                dcc.Dropdown(gene_list, placeholder = 'Select a gene...', id='gene-value-mtecs'),
                 #dropdown for dataset
                 html.H3('Dataset:', id='dataset-headline'),
                 dcc.Dropdown(dataset_list, placeholder = 'Select a dataset...', value='All', id='dataset-value'),
@@ -171,7 +174,7 @@ layout = html.Div([
             html.Div([
                 #input for gene
                 html.H3('Gene:', id='gene-headline'),
-                dcc.Dropdown(list(gene_list), placeholder = 'Select a gene...', id='genotype-graph-gene-value'),
+                dcc.Dropdown(gene_list, placeholder = 'Select a gene...', id='genotype-graph-gene-value'),
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='expression-data-headline'),
                 dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-genotype'),
@@ -280,14 +283,15 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             gene_value = default_gene
         if cell_type_annotations_value is None:
             cell_type_annotations_value = default_cell_type_annotation
-        #first lower case gene value
-        gene_value = gene_value.lower()
 
         #check if gene value is in dataframe
         gene_value_in_df = gene_value in gene_list
         #set gene value to be equal to default gene if gene not in dataframe (assuming default gene is in dataframe)
         if not gene_value_in_df:
             gene_value = default_gene
+        
+        #first lower case gene value
+        gene_value = gene_value.lower()
 
         #table to get gene_value from
         table = gene_lookup[gene_value]
@@ -402,7 +406,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         gene_fig.update_layout(
             autosize = True,
             title = {
-                'text': '<b>' + gene_value + '</b>',
+                'text': '<b>' + gene_value.capitalize() + '</b>',
                 'x': 0.5,
                 'y': 0.95,
                 'xanchor': 'center',
@@ -469,7 +473,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
 
 
 
-        return gene_fig, cell_type_fig, gene_value, genotype_value, genotype_list_subset, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value.capitalize(), genotype_value, genotype_list_subset, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -522,14 +526,15 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
     if metadata is not None:
         if gene_value is None:
             gene_value = default_gene
-        #first lower case gene value
-        gene_value = gene_value.lower()
 
         #check if gene value is in dataframe
         gene_value_in_df = gene_value in gene_list
         #set gene value to be equal to default gene if gene not in dataframe (assuming default gene is in dataframe)
         if not gene_value_in_df:
             gene_value = default_gene
+
+        #first lower case gene value
+        gene_value = gene_value.lower()
 
         #table to get gene_value from
         table = gene_lookup[gene_value]
@@ -608,7 +613,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
         gene_fig_left.update_layout(
             autosize = True,
             title = {
-                'text': '<b>' + gene_value + '</b>',
+                'text': '<b>' + gene_value.capitalize() + '</b>',
                 'x': 0.5,
                 'y': 0.95,
                 'xanchor': 'center',
@@ -654,7 +659,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
         gene_fig_right.update_layout(
             autosize = True,
             title = {
-                'text': '<b>' + gene_value + '</b>',
+                'text': '<b>' + gene_value.capitalize() + '</b>',
                 'x': 0.5,
                 'y': 0.95,
                 'xanchor': 'center',
@@ -679,7 +684,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
 
 
 
-        return gene_fig_left, gene_fig_right, genotype_value_left, genotype_value_right, gene_value, expression_data_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig_left, gene_fig_right, genotype_value_left, genotype_value_right, gene_value.capitalize(), expression_data_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
