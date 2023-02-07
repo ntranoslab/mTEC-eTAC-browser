@@ -322,7 +322,7 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
             },
             coloraxis_colorbar= {'thicknessmode': 'pixels', 'thickness': 30},
             xaxis={'visible': False, 'showticklabels': False},
-            yaxis={'visible': False, 'showticklabels': False},
+            yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
             margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
             )
@@ -363,7 +363,7 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
             legend={'title': '', 'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
             margin={'l':10, 'r': 10},
             xaxis={'visible': False, 'showticklabels': False},
-            yaxis={'visible': False, 'showticklabels': False},
+            yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
             plot_bgcolor = "white"
             )
 

@@ -419,7 +419,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             },
             coloraxis_colorbar= {'thicknessmode': 'pixels', 'thickness': 30},
             xaxis={'visible': False, 'showticklabels': False},
-            yaxis={'visible': False, 'showticklabels': False},
+            yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
             margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
             )
@@ -461,7 +461,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             legend={'title': '', 'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
             margin={'l':10, 'r': 10},
             xaxis={'visible': False, 'showticklabels': False},
-            yaxis={'visible': False, 'showticklabels': False},
+            yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
             plot_bgcolor = "white"
             )
         cell_type_fig.for_each_trace(
@@ -629,7 +629,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
             },
             coloraxis_colorbar= {'thicknessmode': 'pixels', 'thickness': 30},
             xaxis={'visible': False, 'showticklabels': False},
-            yaxis={'visible': False, 'showticklabels': False},
+            yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
             margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
             ),
@@ -675,7 +675,7 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
             },
             coloraxis_colorbar= {'thicknessmode': 'pixels', 'thickness': 30},
             xaxis={'visible': False, 'showticklabels': False},
-            yaxis={'visible': False, 'showticklabels': False},
+            yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
             margin={'l': 10, 'r': 10},
             plot_bgcolor = "white"
             )
