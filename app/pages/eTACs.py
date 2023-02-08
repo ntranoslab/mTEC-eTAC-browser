@@ -77,10 +77,12 @@ sorted_cell_list = metadata.cell_type.unique().copy()
 sorted_cell_list.sort()
 
 checklist_children = [{"label": html.Div([
-    html.Button(disabled = True, style={'background-color': color_list[i]}, className = 'icon-button'),
-    html.Div(sorted_cell_list[i], style={'font-size': 12, 'padding-left': 10, 'color': 'black'}),
+    html.Button(disabled = True, style={'background-color': color_list[i], 'padding-left': 10}, className = 'icon-button'),
+    html.Div(sorted_cell_list[i], style={'font-size': 12, 'padding-left': 5, 'color': 'black'}),
     ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}), "value": sorted_cell_list[i]} for i in range(len(sorted_cell_list))]
-# checklist_children.insert(0, {"label": html.Div("All", style={'font-size': 12, 'padding-left': 10, 'color': 'black'}), "value": "All"})
+checklist_all = [{"label": html.Div([
+    html.Div("All", style={'font-size': 12, 'padding-left': 2, 'color': 'black', 'font-weight': 'bold'}),
+    ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}), "value": "All"}]
 
 if len(color_list) >= len(metadata.cell_type.unique()):
     color_list = color_list[0:len(metadata.cell_type.unique())]
@@ -160,7 +162,7 @@ layout = html.Div([
                                 id='umap-graphic-cell-types-etacs')
                         ], style={'width': '37%', 'marginLeft': '1.5%'}),
                         html.Div([
-                            dcc.Checklist(["All"], ["All"], labelStyle = {'display': 'flex'}, style={'padding-top': '3%', 'padding-right': '2%', 'font-size': 12, 'color': 'black'}, id="all-cell-type-checklist"),
+                            dcc.Checklist(checklist_all, ["All"], labelStyle = {'display': 'flex'}, style={'padding-top': '10%','padding-right': '2%'}, id='all-cell-type-checklist'),
                             dcc.Checklist(checklist_children, sorted_cell_list[0:len(sorted_cell_list)], labelStyle = {'display': 'flex'}, style={'padding-right': '2%'}, id='cell-type-checklist'),
                         ]),
                     ], style = {'display': 'flex', 'justify-content': 'center'}),
@@ -294,7 +296,7 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
             all_cell_type_checklist = ["All"] if set(cell_type_checklist) == set(sorted_cell_list) else []
         elif input_id == 'all-cell-type-checklist':
             cell_type_checklist = sorted_cell_list if all_cell_type_checklist else [sorted_cell_list[0]]
-        
+
         for i in cell_type_checklist:
                 gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data['cell_type'] == i]])
         
