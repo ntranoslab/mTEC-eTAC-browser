@@ -315,6 +315,14 @@ button{
 	font-weight: bold;
 }
 
+.icon-button {
+	border-width: 0px;
+	height: 15px;
+	width: 15px;
+	border-radius: 7.5px;
+	cursor: default;
+}
+
 .tab-parent .tab-container {
 	border: 2px;
 	border-color: ghostwhite;
