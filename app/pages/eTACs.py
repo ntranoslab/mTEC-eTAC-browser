@@ -290,39 +290,12 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
             all_cell_type_checklist.insert(0, 'All')
             cell_type_checklist = sorted_cell_list
 
-        if input_id == 'cell-type-checklist':
-            cell_type_checklist.sort()
-            if 'All' in all_cell_type_checklist:
-                #plot all cell types all cell types are really selected
-                if (len(cell_type_checklist) - 1) == len(sorted_cell_list):
-                    gene_data_filtered = gene_data
-                #remove all if not all options are selected
-                else:
-                    all_cell_type_checklist.remove('All')
-                    for i in cell_type_checklist:
-                        gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data['cell_type'] == i]])
-            else:
-                #automatically select 'All' if every option is selected
-                if len(cell_type_checklist) == len(sorted_cell_list):
-                    all_cell_type_checklist.insert(0, 'All')
-                    gene_data_filtered = gene_data
-                #plot first cell type if none are selected
-                elif len(cell_type_checklist) == 0:
-                    cell_type_checklist = [sorted_cell_list[0]]
-                    gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data['cell_type'] == cell_type_checklist[0]]])
-                #only plot selected cell types
-                else:
-                    for i in cell_type_checklist:
-                        gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data['cell_type'] == i]])
+        if input_id == "cell-type-checklist":
+            all_cell_type_checklist = ["All"] if set(cell_type_checklist) == set(sorted_cell_list) else []
         elif input_id == 'all-cell-type-checklist':
-            if 'All' in all_cell_type_checklist:
-                cell_type_checklist = sorted_cell_list
-                gene_data_filtered = gene_data
-            else:
-                cell_type_checklist = [sorted_cell_list[0]]
-                gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data['cell_type'] == cell_type_checklist[0]]])
-        else:
-            for i in cell_type_checklist:
+            cell_type_checklist = sorted_cell_list if all_cell_type_checklist else [sorted_cell_list[0]]
+        
+        for i in cell_type_checklist:
                 gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data['cell_type'] == i]])
         
         #graphs
