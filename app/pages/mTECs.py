@@ -60,6 +60,20 @@ color_list = [
     '#bc80bd','#ccebc5','#ffed6f','darkred','darkblue'
 ]
 
+sorted_cell_list = metadata[default_cell_type_annotation].unique().copy()
+sorted_cell_list.sort()
+
+sorted_cell_list_miller = metadata['Miller'].unique().copy()
+sorted_cell_list_miller.remove('Other dataset')
+sorted_cell_list_miller.sort()
+sorted_cell_list_miller.append('Other dataset')
+
+checklist_children = [{"label": html.Div([
+    html.Button(disabled = True, style={'background-color': color_list[i], 'padding-left': 10}, className = 'icon-button'),
+    html.Div(sorted_cell_list[i], style={'font-size': 12, 'padding-left': 5, 'color': 'black'}),
+    ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}), "value": sorted_cell_list[i]} for i in range(len(sorted_cell_list))]
+
+
 colorscales = ['bluered', 'blues', 'cividis', 'dense', 'hot', 'ice', 'inferno', 'magenta', 'magma', 'picnic', 'plasma',
                'plotly3', 'purp', 'purples', 'rdpu', 'rdylbu', 'teal', 'viridis']
 
@@ -133,6 +147,13 @@ layout = html.Div([
                             width=650, height=650),
                             id='umap-graphic-cell-types-mtecs')
                     ], style={'width': '45%', 'marginRight': '2.5%'}),
+                    html.Div([
+                        html.Div([
+                            html.Button('All', id = 'all-cell-type-button-mtecs'),
+                            html.Button('Deselect', id = 'no-cell-type-button-mtecs')
+                        ], style = {'marginBottom': '2%', 'display': 'flex', 'justify-content': 'center'}),
+                        dcc.Checklist(checklist_children, sorted_cell_list[0:len(sorted_cell_list)], labelStyle = {'display': 'flex'}, id='cell-type-checklist-mtecs'),
+                    ], style = {'marginTop': '1%', 'marginRight': '2%'}),
                 ], style = {'display': 'flex', 'justify-content': 'center'}),
             ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
         ]),
@@ -260,6 +281,8 @@ layout = html.Div([
     Output('umap-graphic-gene-slider-mtecs', 'max'),
     Output('umap-graphic-gene-slider-mtecs', 'marks'),
     Output('umap-graphic-gene-slider-mtecs', 'value'),
+    Output('cell-type-checklist-mtecs', 'options'),
+    Output('cell-type-checklist-mtecs', 'value'),
     Input('gene-value-mtecs', 'value'),
     Input('genotype-value-mtecs', 'value'),
     Input('cell-type-annotations-value', 'value'),
@@ -270,10 +293,12 @@ layout = html.Div([
     Input('color-scale-dropdown', 'value'),
     Input('first-percentile-button', 'n_clicks'),
     Input('ninty-ninth-percentile-button', 'n_clicks'),
-    Input('umap-graphic-cell-types-mtecs', 'restyleData'),
+    Input('all-cell-type-button-mtecs', 'n_clicks'),
+    Input('no-cell-type-button-mtecs', 'n_clicks'),
+    Input('cell-type-checklist-mtecs', 'value')
     )
 
-def update_graph(gene_value, genotype_value, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, cell_type_fig_restyle_data):
+def update_graph(gene_value, genotype_value, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, all_cell_type_button_click, no_cell_type_button_click, cell_type_checklist):
 
     input_id = ctx.triggered_id
     global metadata
@@ -338,7 +363,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         elif input_id == 'ninty-ninth-percentile-button':
             lower_slider_value = min(umap_graphic_gene_slider)
             higher_slider_value = percentile_values[0]
-        elif (input_id == 'umap-graphic-cell-types-mtecs') |  (input_id == 'dot-size-slider-data-browser-mtecs'):
+        elif (input_id == 'umap-graphic-cell-types-mtecs') |  (input_id == 'dot-size-slider-data-browser-mtecs') | (input_id == 'cell-type-checklist-mtecs') | (input_id == 'all-cell-type-button-mtecs') | (input_id == 'no-cell-type-button-mtecs'):
             lower_slider_value = min(umap_graphic_gene_slider) if umap_graphic_gene_slider != None else percentile_values[1]
             higher_slider_value = max(umap_graphic_gene_slider) if umap_graphic_gene_slider != None else percentile_values[0]
         else:
@@ -355,29 +380,29 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         if cell_type_annotations_value != default_cell_type_annotation:
             gene_data_order_other_rows = gene_data[gene_data[cell_type_annotations_value] == 'Other dataset']
             gene_data = pd.concat([gene_data_order_other_rows, gene_data[gene_data[cell_type_annotations_value] != 'Other dataset']])
-        
-        
-        visible_cell_types = []
-        gene_data_cell_types = gene_data[cell_type_annotations_value].unique()
-        list(gene_data_cell_types).reverse()
-        if cell_type_fig_restyle_data != None and input_id == 'umap-graphic-cell-types-mtecs':
-            cell_fig_visible = cell_type_fig_restyle_data[0]['visible']
-            if len(cell_fig_visible) > 1:
-                for i in range(len(cell_fig_visible)):
-                    if cell_fig_visible[i] == True:
-                        visible_cell_types.append(gene_data_cell_types[i])
-            elif len(cell_fig_visible) == 1:
-                visible_cell_types = list(gene_data_cell_types)
-                if cell_type_fig_restyle_data[0]['visible'][0] == 'legendonly':
-                    visible_cell_types.pop(cell_type_fig_restyle_data[1][0])
-        else:
-            visible_cell_types = gene_data_cell_types
 
         gene_data_filtered = pd.DataFrame()
+
+        cell_list = sorted_cell_list if cell_type_annotations_value == default_cell_type_annotation else sorted_cell_list_miller
+
+        if (input_id == 'cell-type-annotations-value') | (input_id == 'gene-value-mtecs') | (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
+            cell_type_checklist = cell_list
+
+        if input_id == 'no-cell-type-button-mtecs':
+            cell_type_checklist = [cell_list[0]]
+
+        if input_id == 'all-cell-type-button-mtecs':
+            cell_type_checklist = cell_list
+
+        cell_type_checklist_options = [{"label": html.Div([
+            html.Button(disabled = True, style={'background-color': color_list[i] if cell_list[i] != 'Other dataset' else 'gainsboro', 'padding-left': 10}, className = 'icon-button'),
+            html.Div(cell_list[i], style={'font-size': 12, 'padding-left': 5, 'color': 'black'}),
+        ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}), "value": cell_list[i]} for i in range(len(cell_list))]
 
         for i in visible_cell_types:
             gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data[cell_type_annotations_value] == i]])
 
+        
         
         #graphs
         #sort dff based on cells highest expressing to lowest expressing gene - makes the gene scatter plot graph highest expressing cells on top of lower expressing cells
@@ -458,7 +483,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                     'color': '#4C5C75'
                 }
             },
-            legend={'title': '', 'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
+            showlegend = False,
             margin={'l':10, 'r': 10},
             xaxis={'visible': False, 'showticklabels': False},
             yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
@@ -473,7 +498,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
 
 
 
-        return gene_fig, cell_type_fig, gene_value.capitalize(), genotype_value, genotype_list_subset, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value]
+        return gene_fig, cell_type_fig, gene_value.capitalize(), genotype_value, genotype_list_subset, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value], cell_type_checklist_options, cell_type_checklist
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -489,7 +514,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, None, None, None, None, 3, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]]
+    return fig, fig, None, None, None, None, None, None, 3, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]], checklist_children, cell_type_checklist
 
 
 ##=========================Callback=========================##
