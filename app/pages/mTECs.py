@@ -64,6 +64,7 @@ sorted_cell_list = metadata[default_cell_type_annotation].unique().copy()
 sorted_cell_list.sort()
 
 sorted_cell_list_miller = metadata['Miller'].unique().copy()
+sorted_cell_list_miller = list(sorted_cell_list_miller)
 sorted_cell_list_miller.remove('Other dataset')
 sorted_cell_list_miller.sort()
 sorted_cell_list_miller.append('Other dataset')
@@ -146,7 +147,7 @@ layout = html.Div([
                             plot_bgcolor = "white",
                             width=650, height=650),
                             id='umap-graphic-cell-types-mtecs')
-                    ], style={'width': '45%', 'marginRight': '2.5%'}),
+                    ], style={'width': '37%', 'marginRight': '2.5%'}),
                     html.Div([
                         html.Div([
                             html.Button('All', id = 'all-cell-type-button-mtecs'),
@@ -399,7 +400,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             html.Div(cell_list[i], style={'font-size': 12, 'padding-left': 5, 'color': 'black'}),
         ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}), "value": cell_list[i]} for i in range(len(cell_list))]
 
-        for i in visible_cell_types:
+        for i in cell_type_checklist:
             gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data[cell_type_annotations_value] == i]])
 
         
@@ -490,7 +491,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
             plot_bgcolor = "white"
             )
         cell_type_fig.for_each_trace(
-            lambda trace: trace.update(visible='legendonly') if trace.name not in visible_cell_types else (),
+            lambda trace: trace.update(visible='legendonly') if trace.name not in cell_type_checklist else (),
             )
 
 
