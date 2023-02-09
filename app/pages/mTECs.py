@@ -139,7 +139,7 @@ layout = html.Div([
                             plot_bgcolor = "white",
                             width=650, height=650),
                             id='umap-graphic-gene-mtecs')
-                    ], style={'width': '45%', 'marginRight': '2.5%'}),
+                    ], style={'width': '40%', 'marginRight': '2.5%'}),
                     html.Div([
                         dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                             xaxis={'visible': False, 'showticklabels': False},
@@ -147,7 +147,7 @@ layout = html.Div([
                             plot_bgcolor = "white",
                             width=650, height=650),
                             id='umap-graphic-cell-types-mtecs')
-                    ], style={'width': '37%', 'marginRight': '2.5%'}),
+                    ], style={'width': '32%', 'marginRight': '2.5%'}),
                     html.Div([
                         html.Div([
                             html.Button('All', id = 'all-cell-type-button-mtecs'),
@@ -386,10 +386,13 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
 
         cell_list = sorted_cell_list if cell_type_annotations_value == default_cell_type_annotation else sorted_cell_list_miller
 
+        if (cell_type_annotations_value != default_cell_type_annotation) & (dataset_value == 'Mathis'):
+            cell_list = ["Other dataset"]
+
         if (input_id == 'cell-type-annotations-value') | (input_id == 'gene-value-mtecs') | (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
             cell_type_checklist = cell_list
 
-        if input_id == 'no-cell-type-button-mtecs':
+        if (input_id == 'no-cell-type-button-mtecs') | (len(cell_type_checklist) == 0):
             cell_type_checklist = [cell_list[0]]
 
         if input_id == 'all-cell-type-button-mtecs':

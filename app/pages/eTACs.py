@@ -149,7 +149,7 @@ layout = html.Div([
                                 plot_bgcolor = "white",
                                 width=650, height=650),
                                 id='umap-graphic-gene-etacs')
-                        ], style={'width': '45%', 'marginRight': '1.5%'}),
+                        ], style={'width': '40%', 'marginRight': '1.5%'}),
                         html.Div([
                             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                                 xaxis={'visible': False, 'showticklabels': False},
@@ -157,7 +157,7 @@ layout = html.Div([
                                 plot_bgcolor = "white",
                                 width=650, height=650),
                                 id='umap-graphic-cell-types-etacs')
-                        ], style={'width': '37%', 'marginLeft': '1.5%'}),
+                        ], style={'width': '32%', 'marginLeft': '1.5%'}),
                         html.Div([
                             html.Div([
                                 html.Button('All', id = 'all-cell-type-button-etacs'),
@@ -291,7 +291,7 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
         if input_id == 'gene-value-etacs':
             cell_type_checklist = sorted_cell_list
 
-        if input_id == 'no-cell-type-button-etacs':
+        if (input_id == 'no-cell-type-button-etacs') | (len(cell_type_checklist) == 0):
             cell_type_checklist = [sorted_cell_list[0]]
 
         if input_id == 'all-cell-type-button-etacs':
