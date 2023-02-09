@@ -149,7 +149,7 @@ layout = html.Div([
                                 plot_bgcolor = "white",
                                 width=650, height=650),
                                 id='umap-graphic-gene-etacs')
-                        ], style={'width': '40%', 'marginRight': '1.5%'}),
+                        ], style={'width': '42%', 'marginRight': '1.5%'}),
                         html.Div([
                             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
                                 xaxis={'visible': False, 'showticklabels': False},
@@ -157,7 +157,7 @@ layout = html.Div([
                                 plot_bgcolor = "white",
                                 width=650, height=650),
                                 id='umap-graphic-cell-types-etacs')
-                        ], style={'width': '32%', 'marginLeft': '1.5%'}),
+                        ], style={'width': '35%', 'marginLeft': '1.5%'}),
                         html.Div([
                             html.Div([
                                 html.Button('All', id = 'all-cell-type-button-etacs'),
