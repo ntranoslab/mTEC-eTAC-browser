@@ -310,8 +310,8 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
         if (input_id == 'no-cell-type-button-etacs') | (len(cell_type_checklist) == 0):
             cell_type_checklist = [sorted_cell_list[0]]
 
-        # if input_id == 'all-cell-type-button-etacs':
-        #     cell_type_checklist = sorted_cell_list
+        if input_id == 'all-cell-type-button-etacs':
+            cell_type_checklist = sorted_cell_list
 
         for i in cell_type_checklist:
                 gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data['cell_type'] == i]])
