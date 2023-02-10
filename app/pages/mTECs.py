@@ -449,14 +449,11 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         else:
             cell_list = sorted_cell_list_miller
 
-        if (input_id == 'cell-type-annotations-value') | (input_id == 'gene-value-mtecs') | (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
+        if (input_id == 'cell-type-annotations-value') | (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
             cell_type_checklist = cell_list
-            print('sorted_cell_list_miller')
-            print(sorted_cell_list_miller)
-            print(cell_list)
 
-        if (input_id == 'no-cell-type-button-mtecs') | (len(cell_type_checklist) == 0):
-            cell_type_checklist = [cell_list[0]]
+        if (input_id == 'no-cell-type-button-mtecs'):
+            cell_type_checklist = []
 
         if input_id == 'all-cell-type-button-mtecs':
             cell_type_checklist = cell_list
@@ -473,92 +470,107 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         
         #graphs
         #sort dff based on cells highest expressing to lowest expressing gene - makes the gene scatter plot graph highest expressing cells on top of lower expressing cells
-        gene_fig = px.scatter(gene_data_filtered.sort_values(by=[gene_value], kind='mergesort'),
-                     #x coordinates
-                     x='x',
-                     #y coordinates
-                     y='y',
-                     color = gene_value if gene_value != None else default_gene,
-                     hover_name = cell_type_annotations_value,
-                     hover_data = {'x': False, 'y': False, cell_type_annotations_value: False},
-                     range_color=
-                     #min of color range
-                     [lower_slider_value, 
-                     #max of color range
-                     higher_slider_value],
-                     color_continuous_scale = color_scale_dropdown_value,
-                     labels = {gene_value: gene_value.capitalize() + ' expression'}
-                     )
-        gene_fig.update_traces(
-            marker=dict(
-                size=dot_size_slider_value,
-                line=dict(width=0)
+        if len(cell_type_checklist) == 0:
+            fig = px.scatter(x=[0],
+                 y=[0],
+                 color_discrete_sequence=['white']
+                 )
+            fig.update_layout(
+                xaxis={'visible': False, 'showticklabels': False},
+                yaxis={'visible': False, 'showticklabels': False},
+                margin = dict(l=50, r=50, t=50, b=50, pad=4),
+                plot_bgcolor = "white",
+                hovermode = False
                 )
-            )
-        gene_fig.update_layout(
-            autosize = True,
-            title = {
-                'text': '<b>' + gene_value.capitalize() + '</b>',
-                'x': 0.5,
-                'y': 0.95,
-                'xanchor': 'center',
-                'yanchor': 'top',
-                'font': {
-                    'size': 20,
-                    'family': 'Arial',
-                    'color': '#4C5C75'
-                }
-            },
-            coloraxis_colorbar= {'thicknessmode': 'pixels', 'thickness': 30},
-            xaxis={'visible': False, 'showticklabels': False},
-            yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
-            margin={'l': 10, 'r': 10},
-            plot_bgcolor = "white"
-            )
-        gene_fig.update_coloraxes(
-            colorbar_title_text=''
-            )
-
-        cell_type_fig = px.scatter(gene_data,
-                        x='x',
-                        #x coordinates
-                        y='y',
-                        color = cell_type_annotations_value,
-                        color_discrete_sequence = color_list_copy,
-                        color_discrete_map = {'Other dataset': 'gainsboro'} if (cell_type_annotations_value != default_cell_type_annotation) & ((dataset_value == 'All') | (dataset_value == 'Mathis')) else {},
-                        hover_name = cell_type_annotations_value,
-                        hover_data = {'x': False, 'y': False, cell_type_annotations_value: False},
+            gene_fig = fig
+            cell_type_fig = fig
+        else:
+            gene_fig = px.scatter(gene_data_filtered.sort_values(by=[gene_value], kind='mergesort'),
+                         #x coordinates
+                         x='x',
+                         #y coordinates
+                         y='y',
+                         color = gene_value if gene_value != None else default_gene,
+                         hover_name = cell_type_annotations_value,
+                         hover_data = {'x': False, 'y': False, cell_type_annotations_value: False},
+                         range_color=
+                         #min of color range
+                         [lower_slider_value, 
+                         #max of color range
+                         higher_slider_value],
+                         color_continuous_scale = color_scale_dropdown_value,
+                         labels = {gene_value: gene_value.capitalize() + ' expression'}
+                         )
+            gene_fig.update_traces(
+                marker=dict(
+                    size=dot_size_slider_value,
+                    line=dict(width=0)
                     )
-
-        cell_type_fig.update_traces(
-            marker=dict(
-                size=dot_size_slider_value,
-                line=dict(width=0)
                 )
-            )
-        cell_type_fig.update_layout(
-            autosize = True,
-            title = {
-                'text': '<b>Cell Types</b>',
-                'x': 0.5,
-                'y': 0.95,
-                'xanchor': 'center',
-                'yanchor': 'top',
-                'font': {
-                    'size': 20,
-                    'family': 'Arial',
-                    'color': '#4C5C75'
-                }
-            },
-            showlegend = False,
-            margin={'l':10, 'r': 10},
-            xaxis={'visible': False, 'showticklabels': False},
-            yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
-            plot_bgcolor = "white"
-            )
-        cell_type_fig.for_each_trace(
-            lambda trace: trace.update(visible='legendonly') if trace.name not in cell_type_checklist else (),
-            )
+            gene_fig.update_layout(
+                autosize = True,
+                title = {
+                    'text': '<b>' + gene_value.capitalize() + '</b>',
+                    'x': 0.5,
+                    'y': 0.95,
+                    'xanchor': 'center',
+                    'yanchor': 'top',
+                    'font': {
+                        'size': 20,
+                        'family': 'Arial',
+                        'color': '#4C5C75'
+                    }
+                },
+                coloraxis_colorbar= {'thicknessmode': 'pixels', 'thickness': 30},
+                xaxis={'visible': False, 'showticklabels': False},
+                yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
+                margin={'l': 10, 'r': 10},
+                plot_bgcolor = "white"
+                )
+            gene_fig.update_coloraxes(
+                colorbar_title_text=''
+                )
+
+            cell_type_fig = px.scatter(gene_data,
+                            x='x',
+                            #x coordinates
+                            y='y',
+                            color = cell_type_annotations_value,
+                            color_discrete_sequence = color_list_copy,
+                            color_discrete_map = {'Other dataset': 'gainsboro'} if (cell_type_annotations_value != default_cell_type_annotation) & ((dataset_value == 'All') | (dataset_value == 'Mathis')) else {},
+                            hover_name = cell_type_annotations_value,
+                            hover_data = {'x': False, 'y': False, cell_type_annotations_value: False},
+                        )
+
+            cell_type_fig.update_traces(
+                marker=dict(
+                    size=dot_size_slider_value,
+                    line=dict(width=0)
+                    )
+                )
+            cell_type_fig.update_layout(
+                autosize = True,
+                title = {
+                    'text': '<b>Cell Types</b>',
+                    'x': 0.5,
+                    'y': 0.95,
+                    'xanchor': 'center',
+                    'yanchor': 'top',
+                    'font': {
+                        'size': 20,
+                        'family': 'Arial',
+                        'color': '#4C5C75'
+                    }
+                },
+                showlegend = False,
+                margin={'l':10, 'r': 10},
+                xaxis={'visible': False, 'showticklabels': False},
+                yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
+                plot_bgcolor = "white"
+                )
+            cell_type_fig.for_each_trace(
+                lambda trace: trace.update(visible='legendonly') if trace.name not in cell_type_checklist else (),
+                )
 
 
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
@@ -572,7 +584,6 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                  color_discrete_sequence=['white']
                  )
     fig.update_layout(
-        width = 650, height = 650,
         xaxis={'visible': False, 'showticklabels': False},
         yaxis={'visible': False, 'showticklabels': False},
         margin = dict(l=50, r=50, t=50, b=50, pad=4),
@@ -786,7 +797,6 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
                  color_discrete_sequence=['white']
                  )
     fig.update_layout(
-        width = 650, height = 650,
         xaxis={'visible': False, 'showticklabels': False},
         yaxis={'visible': False, 'showticklabels': False},
         margin = dict(l=50, r=50, t=50, b=50, pad=4),
