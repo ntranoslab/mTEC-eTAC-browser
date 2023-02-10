@@ -127,6 +127,76 @@ button{
 	color: purple;
 }
 
+#all-cell-type-button-mtecs {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	margin-right: 10px;
+	transition-duration: 0.2s;
+}
+
+#all-cell-type-button-mtecs:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
+}
+
+#no-cell-type-button-mtecs {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	transition-duration: 0.2s;
+}
+
+#no-cell-type-button-mtecs:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
+}
+
+#all-cell-type-button-etacs {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	margin-right: 10px;
+	transition-duration: 0.2s;
+}
+
+#all-cell-type-button-etacs:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
+}
+
+#no-cell-type-button-etacs {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	transition-duration: 0.2s;
+}
+
+#no-cell-type-button-etacs:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
+}
+
 #first-percentile-button {
 	background-color: white;
 	border-color: lightgray;
@@ -313,6 +383,14 @@ button{
 	color: #3F6CB4;
 	font-family: Arial;
 	font-weight: bold;
+}
+
+.icon-button {
+	border-width: 0px;
+	height: 15px;
+	width: 15px;
+	border-radius: 7.5px;
+	cursor: default;
 }
 
 .tab-parent .tab-container {
