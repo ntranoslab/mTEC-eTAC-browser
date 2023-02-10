@@ -384,13 +384,25 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
 
         gene_data_filtered = pd.DataFrame()
 
-        cell_list = sorted_cell_list if cell_type_annotations_value == default_cell_type_annotation else sorted_cell_list_miller
-
-        if (cell_type_annotations_value != default_cell_type_annotation) & (dataset_value == 'Mathis'):
+        #cell list if choose aggregated cell type annotations
+        if cell_type_annotations_value == default_cell_type_annotation:
+            cell_list = sorted_cell_list
+        #cell list if Miller cell type annotation and Miller dataset selected
+        elif dataset_value == 'Miller':
+            cell_list = sorted_cell_list_miller.copy()
+            cell_list.remove('Other dataset')
+        #cell list if Miller cell type annotation and Mathis dataset selected
+        elif dataset_value == 'Mathis':
             cell_list = ["Other dataset"]
+        #cell list if Miller cell type annotation and All datasets are selected
+        else:
+            cell_list = sorted_cell_list_miller
 
         if (input_id == 'cell-type-annotations-value') | (input_id == 'gene-value-mtecs') | (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
             cell_type_checklist = cell_list
+            print('sorted_cell_list_miller')
+            print(sorted_cell_list_miller)
+            print(cell_list)
 
         if (input_id == 'no-cell-type-button-mtecs') | (len(cell_type_checklist) == 0):
             cell_type_checklist = [cell_list[0]]
@@ -462,7 +474,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                         y='y',
                         color = cell_type_annotations_value,
                         color_discrete_sequence = color_list_copy,
-                        color_discrete_map = {'Other dataset': 'gainsboro'} if (cell_type_annotations_value != default_cell_type_annotation) & ((genotype_value == 'WT') | (genotype_value == 'All')) else {},
+                        color_discrete_map = {'Other dataset': 'gainsboro'} if (cell_type_annotations_value != default_cell_type_annotation) & ((dataset_value == 'All') | (dataset_value == 'Mathis')) else {},
                         hover_name = cell_type_annotations_value,
                         hover_data = {'x': False, 'y': False, cell_type_annotations_value: False}
                     )
