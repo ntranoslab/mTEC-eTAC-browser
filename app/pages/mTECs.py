@@ -449,11 +449,8 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         else:
             cell_list = sorted_cell_list_miller
 
-        if (input_id == 'cell-type-annotations-value') | (input_id == 'gene-value-mtecs') | (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
+        if (input_id == 'cell-type-annotations-value') | (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
             cell_type_checklist = cell_list
-            print('sorted_cell_list_miller')
-            print(sorted_cell_list_miller)
-            print(cell_list)
 
         if (input_id == 'no-cell-type-button-mtecs') | (len(cell_type_checklist) == 0):
             cell_type_checklist = [cell_list[0]]

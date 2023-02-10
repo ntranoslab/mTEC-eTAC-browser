@@ -307,10 +307,6 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
 
         gene_data_filtered = pd.DataFrame()
 
-        #reset selected cell types to display if user changes genes
-        if input_id == 'gene-value-etacs':
-            cell_type_checklist = sorted_cell_list
-
         if (input_id == 'no-cell-type-button-etacs') | (len(cell_type_checklist) == 0):
             cell_type_checklist = [sorted_cell_list[0]]
 
