@@ -52,6 +52,17 @@ default_dataset_value = 'All'
 
 default_expression_data_value = 'Normalized'
 
+config = {
+            'toImageButtonOptions': {
+                'format': 'svg',
+                'filename': 'cell_types',
+                'height': 1080,
+                'width': 1080,
+                'scale': 1
+            },
+            'displaylogo': False
+        }
+
 #Add when dataset added
 #metadata.dataset.unique()
 color_list = [
@@ -138,6 +149,16 @@ layout = html.Div([
                             yaxis={'visible': False, 'showticklabels': False},
                             plot_bgcolor = "white",
                             width=650, height=650),
+                            config = {
+                                'toImageButtonOptions': {
+                                    'format': 'svg',
+                                    'filename': 'mtec_gene_expression',
+                                    'height': 1080,
+                                    'width': 1080,
+                                    'scale': 1
+                                },
+                                'displaylogo': False
+                            },
                             id='umap-graphic-gene-mtecs')
                     ], style={'width': '42%', 'marginRight': '2.5%'}),
                     html.Div([
@@ -146,6 +167,16 @@ layout = html.Div([
                             yaxis={'visible': False, 'showticklabels': False},
                             plot_bgcolor = "white",
                             width=650, height=650),
+                            config = {
+                                'toImageButtonOptions': {
+                                    'format': 'svg',
+                                    'filename': 'mtec_cell_types',
+                                    'height': 1080,
+                                    'width': 1080,
+                                    'scale': 1
+                                },
+                                'displaylogo': False
+                            },
                             id='umap-graphic-cell-types-mtecs')
                     ], style={'width': '35%', 'marginRight': '2.5%'}),
                     html.Div([
@@ -241,6 +272,16 @@ layout = html.Div([
                             yaxis={'visible': False, 'showticklabels': False},
                             plot_bgcolor = "white",
                             width=650, height=650),
+                            config = {
+                                'toImageButtonOptions': {
+                                    'format': 'svg',
+                                    'filename': 'mtec_gene_expression',
+                                    'height': 1080,
+                                    'width': 1080,
+                                    'scale': 1
+                                },
+                                'displaylogo': False
+                            },
                             id='genotype-graph-left'),
                     ], style={'width': '45%', 'marginLeft': '3%','marginRight': '1%'}),
                     html.Div([
@@ -249,6 +290,16 @@ layout = html.Div([
                             yaxis={'visible': False, 'showticklabels': False},
                             plot_bgcolor = "white",
                             width=650, height=650),
+                            config = {
+                                'toImageButtonOptions': {
+                                    'format': 'svg',
+                                    'filename': 'mtec_gene_expression',
+                                    'height': 1080,
+                                    'width': 1080,
+                                    'scale': 1
+                                },
+                                'displaylogo': False
+                            },
                             id='genotype-graph-right'),
                     ], style={'width': '45%', 'marginLeft': '1%', 'marginRight': '3%'}),
                 ], style = {'display': 'flex', 'justify-content': 'center'}),
@@ -476,7 +527,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                         color_discrete_sequence = color_list_copy,
                         color_discrete_map = {'Other dataset': 'gainsboro'} if (cell_type_annotations_value != default_cell_type_annotation) & ((dataset_value == 'All') | (dataset_value == 'Mathis')) else {},
                         hover_name = cell_type_annotations_value,
-                        hover_data = {'x': False, 'y': False, cell_type_annotations_value: False}
+                        hover_data = {'x': False, 'y': False, cell_type_annotations_value: False},
                     )
 
         cell_type_fig.update_traces(
