@@ -148,6 +148,16 @@ layout = html.Div([
                                 yaxis={'visible': False, 'showticklabels': False},
                                 plot_bgcolor = "white",
                                 width=650, height=650),
+                                config = {
+                                    'toImageButtonOptions': {
+                                        'format': 'svg',
+                                        'filename': 'etac_gene_expression',
+                                        'height': 1080,
+                                        'width': 1080,
+                                        'scale': 1
+                                    },
+                                    'displaylogo': False
+                                },
                                 id='umap-graphic-gene-etacs')
                         ], style={'width': '42%', 'marginRight': '1.5%'}),
                         html.Div([
@@ -156,6 +166,16 @@ layout = html.Div([
                                 yaxis={'visible': False, 'showticklabels': False},
                                 plot_bgcolor = "white",
                                 width=650, height=650),
+                                config = {
+                                    'toImageButtonOptions': {
+                                        'format': 'svg',
+                                        'filename': 'etac_cell_types',
+                                        'height': 1080,
+                                        'width': 1080,
+                                        'scale': 1
+                                    },
+                                    'displaylogo': False
+                                },
                                 id='umap-graphic-cell-types-etacs')
                         ], style={'width': '35%', 'marginLeft': '1.5%'}),
                         html.Div([
