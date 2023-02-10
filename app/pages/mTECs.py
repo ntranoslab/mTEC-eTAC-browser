@@ -452,7 +452,8 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         if (input_id == 'cell-type-annotations-value') | (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
             cell_type_checklist = cell_list
 
-        #ell_type_checklist = [cell_list[0]]
+        if (input_id == 'no-cell-type-button-mtecs') | (len(cell_type_checklist) == 0):
+            cell_type_checklist = [cell_list[0]]
 
         if input_id == 'all-cell-type-button-mtecs':
             cell_type_checklist = cell_list
