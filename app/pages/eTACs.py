@@ -156,7 +156,22 @@ layout = html.Div([
                                         'width': 1080,
                                         'scale': 1
                                     },
-                                    'displaylogo': False
+                                    'displaylogo': False,
+                                    # 'modeBarButtonsToAdd': [
+                                    #     {
+                                    #       'name': 'color toggler',
+                                    #       'icon': 'icon1',
+                                    #       'click': function(gd) {
+                                    #         var newColor = colors[Math.floor(3 * Math.random())]
+                                    #         Plotly.restyle(gd, 'line.color', newColor)
+                                    #       }},
+                                    #     {
+                                    #       'name': 'button1',
+                                    #       'icon': Plotly.Icons.pencil,
+                                    #       'direction': 'up',
+                                    #       click: function(gd) {alert('button1')
+                                    #     }}],
+                                    'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
                                 },
                                 id='umap-graphic-gene-etacs')
                         ], style={'width': '42%', 'marginRight': '1.5%'}),
@@ -174,7 +189,8 @@ layout = html.Div([
                                         'width': 1080,
                                         'scale': 1
                                     },
-                                    'displaylogo': False
+                                    'displaylogo': False,
+                                    'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
                                 },
                                 id='umap-graphic-cell-types-etacs')
                         ], style={'width': '35%', 'marginLeft': '1.5%'}),

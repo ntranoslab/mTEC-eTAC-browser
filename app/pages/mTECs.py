@@ -157,7 +157,8 @@ layout = html.Div([
                                     'width': 1080,
                                     'scale': 1
                                 },
-                                'displaylogo': False
+                                'displaylogo': False,
+                                'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
                             },
                             id='umap-graphic-gene-mtecs')
                     ], style={'width': '42%', 'marginRight': '2.5%'}),
@@ -175,7 +176,8 @@ layout = html.Div([
                                     'width': 1080,
                                     'scale': 1
                                 },
-                                'displaylogo': False
+                                'displaylogo': False,
+                                'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
                             },
                             id='umap-graphic-cell-types-mtecs')
                     ], style={'width': '35%', 'marginRight': '2.5%'}),
@@ -280,7 +282,8 @@ layout = html.Div([
                                     'width': 1080,
                                     'scale': 1
                                 },
-                                'displaylogo': False
+                                'displaylogo': False,
+                                'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
                             },
                             id='genotype-graph-left'),
                     ], style={'width': '45%', 'marginLeft': '3%','marginRight': '1%'}),
@@ -298,7 +301,8 @@ layout = html.Div([
                                     'width': 1080,
                                     'scale': 1
                                 },
-                                'displaylogo': False
+                                'displaylogo': False,
+                                'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
                             },
                             id='genotype-graph-right'),
                     ], style={'width': '45%', 'marginLeft': '1%', 'marginRight': '3%'}),
