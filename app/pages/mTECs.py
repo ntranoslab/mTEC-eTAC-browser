@@ -157,7 +157,8 @@ layout = html.Div([
                                     'width': 1080,
                                     'scale': 1
                                 },
-                                'displaylogo': False
+                                'displaylogo': False,
+                                'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
                             },
                             id='umap-graphic-gene-mtecs')
                     ], style={'width': '42%', 'marginRight': '2.5%'}),
@@ -175,7 +176,8 @@ layout = html.Div([
                                     'width': 1080,
                                     'scale': 1
                                 },
-                                'displaylogo': False
+                                'displaylogo': False,
+                                'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
                             },
                             id='umap-graphic-cell-types-mtecs')
                     ], style={'width': '35%', 'marginRight': '2.5%'}),
@@ -185,6 +187,7 @@ layout = html.Div([
                             html.Button('Deselect', id = 'no-cell-type-button-mtecs')
                         ], style = {'marginBottom': '2%', 'display': 'flex', 'justify-content': 'center'}),
                         dcc.Checklist(checklist_children, sorted_cell_list[0:len(sorted_cell_list)], labelStyle = {'display': 'flex'}, id='cell-type-checklist-mtecs'),
+                        html.Button('Legend', id = 'cell-type-legend-button-mtecs', style = {'marginTop': '1%'}),
                     ], style = {'marginTop': '1%', 'marginRight': '2%'}),
                 ], style = {'display': 'flex', 'justify-content': 'center'}),
             ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
@@ -280,7 +283,8 @@ layout = html.Div([
                                     'width': 1080,
                                     'scale': 1
                                 },
-                                'displaylogo': False
+                                'displaylogo': False,
+                                'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
                             },
                             id='genotype-graph-left'),
                     ], style={'width': '45%', 'marginLeft': '3%','marginRight': '1%'}),
@@ -298,7 +302,8 @@ layout = html.Div([
                                     'width': 1080,
                                     'scale': 1
                                 },
-                                'displaylogo': False
+                                'displaylogo': False,
+                                'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
                             },
                             id='genotype-graph-right'),
                     ], style={'width': '45%', 'marginLeft': '1%', 'marginRight': '3%'}),
@@ -347,10 +352,11 @@ layout = html.Div([
     Input('ninty-ninth-percentile-button', 'n_clicks'),
     Input('all-cell-type-button-mtecs', 'n_clicks'),
     Input('no-cell-type-button-mtecs', 'n_clicks'),
-    Input('cell-type-checklist-mtecs', 'value')
+    Input('cell-type-checklist-mtecs', 'value'),
+    Input('cell-type-legend-button-mtecs', 'n_clicks')
     )
 
-def update_graph(gene_value, genotype_value, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, all_cell_type_button_click, no_cell_type_button_click, cell_type_checklist):
+def update_graph(gene_value, genotype_value, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, all_cell_type_button_click, no_cell_type_button_click, cell_type_checklist, cell_type_legend_button):
 
     input_id = ctx.triggered_id
     global metadata
@@ -548,6 +554,12 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                     line=dict(width=0)
                     )
                 )
+            if cell_type_legend_button is None:
+                show_cell_legend = False
+            elif cell_type_legend_button % 2 == 0:
+                show_cell_legend = False
+            else:
+                show_cell_legend = True
             cell_type_fig.update_layout(
                 autosize = True,
                 title = {
@@ -562,7 +574,8 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                         'color': '#4C5C75'
                     }
                 },
-                showlegend = False,
+                showlegend = show_cell_legend,
+                legend={'title': '', 'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
                 margin={'l':10, 'r': 10},
                 xaxis={'visible': False, 'showticklabels': False},
                 yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
