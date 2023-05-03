@@ -1,6 +1,4 @@
-raw_counts_cytoTrace_normalized_expression.csv
 .*
 !/.gitignore
 data
-cache
 __pycache__/

@@ -42,6 +42,7 @@ button{
 #headline {
 	font-size: xx-large;
 	color: #4C5C75;
+	cursor: default;
 }
 
 #tabs {
@@ -62,10 +63,16 @@ button{
 
 #gene-headline {
 	color: #4C5C75;
+	cursor: default;
 }
 
 #gene-value-mtecs {
 	width: 95.5%;
+}
+
+#genotype-graph-gene-value {
+	width: 95.5%;
+	cursor: default;
 }
 
 #gene-value-etacs {
@@ -74,26 +81,120 @@ button{
 
 #genotype-headline {
 	color: #4C5C75;
+	cursor: default;
+}
+
+#cell-type-annotations-headline {
+	color: #4C5C75;
+	cursor: default;
+}
+
+#dataset-headline {
+	color: #4C5C75;
+	cursor: default;
+}
+
+#expression-data-headline {
+	color: #4C5C75;
+	cursor: default;
+}
+
+#dot-size-headline {
+	color: #4C5C75;
+	cursor: default;
 }
 
 #color-scale-headline {
 	color: #4C5C75;
+	cursor: default;
 }
 
 #slider-headline {
 	color: #4C5C75;
 	text-align: center;
 	font-size: 1.0625em;
+	cursor: default;
 }
 
 #percentile-headline {
 	color: #4C5C75;
 	text-align: center;
 	font-size: 1.0625em;
+	cursor: default;
 }
 
 #graph-name-value {
 	color: purple;
+}
+
+#all-cell-type-button-mtecs {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	margin-right: 10px;
+	transition-duration: 0.2s;
+}
+
+#all-cell-type-button-mtecs:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
+}
+
+#no-cell-type-button-mtecs {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	transition-duration: 0.2s;
+}
+
+#no-cell-type-button-mtecs:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
+}
+
+#all-cell-type-button-etacs {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	margin-right: 10px;
+	transition-duration: 0.2s;
+}
+
+#all-cell-type-button-etacs:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
+}
+
+#no-cell-type-button-etacs {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	transition-duration: 0.2s;
+}
+
+#no-cell-type-button-etacs:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
 }
 
 #first-percentile-button {
@@ -170,6 +271,42 @@ button{
 	color: #3F6CB4;
 }
 
+#cell-type-legend-button-etacs {
+	font-size: 0.9em;
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 3px 8px;
+	transition-duration: 0.2s;
+}
+
+#cell-type-legend-button-etacs:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
+}
+
+#cell-type-legend-button-mtecs {
+	font-size: 0.9em;
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 3px 8px;
+	transition-duration: 0.2s;
+}
+
+#cell-type-legend-button-mtecs:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
+}
+
 #genotype-swap-button {
 	height: 45px;
 	background-color: white;
@@ -181,6 +318,11 @@ button{
 	border-bottom-left-radius: 5px;
 	padding: 5px 10px;
 	transition-duration: 0.2s;
+}
+
+#genotype-swap-button:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
 }
 
 #umap-graphic-gene-slider-mtecs {
@@ -204,6 +346,14 @@ button{
 	padding: 0px;
 }
 
+#description-headline {
+	cursor: default;
+}
+
+#description {
+	cursor: default;
+}
+
 
 .header {
 	display: flex;
@@ -211,6 +361,10 @@ button{
 	justify-content: space-between;
 	align-items: center;
 	flex-wrap: wrap;
+}
+
+.graph-titles {
+	cursor: default;
 }
 
 
@@ -265,6 +419,14 @@ button{
 	color: #3F6CB4;
 	font-family: Arial;
 	font-weight: bold;
+}
+
+.icon-button {
+	border-width: 0px;
+	height: 15px;
+	width: 15px;
+	border-radius: 7.5px;
+	cursor: default;
 }
 
 .tab-parent .tab-container {
