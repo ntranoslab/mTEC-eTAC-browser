@@ -35,7 +35,7 @@ entrypoints==0.4
 executing==1.1.0
 fastapi==0.88.0
 filelock==3.9.0
-Flask==2.2.2
+Flask==2.2.5
 Flask-Compress==1.13
 fonttools==4.37.4
 frozendict==2.3.4
