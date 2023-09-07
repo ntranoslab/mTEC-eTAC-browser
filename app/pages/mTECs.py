@@ -75,11 +75,11 @@ color_list = [
 sorted_cell_list = metadata[default_cell_type_annotation].unique().copy()
 sorted_cell_list.sort()
 
-sorted_cell_list_miller = metadata['Miller'].unique().copy()
-sorted_cell_list_miller = list(sorted_cell_list_miller)
-sorted_cell_list_miller.remove('Other dataset')
-sorted_cell_list_miller.sort()
-sorted_cell_list_miller.append('Other dataset')
+# sorted_cell_list_miller = metadata['Miller'].unique().copy()
+# sorted_cell_list_miller = list(sorted_cell_list_miller)
+# sorted_cell_list_miller.remove('Other dataset')
+# sorted_cell_list_miller.sort()
+# sorted_cell_list_miller.append('Other dataset')
 
 checklist_children = [{"label": html.Div([
     html.Button(disabled = True, style={'background-color': color_list[i], 'padding-left': 10}, className = 'icon-button'),
@@ -438,33 +438,19 @@ def update_graph(gene_value, genotype_value, expression_data_value, dataset_valu
 
         gene_data_filtered = pd.DataFrame()
 
-        #cell list if choose aggregated cell type annotations
-        if cell_type_annotations_value == default_cell_type_annotation:
-            cell_list = sorted_cell_list
-        #cell list if Miller cell type annotation and Miller dataset selected
-        elif dataset_value == 'Miller':
-            cell_list = sorted_cell_list_miller.copy()
-            cell_list.remove('Other dataset')
-        #cell list if Miller cell type annotation and Mathis dataset selected
-        elif dataset_value == 'Mathis':
-            cell_list = ["Other dataset"]
-        #cell list if Miller cell type annotation and All datasets are selected
-        else:
-            cell_list = sorted_cell_list_miller
-
         if (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
-            cell_type_checklist = cell_list
+            cell_type_checklist = sorted_cell_list
 
         if (input_id == 'no-cell-type-button-mtecs'):
             cell_type_checklist = []
 
         if input_id == 'all-cell-type-button-mtecs':
-            cell_type_checklist = cell_list
+            cell_type_checklist = sorted_cell_list
 
         cell_type_checklist_options = [{"label": html.Div([
-            html.Button(disabled = True, style={'background-color': color_list[i] if cell_list[i] != 'Other dataset' else 'gainsboro', 'padding-left': 10}, className = 'icon-button'),
-            html.Div(cell_list[i], style={'font-size': 12, 'padding-left': 5, 'color': 'black'}),
-        ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}), "value": cell_list[i]} for i in range(len(cell_list))]
+            html.Button(disabled = True, style={'background-color': color_list[i] if sorted_cell_list[i] != 'Other dataset' else 'gainsboro', 'padding-left': 10}, className = 'icon-button'),
+            html.Div(sorted_cell_list[i], style={'font-size': 12, 'padding-left': 5, 'color': 'black'}),
+        ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}), "value": sorted_cell_list[i]} for i in range(len(sorted_cell_list))]
 
         for i in cell_type_checklist:
             gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data[cell_type_annotations_value] == i]])
