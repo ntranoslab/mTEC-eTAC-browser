@@ -7,7 +7,7 @@ layout = html.Div([
     html.Div([
         html.Div([
             html.A(
-                html.Img(src='static/gardner-lab-logo-200w-transparent.png', id = 'lab-logo'),
+                html.Img(src='static/gardner-lab-logo-200w-transparent-new.png', id = 'lab-logo'),
                 href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
                 target = '_blank'
                 ),

@@ -44,7 +44,8 @@ for i in range(len(gene_list)):
 genotype_list = np.insert(metadata.genotype.unique(), 0, 'All')
 default_genotype_value = 'WT'
 
-cell_type_annotations_list = ["Aggregated", "Miller"]
+#cell_type_annotations_list = ["Aggregated", "Miller"]
+cell_type_annotations_value = "Aggregated"
 default_cell_type_annotation = 'Aggregated'
 
 dataset_list = np.insert(metadata.dataset.unique(), 0, 'All')
@@ -94,7 +95,7 @@ layout = html.Div([
     html.Div([
         html.Div([
             html.A(
-                html.Img(src='static/gardner-lab-logo-200w-transparent.png', id = 'lab-logo'),
+                html.Img(src='static/gardner-lab-logo-200w-transparent-new.png', id = 'lab-logo'),
                 href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
                 target = '_blank'
                 ),
@@ -134,7 +135,7 @@ layout = html.Div([
                 dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-mtecs'),
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='expression-data-headline'),
-                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-mtecs'),
+                dcc.Dropdown(['Log1p', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-mtecs'),
                 #slideer for dot size
                 html.H3('Dot size', id = 'dot-size-headline'),
                 html.Div([
@@ -215,10 +216,10 @@ layout = html.Div([
                     ], style = {'display': 'flex', 'justify-content': 'space-between'})
             ], style = {'marginLeft': '2%', 'width': '15%'}),
             #dropdown for celltype annotations
-            html.Div([
-                html.H3('Cell type annotations:', id='cell-type-annotations-headline', style = {'text-align': 'center'}),
-                dcc.Dropdown(cell_type_annotations_list, placeholder = 'Select a cell type...', id='cell-type-annotations-value'),
-            ], style = {'marginLeft': '15%', 'width': '20%'}),
+            # html.Div([
+            #     html.H3('Cell type annotations:', id='cell-type-annotations-headline', style = {'text-align': 'center'}),
+            #     dcc.Dropdown(cell_type_annotations_list, placeholder = 'Select a cell type...', id='cell-type-annotations-value'),
+            # ], style = {'marginLeft': '15%', 'width': '20%'}),
         ], style={'marginLeft': '2.5%','display': 'flex', 'justify-content': 'space-evenly', 'width': '62.5%'}),
         html.Div([], style={'marginBottom': '5%'}),
         html.Hr([], style = {'border-top': '2px', 'marginRight': '2.5%', 'marginLeft': '2.5%'}),
@@ -233,7 +234,7 @@ layout = html.Div([
                 dcc.Dropdown(gene_list, placeholder = 'Select a gene...', id='genotype-graph-gene-value'),
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='expression-data-headline'),
-                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-genotype'),
+                dcc.Dropdown(['Log1p', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-genotype'),
                 #slideer for dot size
                 html.H3('Dot size', id = 'dot-size-headline'),
                 html.Div([
@@ -330,7 +331,6 @@ layout = html.Div([
     Output('gene-value-mtecs', 'value'),
     Output('genotype-value-mtecs', 'value'),
     Output('genotype-value-mtecs', 'options'),
-    Output('cell-type-annotations-value', 'value'),
     Output('expression-data-value-mtecs', 'value'),
     Output('dataset-value', 'value'),
     Output('dot-size-slider-data-browser-mtecs', 'value'),
@@ -342,7 +342,6 @@ layout = html.Div([
     Output('cell-type-checklist-mtecs', 'value'),
     Input('gene-value-mtecs', 'value'),
     Input('genotype-value-mtecs', 'value'),
-    Input('cell-type-annotations-value', 'value'),
     Input('expression-data-value-mtecs', 'value'),
     Input('dataset-value', 'value'),
     Input('dot-size-slider-data-browser-mtecs', 'value'),
@@ -356,7 +355,7 @@ layout = html.Div([
     Input('cell-type-legend-button-mtecs', 'n_clicks')
     )
 
-def update_graph(gene_value, genotype_value, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, all_cell_type_button_click, no_cell_type_button_click, cell_type_checklist, cell_type_legend_button):
+def update_graph(gene_value, genotype_value, expression_data_value, dataset_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, all_cell_type_button_click, no_cell_type_button_click, cell_type_checklist, cell_type_legend_button):
 
     input_id = ctx.triggered_id
     global metadata
@@ -364,8 +363,6 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         #set initial gene value to be equal to default gene
         if gene_value is None:
             gene_value = default_gene
-        if cell_type_annotations_value is None:
-            cell_type_annotations_value = default_cell_type_annotation
 
         #check if gene value is in dataframe
         gene_value_in_df = gene_value in gene_list
@@ -455,7 +452,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         else:
             cell_list = sorted_cell_list_miller
 
-        if (input_id == 'cell-type-annotations-value') | (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
+        if (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
             cell_type_checklist = cell_list
 
         if (input_id == 'no-cell-type-button-mtecs'):
@@ -590,7 +587,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
 
 
 
-        return gene_fig, cell_type_fig, gene_value.capitalize(), genotype_value, genotype_list_subset, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value], cell_type_checklist_options, cell_type_checklist
+        return gene_fig, cell_type_fig, gene_value.capitalize(), genotype_value, genotype_list_subset, expression_data_value, dataset_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value], cell_type_checklist_options, cell_type_checklist
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -605,7 +602,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, None, None, None, None, 3, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]], checklist_children, cell_type_checklist
+    return fig, fig, None, None, None, None, None, 3, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]], checklist_children, cell_type_checklist
 
 
 ##=========================Callback=========================##
