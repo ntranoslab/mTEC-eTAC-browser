@@ -141,13 +141,13 @@ def sql_upload_csv(df, engine, table_name):
     with engine.connect() as connection:
         # Drop the table if it already exists
         sql_query = f"DROP TABLE IF EXISTS {str(table_name)}"
-        connection.execute(sql_query)
+        connection.execute(db.text(sql_query))
         # Create new table with columns/data types
         sql_query = f"CREATE TABLE {str(table_name)}({col_string})"
-        connection.execute(sql_query)
+        connection.execute(db.text(sql_query))
         # Load temp csv into table
         sql_query = f"LOAD DATA LOCAL INFILE 'tmp.csv' REPLACE INTO TABLE {str(table_name)} FIELDS TERMINATED BY ',' IGNORE 1 ROWS"
-        connection.execute(sql_query)
+        connection.execute(db.text(sql_query))
     # Cleanup tmp file
     os.remove("tmp.csv")
 
@@ -161,11 +161,11 @@ if database_exists(engine.url):
     with engine.connect() as connection:
         # Drop the database if it already exists
         sql_query = f"DROP DATABASE IF EXISTS {database}"
-        connection.execute(sql_query)
+        connection.execute(db.text(sql_query))
 create_database(engine.url)
 with engine.connect() as connection:
     sql_query = f"USE {database}"
-    connection.execute(sql_query)
+    connection.execute(db.text(sql_query))
 print()
 
 print("---------------------Upload---------------------")
