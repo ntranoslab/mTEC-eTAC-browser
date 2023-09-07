@@ -44,8 +44,8 @@ for i in range(len(gene_list)):
 genotype_list = np.insert(metadata.genotype.unique(), 0, 'All')
 default_genotype_value = 'WT'
 
-cell_type_annotations_list = ["Aggregated", "Miller"]
-default_cell_type_annotation = 'Aggregated'
+#cell_type_annotations_list = ["Aggregated", "Miller"]
+cell_type_annotations_value = "Aggregated"
 
 dataset_list = np.insert(metadata.dataset.unique(), 0, 'All')
 default_dataset_value = 'All'
@@ -71,14 +71,14 @@ color_list = [
     '#bc80bd','#ccebc5','#ffed6f','darkred','darkblue'
 ]
 
-sorted_cell_list = metadata[default_cell_type_annotation].unique().copy()
+sorted_cell_list = metadata[cell_type_annotations_value].unique().copy()
 sorted_cell_list.sort()
 
-sorted_cell_list_miller = metadata['Miller'].unique().copy()
-sorted_cell_list_miller = list(sorted_cell_list_miller)
-sorted_cell_list_miller.remove('Other dataset')
-sorted_cell_list_miller.sort()
-sorted_cell_list_miller.append('Other dataset')
+# sorted_cell_list_miller = metadata['Miller'].unique().copy()
+# sorted_cell_list_miller = list(sorted_cell_list_miller)
+# sorted_cell_list_miller.remove('Other dataset')
+# sorted_cell_list_miller.sort()
+# sorted_cell_list_miller.append('Other dataset')
 
 checklist_children = [{"label": html.Div([
     html.Button(disabled = True, style={'background-color': color_list[i], 'padding-left': 10}, className = 'icon-button'),
@@ -94,7 +94,7 @@ layout = html.Div([
     html.Div([
         html.Div([
             html.A(
-                html.Img(src='static/gardner-lab-logo-200w-transparent.png', id = 'lab-logo'),
+                html.Img(src='static/gardner-lab-logo-200w-transparent-new.png', id = 'lab-logo'),
                 href = 'https://diabetes.ucsf.edu/lab/gardner-lab',
                 target = '_blank'
                 ),
@@ -134,7 +134,7 @@ layout = html.Div([
                 dcc.Dropdown(genotype_list, placeholder = 'Select a genotype...', id='genotype-value-mtecs'),
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='expression-data-headline'),
-                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-mtecs'),
+                dcc.Dropdown(['Log1p', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-mtecs'),
                 #slideer for dot size
                 html.H3('Dot size', id = 'dot-size-headline'),
                 html.Div([
@@ -216,8 +216,8 @@ layout = html.Div([
             ], style = {'marginLeft': '2%', 'width': '15%'}),
             #dropdown for celltype annotations
             html.Div([
-                html.H3('Cell type annotations:', id='cell-type-annotations-headline', style = {'text-align': 'center'}),
-                dcc.Dropdown(cell_type_annotations_list, placeholder = 'Select a cell type...', id='cell-type-annotations-value'),
+            #     html.H3('Cell type annotations:', id='cell-type-annotations-headline', style = {'text-align': 'center'}),
+            #     dcc.Dropdown(cell_type_annotations_list, placeholder = 'Select a cell type...', id='cell-type-annotations-value'),
             ], style = {'marginLeft': '15%', 'width': '20%'}),
         ], style={'marginLeft': '2.5%','display': 'flex', 'justify-content': 'space-evenly', 'width': '62.5%'}),
         html.Div([], style={'marginBottom': '5%'}),
@@ -233,7 +233,7 @@ layout = html.Div([
                 dcc.Dropdown(gene_list, placeholder = 'Select a gene...', id='genotype-graph-gene-value'),
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='expression-data-headline'),
-                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-genotype'),
+                dcc.Dropdown(['Log1p', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-genotype'),
                 #slideer for dot size
                 html.H3('Dot size', id = 'dot-size-headline'),
                 html.Div([
@@ -330,7 +330,6 @@ layout = html.Div([
     Output('gene-value-mtecs', 'value'),
     Output('genotype-value-mtecs', 'value'),
     Output('genotype-value-mtecs', 'options'),
-    Output('cell-type-annotations-value', 'value'),
     Output('expression-data-value-mtecs', 'value'),
     Output('dataset-value', 'value'),
     Output('dot-size-slider-data-browser-mtecs', 'value'),
@@ -342,7 +341,6 @@ layout = html.Div([
     Output('cell-type-checklist-mtecs', 'value'),
     Input('gene-value-mtecs', 'value'),
     Input('genotype-value-mtecs', 'value'),
-    Input('cell-type-annotations-value', 'value'),
     Input('expression-data-value-mtecs', 'value'),
     Input('dataset-value', 'value'),
     Input('dot-size-slider-data-browser-mtecs', 'value'),
@@ -356,7 +354,7 @@ layout = html.Div([
     Input('cell-type-legend-button-mtecs', 'n_clicks')
     )
 
-def update_graph(gene_value, genotype_value, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, all_cell_type_button_click, no_cell_type_button_click, cell_type_checklist, cell_type_legend_button):
+def update_graph(gene_value, genotype_value, expression_data_value, dataset_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, all_cell_type_button_click, no_cell_type_button_click, cell_type_checklist, cell_type_legend_button):
 
     input_id = ctx.triggered_id
     global metadata
@@ -364,8 +362,6 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         #set initial gene value to be equal to default gene
         if gene_value is None:
             gene_value = default_gene
-        if cell_type_annotations_value is None:
-            cell_type_annotations_value = default_cell_type_annotation
 
         #check if gene value is in dataframe
         gene_value_in_df = gene_value in gene_list
@@ -435,39 +431,21 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
 
         gene_data = gene_data.sort_values(by=[cell_type_annotations_value], kind='mergesort', ascending=False)
 
-        if cell_type_annotations_value != default_cell_type_annotation:
-            gene_data_order_other_rows = gene_data[gene_data[cell_type_annotations_value] == 'Other dataset']
-            gene_data = pd.concat([gene_data_order_other_rows, gene_data[gene_data[cell_type_annotations_value] != 'Other dataset']])
-
         gene_data_filtered = pd.DataFrame()
 
-        #cell list if choose aggregated cell type annotations
-        if cell_type_annotations_value == default_cell_type_annotation:
-            cell_list = sorted_cell_list
-        #cell list if Miller cell type annotation and Miller dataset selected
-        elif dataset_value == 'Miller':
-            cell_list = sorted_cell_list_miller.copy()
-            cell_list.remove('Other dataset')
-        #cell list if Miller cell type annotation and Mathis dataset selected
-        elif dataset_value == 'Mathis':
-            cell_list = ["Other dataset"]
-        #cell list if Miller cell type annotation and All datasets are selected
-        else:
-            cell_list = sorted_cell_list_miller
-
-        if (input_id == 'cell-type-annotations-value') | (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
-            cell_type_checklist = cell_list
+        if (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
+            cell_type_checklist = sorted_cell_list
 
         if (input_id == 'no-cell-type-button-mtecs'):
             cell_type_checklist = []
 
         if input_id == 'all-cell-type-button-mtecs':
-            cell_type_checklist = cell_list
+            cell_type_checklist = sorted_cell_list
 
         cell_type_checklist_options = [{"label": html.Div([
-            html.Button(disabled = True, style={'background-color': color_list[i] if cell_list[i] != 'Other dataset' else 'gainsboro', 'padding-left': 10}, className = 'icon-button'),
-            html.Div(cell_list[i], style={'font-size': 12, 'padding-left': 5, 'color': 'black'}),
-        ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}), "value": cell_list[i]} for i in range(len(cell_list))]
+            html.Button(disabled = True, style={'background-color': color_list[i] if sorted_cell_list[i] != 'Other dataset' else 'gainsboro', 'padding-left': 10}, className = 'icon-button'),
+            html.Div(sorted_cell_list[i], style={'font-size': 12, 'padding-left': 5, 'color': 'black'}),
+        ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}), "value": sorted_cell_list[i]} for i in range(len(sorted_cell_list))]
 
         for i in cell_type_checklist:
             gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data[cell_type_annotations_value] == i]])
@@ -543,7 +521,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
                             y='y',
                             color = cell_type_annotations_value,
                             color_discrete_sequence = color_list_copy,
-                            color_discrete_map = {'Other dataset': 'gainsboro'} if (cell_type_annotations_value != default_cell_type_annotation) & ((dataset_value == 'All') | (dataset_value == 'Mathis')) else {},
+                            color_discrete_map = {},
                             hover_name = cell_type_annotations_value,
                             hover_data = {'x': False, 'y': False, cell_type_annotations_value: False},
                         )
@@ -590,7 +568,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
 
 
 
-        return gene_fig, cell_type_fig, gene_value.capitalize(), genotype_value, genotype_list_subset, cell_type_annotations_value, expression_data_value, dataset_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value], cell_type_checklist_options, cell_type_checklist
+        return gene_fig, cell_type_fig, gene_value.capitalize(), genotype_value, genotype_list_subset, expression_data_value, dataset_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value], cell_type_checklist_options, cell_type_checklist
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -605,7 +583,7 @@ def update_graph(gene_value, genotype_value, cell_type_annotations_value, expres
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, None, None, None, None, 3, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]], checklist_children, cell_type_checklist
+    return fig, fig, None, None, None, None, None, 3, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]], checklist_children, cell_type_checklist
 
 
 ##=========================Callback=========================##
@@ -713,8 +691,8 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
                      #y coordinates
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
-                     hover_name = default_cell_type_annotation,
-                     hover_data = {'x': False, 'y': False, default_cell_type_annotation: False},
+                     hover_name = cell_type_annotations_value,
+                     hover_data = {'x': False, 'y': False, cell_type_annotations_value: False},
                      range_color=
                      #min of color range
                      [lower_slider_value, 
@@ -759,8 +737,8 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
                      #y coordinates
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
-                     hover_name = default_cell_type_annotation,
-                     hover_data = {'x': False, 'y': False, default_cell_type_annotation: False},
+                     hover_name = cell_type_annotations_value,
+                     hover_data = {'x': False, 'y': False, cell_type_annotations_value: False},
                      range_color=
                      #min of color range
                      [lower_slider_value, 
