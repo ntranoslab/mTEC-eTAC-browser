@@ -46,7 +46,6 @@ default_genotype_value = 'WT'
 
 #cell_type_annotations_list = ["Aggregated", "Miller"]
 cell_type_annotations_value = "Aggregated"
-default_cell_type_annotation = 'Aggregated'
 
 dataset_list = np.insert(metadata.dataset.unique(), 0, 'All')
 default_dataset_value = 'All'
@@ -72,7 +71,7 @@ color_list = [
     '#bc80bd','#ccebc5','#ffed6f','darkred','darkblue'
 ]
 
-sorted_cell_list = metadata[default_cell_type_annotation].unique().copy()
+sorted_cell_list = metadata[cell_type_annotations_value].unique().copy()
 sorted_cell_list.sort()
 
 # sorted_cell_list_miller = metadata['Miller'].unique().copy()
@@ -432,10 +431,6 @@ def update_graph(gene_value, genotype_value, expression_data_value, dataset_valu
 
         gene_data = gene_data.sort_values(by=[cell_type_annotations_value], kind='mergesort', ascending=False)
 
-        if cell_type_annotations_value != default_cell_type_annotation:
-            gene_data_order_other_rows = gene_data[gene_data[cell_type_annotations_value] == 'Other dataset']
-            gene_data = pd.concat([gene_data_order_other_rows, gene_data[gene_data[cell_type_annotations_value] != 'Other dataset']])
-
         gene_data_filtered = pd.DataFrame()
 
         if (input_id == 'genotype-value-mtecs') | (input_id == 'dataset-value'):
@@ -526,7 +521,7 @@ def update_graph(gene_value, genotype_value, expression_data_value, dataset_valu
                             y='y',
                             color = cell_type_annotations_value,
                             color_discrete_sequence = color_list_copy,
-                            color_discrete_map = {'Other dataset': 'gainsboro'} if (cell_type_annotations_value != default_cell_type_annotation) & ((dataset_value == 'All') | (dataset_value == 'Mathis')) else {},
+                            color_discrete_map = {},
                             hover_name = cell_type_annotations_value,
                             hover_data = {'x': False, 'y': False, cell_type_annotations_value: False},
                         )
@@ -696,8 +691,8 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
                      #y coordinates
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
-                     hover_name = default_cell_type_annotation,
-                     hover_data = {'x': False, 'y': False, default_cell_type_annotation: False},
+                     hover_name = cell_type_annotations_value,
+                     hover_data = {'x': False, 'y': False, cell_type_annotations_value: False},
                      range_color=
                      #min of color range
                      [lower_slider_value, 
@@ -742,8 +737,8 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
                      #y coordinates
                      y='y',
                      color = gene_value if gene_value != None else default_gene,
-                     hover_name = default_cell_type_annotation,
-                     hover_data = {'x': False, 'y': False, default_cell_type_annotation: False},
+                     hover_name = cell_type_annotations_value,
+                     hover_data = {'x': False, 'y': False, cell_type_annotations_value: False},
                      range_color=
                      #min of color range
                      [lower_slider_value, 
