@@ -45,7 +45,7 @@ genotype_list = np.insert(metadata.genotype.unique(), 0, 'All')
 default_genotype_value = 'WT'
 
 #cell_type_annotations_list = ["Aggregated", "Miller"]
-cell_type_annotations_value = "Aggregated"
+cell_type_annotations_value = "celltype"
 
 dataset_list = np.insert(metadata.dataset.unique(), 0, 'All')
 default_dataset_value = 'All'
