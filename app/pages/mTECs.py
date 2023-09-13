@@ -390,11 +390,15 @@ def update_graph(gene_value, genotype_value, expression_data_value, dataset_valu
             metadata_subset = metadata
 
         #change genotype dropdown list depending on dataset input value
-        genotype_list_subset = np.insert(metadata_subset.genotype.unique(), 0, 'All')
+        genotype_list_subset = metadata_subset.genotype.unique()
+        if genotype_list_subset.size == 0:
+            raise ValueError("No genotypes found in this dataset...")
+        elif genotype_list_subset.size > 1:
+            genotype_list_subset = np.insert(genotype_list_subset, 0, 'All')
 
         #set default genotype value to WT
         if genotype_value is None or genotype_value not in genotype_list_subset:
-            genotype_value = default_genotype_value
+            genotype_value = default_genotype_value if default_genotype_value in genotype_list_subset else genotype_list_subset[0]
         #makes genotype value into list of selected genotypes
         if genotype_value != 'All':
             metadata_subset = metadata_subset[metadata_subset.genotype == genotype_value]

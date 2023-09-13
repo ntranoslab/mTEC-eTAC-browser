@@ -119,7 +119,7 @@ print(f"mySQL engine: mysql+pymysql://{user}:*****@{host}/{database}?local_infil
 print(f"Cell metadata: {metadata_cols}")
 
 #----------------------------------Methods---------------------------------#
-def sql_upload_csv(df, engine, table_name):
+def sql_upload_csv(df, engine, table_name, debug=False):
     # Create tmp.csv containing df to upload
     df.to_csv("tmp.csv", index_label="barcode")
     df = pd.read_csv("tmp.csv")
@@ -141,13 +141,14 @@ def sql_upload_csv(df, engine, table_name):
     with engine.connect() as connection:
         # Drop the table if it already exists
         sql_query = f"DROP TABLE IF EXISTS {str(table_name)}"
-        connection.execute(db.text(sql_query))
+        connection.execute(sql_query)
         # Create new table with columns/data types
         sql_query = f"CREATE TABLE {str(table_name)}({col_string})"
-        connection.execute(db.text(sql_query))
+        connection.execute(sql_query)
         # Load temp csv into table
+        line = r'\n'
         sql_query = f"LOAD DATA LOCAL INFILE 'tmp.csv' REPLACE INTO TABLE {str(table_name)} FIELDS TERMINATED BY ',' IGNORE 1 ROWS"
-        connection.execute(db.text(sql_query))
+        connection.execute(sql_query)
     # Cleanup tmp file
     os.remove("tmp.csv")
 
@@ -165,7 +166,7 @@ if database_exists(engine.url):
 create_database(engine.url)
 with engine.connect() as connection:
     sql_query = f"USE {database}"
-    connection.execute(db.text(sql_query))
+    connection.execute(sql_query)
 print()
 
 print("---------------------Upload---------------------")
@@ -184,7 +185,6 @@ data = data[data.columns[~data.columns.str.match('^\d')]]
 data = data[data.columns[~data.columns.str.startswith("Gm")]]
 # Convert all column names to lowercase for easier matching
 data.columns = data.columns.str.lower()
-
 ##### Upload tables to mySQL database
 # Get all gene starting characters
 gene_sets = set([i[0] for i in data.columns])
