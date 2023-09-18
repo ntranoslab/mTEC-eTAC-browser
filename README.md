@@ -37,6 +37,6 @@ The percentiles are based off of the 1st and 99th percentile of the selected gen
 
 ---
 ## Implementation
-The web application is running online using an AWS EC2 instance with its dataset in a MySQL RDS, a relational database aws service.
+Coming soon: the web application will run online using an AWS EC2 instance with its dataset in a MySQL RDS, a relational database aws service.
 
 ***Hope you enjoy!***
