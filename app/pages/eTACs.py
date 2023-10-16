@@ -45,6 +45,13 @@ gene_list = list(gene_list)
 for i in range(len(gene_list)):
     gene_list[i] = gene_list[i].capitalize()
 
+#dataset_list = np.insert(metadata.dataset.unique(), 0, 'All')
+dataset_list = ['All', 'Gardner']
+default_dataset_value = 'All'
+
+subset_dataset_list = ['All', 'RORgt+ APCs']
+default_subset_dataset_value = 'All'
+
 color_list = ['#1f77b4',
  '#aec7e8',
  '#ff7f0e',
@@ -131,10 +138,16 @@ layout = html.Div([
                 #input for gene
                 html.H3('Gene:', id='gene-headline'),
                 dcc.Dropdown(gene_list, placeholder = 'Select a gene...', id='gene-value-etacs'),
+                #dropdown for dataset
+                html.H3('Dataset:', id='dataset-headline'),
+                dcc.Dropdown(dataset_list, placeholder = 'Select a dataset...', value='All', id='dataset-value-etacs'),
+                #dropdown for subsetting data for JCs
+                html.H3('Subset data:', id='subset-data-headline'),
+                dcc.Dropdown(subset_dataset_list, placeholder = 'Select a celltype...', value = 'All', id='subset-data-value-etacs'),
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='expression-data-headline'),
                 dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-etacs'),
-                #slideer for dot size
+                #slider for dot size
                 html.H3('Dot size', id = 'dot-size-headline'),
                 html.Div([
                     dcc.Slider(min=3, max=10, step=1, marks=None, included=False, vertical=False, tooltip={'placement': 'top', 'always_visible': True}, id='dot-size-slider-data-browser-etacs'),
@@ -249,6 +262,8 @@ layout = html.Div([
     Output('umap-graphic-cell-types-etacs', 'figure'),
     Output('gene-value-etacs', 'value'),
     Output('expression-data-value-etacs', 'value'),
+    Output('dataset-value-etacs', 'value'),
+    Output('subset-data-value-etacs', 'value'),
     Output('dot-size-slider-data-browser-etacs', 'value'),
     Output('umap-graphic-gene-slider-etacs', 'min'),
     Output('umap-graphic-gene-slider-etacs', 'max'),
@@ -257,6 +272,8 @@ layout = html.Div([
     Output('cell-type-checklist-etacs', 'value'),
     Input('gene-value-etacs', 'value'),
     Input('expression-data-value-etacs', 'value'),
+    Input('dataset-value-etacs', 'value'),
+    Input('subset-data-value-etacs', 'value'),
     Input('dot-size-slider-data-browser-etacs', 'value'),
     Input('umap-graphic-gene-slider-etacs', 'value'),
     Input('color-scale-dropdown', 'value'),
@@ -269,7 +286,7 @@ layout = html.Div([
     Input('cell-type-legend-button-etacs', 'n_clicks')
     )
 
-def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, cell_type_fig_restyle_data, all_cell_type_button_click, no_cell_type_button_click, cell_type_checklist, cell_type_legend_button):
+def update_graph(gene_value, expression_data_value, dataset_value, subset_data_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, cell_type_fig_restyle_data, all_cell_type_button_click, no_cell_type_button_click, cell_type_checklist, cell_type_legend_button):
 
     input_id = ctx.triggered_id
     global metadata
@@ -294,6 +311,34 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
             expression_data_value = default_expression_data_value
         #extract gene column from table
         gene_data = pd.read_sql(table, con=engine if expression_data_value == 'Normalized' else engine_counts, columns = [gene_value, 'barcode'])
+
+        #set default genotype value to WT
+        if dataset_value is None:
+            dataset_value = default_dataset_value
+
+        if subset_data_value is None:
+            subset_data_value = default_subset_dataset_value
+        # #makes dataset value into list of selected datasets
+        # if dataset_value != 'All':
+        #     metadata_subset = metadata[metadata.dataset == dataset_value]
+        # else:
+        #     metadata_subset = metadata
+
+        # #change genotype dropdown list depending on dataset input value
+        # genotype_list_subset = metadata_subset.genotype.unique()
+        # if genotype_list_subset.size == 0:
+        #     raise ValueError("No genotypes found in this dataset...")
+        # elif genotype_list_subset.size > 1:
+        #     genotype_list_subset = np.insert(genotype_list_subset, 0, 'All')
+
+        # #set default genotype value to WT
+        # if genotype_value is None or genotype_value not in genotype_list_subset:
+        #     genotype_value = default_genotype_value if default_genotype_value in genotype_list_subset else genotype_list_subset[0]
+        # #makes genotype value into list of selected genotypes
+        # if genotype_value != 'All':
+        #     metadata_subset = metadata_subset[metadata_subset.genotype == genotype_value]
+        # else:
+        #     metadata_subset = metadata_subset
 
         #subset expression data on selected cells [gene_value, meta_cols]
         gene_data = pd.merge(gene_data, metadata, on='barcode', how='inner')
@@ -447,7 +492,7 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
 
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
 
-        return gene_fig, cell_type_fig, gene_value.capitalize(), expression_data_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value], cell_type_checklist
+        return gene_fig, cell_type_fig, gene_value.capitalize(), expression_data_value, dataset_value, subset_data_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value], cell_type_checklist
         #gene_slider
     fig = px.scatter(x=[0],
                  y=[0],
@@ -462,5 +507,5 @@ def update_graph(gene_value, expression_data_value, dot_size_slider_value, umap_
         )
     default_percentiles = np.quantile([0, 100], [0.99, 0.01])
     default_slider_marks = {int(default_percentiles[0]): '99th', int(default_percentiles[1]): '1st'}
-    return fig, fig, None, None, None, 3, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]], cell_type_checklist
+    return fig, fig, None, None, None, None, None, 3, 0, 100, [], [], html.H3(''), default_slider_marks, [default_percentiles[1], default_percentiles[0]], cell_type_checklist
 

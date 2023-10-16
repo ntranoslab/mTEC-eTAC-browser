@@ -94,6 +94,11 @@ button{
 	cursor: default;
 }
 
+#subset-data-headline {
+	color: #4C5C75;
+	cursor: default;
+}
+
 #expression-data-headline {
 	color: #4C5C75;
 	cursor: default;
