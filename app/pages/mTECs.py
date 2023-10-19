@@ -47,8 +47,13 @@ default_genotype_value = 'WT'
 #cell_type_annotations_list = ["Aggregated", "Miller"]
 cell_type_annotations_value = "celltype"
 
-dataset_list = np.insert(metadata.dataset.unique(), 0, 'All')
-default_dataset_value = 'All'
+#dataset_list = metadata.dataset.unique()
+if hasattr(metadata, 'dataset'):
+    dataset_list = np.insert(metadata.dataset.unique(), 0, 'All') if metadata.dataset.unique().size >= 1 else metadata.dataset.unique()
+else:
+    dataset_list = ['All']
+
+default_dataset_value = dataset_list[0]
 
 default_expression_data_value = 'Normalized'
 
@@ -112,6 +117,10 @@ layout = html.Div([
                     html.A(
                     html.Button('eTACs', className='page-buttons'),
                     href='/etacs'
+                    ),
+                    html.A(
+                    html.Button('JCs', className='page-buttons'),
+                    href='/jcs'
                     ),
                 ], id = 'tabs'),
     ], className = 'header'),
@@ -383,8 +392,9 @@ def update_graph(gene_value, genotype_value, expression_data_value, dataset_valu
         #set default genotype value to WT
         if dataset_value is None:
             dataset_value = default_dataset_value
+
         #makes dataset value into list of selected datasets
-        if dataset_value != 'All':
+        if (dataset_value != 'All') & (len(dataset_list) > 1):
             metadata_subset = metadata[metadata.dataset == dataset_value]
         else:
             metadata_subset = metadata

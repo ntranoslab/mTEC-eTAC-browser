@@ -53,6 +53,7 @@ else:
 
 default_dataset_value = dataset_list[0]
 
+
 color_list = ['#1f77b4',
  '#aec7e8',
  '#ff7f0e',
@@ -110,7 +111,7 @@ layout = html.Div([
                 target = '_blank'
                 ),
             ], id = 'lab-logo-link'),
-            html.H3('Lymph Nodes', id = 'headline'),
+            html.H3('Janus Cells', id = 'headline'),
             html.Div([
                     html.A(
                     html.Button('Home', className='page-buttons'),
@@ -121,11 +122,11 @@ layout = html.Div([
                     href='/mtecs'
                     ),
                     html.A(
-                    html.Button('eTACs', className='selected-button'),
+                    html.Button('eTACs', className='page-buttons'),
                     href='/etacs'
                     ),
                     html.A(
-                    html.Button('JCs', className='page-buttons'),
+                    html.Button('JCs', className='selected-button'),
                     href='/jcs'
                     ),
                 ], id = 'tabs'),
@@ -142,17 +143,17 @@ layout = html.Div([
             html.Div([
                 #input for gene
                 html.H3('Gene:', id='gene-headline'),
-                dcc.Dropdown(gene_list, placeholder = 'Select a gene...', id='gene-value-etacs'),
+                dcc.Dropdown(gene_list, placeholder = 'Select a gene...', id='gene-value-jcs'),
                 #dropdown for dataset
                 html.H3('Dataset:', id='dataset-headline'),
-                dcc.Dropdown(dataset_list, placeholder = 'Select a dataset...', value='All', id='dataset-value-etacs'),
+                dcc.Dropdown(dataset_list, placeholder = 'Select a dataset...', value='All', id='dataset-value-jcs'),
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='expression-data-headline'),
-                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-etacs'),
+                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-jcs'),
                 #slider for dot size
                 html.H3('Dot size', id = 'dot-size-headline'),
                 html.Div([
-                    dcc.Slider(min=3, max=10, step=1, marks=None, included=False, vertical=False, tooltip={'placement': 'top', 'always_visible': True}, id='dot-size-slider-data-browser-etacs'),
+                    dcc.Slider(min=3, max=10, step=1, marks=None, included=False, vertical=False, tooltip={'placement': 'top', 'always_visible': True}, id='dot-size-slider-data-browser-jcs'),
                     ], style = {'marginLeft': '-12%','width': '122%'}),
             ], style={'width': '11%', 'display': 'inline-block', 'float': 'right', 'marginRight': '3.5%'}),
             dcc.Loading([
@@ -188,7 +189,7 @@ layout = html.Div([
                                          ],
                                     'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
                                 },
-                                id='umap-graphic-gene-etacs')
+                                id='umap-graphic-gene-jcs')
                         ], style={'width': '42%', 'marginRight': '1.5%'}),
                         html.Div([
                             dcc.Graph(figure = px.scatter(x = [0], y=[0], color_discrete_sequence=['white']).update_layout(
@@ -207,15 +208,15 @@ layout = html.Div([
                                     'displaylogo': False,
                                     'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
                                 },
-                                id='umap-graphic-cell-types-etacs')
+                                id='umap-graphic-cell-types-jcs')
                         ], style={'width': '35%', 'marginLeft': '1.5%'}),
                         html.Div([
                             html.Div([
-                                html.Button('All', id = 'all-cell-type-button-etacs'),
-                                html.Button('Deselect', id = 'no-cell-type-button-etacs')
+                                html.Button('All', id = 'all-cell-type-button-jcs'),
+                                html.Button('Deselect', id = 'no-cell-type-button-jcs')
                             ], style = {'marginBottom': '2%', 'display': 'flex', 'justify-content': 'center'}),
-                            dcc.Checklist(checklist_children, sorted_cell_list[0:len(sorted_cell_list)], labelStyle = {'display': 'flex'}, id='cell-type-checklist-etacs'),
-                            html.Button('Legend', id = 'cell-type-legend-button-etacs', style = {'marginTop': '1%'}),
+                            dcc.Checklist(checklist_children, sorted_cell_list[0:len(sorted_cell_list)], labelStyle = {'display': 'flex'}, id='cell-type-checklist-jcs'),
+                            html.Button('Legend', id = 'cell-type-legend-button-jcs', style = {'marginTop': '1%'}),
                         ], style = {'marginTop': '1%', 'marginRight': '2%'}),
                     ], style = {'display': 'flex', 'justify-content': 'center'}),
                 ], color='#3F6CB4', type='cube', style={'marginRight': '10%'}),
@@ -234,7 +235,7 @@ layout = html.Div([
             html.Div([
                 html.H4('Scale', id = 'slider-headline'),
                 html.Div([
-                    dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-etacs'),
+                    dcc.RangeSlider(min=0, max=100, allowCross = False, vertical = False, tooltip={'placement': 'top', 'always_visible': True}, id='umap-graphic-gene-slider-jcs'),
                 ], style = {'marginLeft': '5px'}),
             ], style = {'width': '27.5%'}),
             html.Div([
@@ -260,30 +261,30 @@ layout = html.Div([
 ##=========================Callback=========================##
 
 @callback(
-    Output('umap-graphic-gene-etacs', 'figure'),
-    Output('umap-graphic-cell-types-etacs', 'figure'),
-    Output('gene-value-etacs', 'value'),
-    Output('expression-data-value-etacs', 'value'),
-    Output('dataset-value-etacs', 'value'),
-    Output('dot-size-slider-data-browser-etacs', 'value'),
-    Output('umap-graphic-gene-slider-etacs', 'min'),
-    Output('umap-graphic-gene-slider-etacs', 'max'),
-    Output('umap-graphic-gene-slider-etacs', 'marks'),
-    Output('umap-graphic-gene-slider-etacs', 'value'),
-    Output('cell-type-checklist-etacs', 'value'),
-    Input('gene-value-etacs', 'value'),
-    Input('expression-data-value-etacs', 'value'),
-    Input('dataset-value-etacs', 'value'),
-    Input('dot-size-slider-data-browser-etacs', 'value'),
-    Input('umap-graphic-gene-slider-etacs', 'value'),
+    Output('umap-graphic-gene-jcs', 'figure'),
+    Output('umap-graphic-cell-types-jcs', 'figure'),
+    Output('gene-value-jcs', 'value'),
+    Output('expression-data-value-jcs', 'value'),
+    Output('dataset-value-jcs', 'value'),
+    Output('dot-size-slider-data-browser-jcs', 'value'),
+    Output('umap-graphic-gene-slider-jcs', 'min'),
+    Output('umap-graphic-gene-slider-jcs', 'max'),
+    Output('umap-graphic-gene-slider-jcs', 'marks'),
+    Output('umap-graphic-gene-slider-jcs', 'value'),
+    Output('cell-type-checklist-jcs', 'value'),
+    Input('gene-value-jcs', 'value'),
+    Input('expression-data-value-jcs', 'value'),
+    Input('dataset-value-jcs', 'value'),
+    Input('dot-size-slider-data-browser-jcs', 'value'),
+    Input('umap-graphic-gene-slider-jcs', 'value'),
     Input('color-scale-dropdown', 'value'),
     Input('first-percentile-button', 'n_clicks'),
     Input('ninty-ninth-percentile-button', 'n_clicks'),
-    Input('umap-graphic-cell-types-etacs', 'restyleData'),
-    Input('all-cell-type-button-etacs', 'n_clicks'),
-    Input('no-cell-type-button-etacs', 'n_clicks'),
-    Input('cell-type-checklist-etacs', 'value'),
-    Input('cell-type-legend-button-etacs', 'n_clicks')
+    Input('umap-graphic-cell-types-jcs', 'restyleData'),
+    Input('all-cell-type-button-jcs', 'n_clicks'),
+    Input('no-cell-type-button-jcs', 'n_clicks'),
+    Input('cell-type-checklist-jcs', 'value'),
+    Input('cell-type-legend-button-jcs', 'n_clicks')
     )
 
 def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, cell_type_fig_restyle_data, all_cell_type_button_click, no_cell_type_button_click, cell_type_checklist, cell_type_legend_button):
@@ -345,7 +346,7 @@ def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slid
         percentile_values = np.quantile(gene_data[gene_value], [0.99, 0.01])
         df_gene_min = min(gene_data[gene_value])
         df_gene_max = max(gene_data[gene_value])
-        if input_id == 'umap-graphic-gene-slider-etacs':
+        if input_id == 'umap-graphic-gene-slider-jcs':
             lower_slider_value = min(umap_graphic_gene_slider)
             higher_slider_value = max(umap_graphic_gene_slider)
         elif input_id == 'first-percentile-button':
@@ -354,7 +355,7 @@ def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slid
         elif input_id == 'ninty-ninth-percentile-button':
             lower_slider_value = min(umap_graphic_gene_slider)
             higher_slider_value = percentile_values[0]
-        elif (input_id == 'umap-graphic-cell-types-etacs') | (input_id == 'dot-size-slider-data-browser-etacs') | (input_id == 'cell-type-checklist-etacs') | (input_id == 'all-cell-type-button-etacs') | (input_id == 'no-cell-type-button-etacs'):
+        elif (input_id == 'umap-graphic-cell-types-jcs') | (input_id == 'dot-size-slider-data-browser-jcs') | (input_id == 'cell-type-checklist-jcs') | (input_id == 'all-cell-type-button-jcs') | (input_id == 'no-cell-type-button-jcs'):
             lower_slider_value = min(umap_graphic_gene_slider) if umap_graphic_gene_slider != None else percentile_values[1]
             higher_slider_value = max(umap_graphic_gene_slider) if umap_graphic_gene_slider != None else percentile_values[0]
         else:
@@ -368,10 +369,10 @@ def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slid
 
         gene_data_filtered = pd.DataFrame()
 
-        if (input_id == 'no-cell-type-button-etacs'):
+        if (input_id == 'no-cell-type-button-jcs'):
             cell_type_checklist = []
 
-        if input_id == 'all-cell-type-button-etacs':
+        if input_id == 'all-cell-type-button-jcs':
             cell_type_checklist = sorted_cell_list
 
         for i in cell_type_checklist:

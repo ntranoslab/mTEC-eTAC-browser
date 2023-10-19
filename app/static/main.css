@@ -46,7 +46,7 @@ button{
 }
 
 #tabs {
-	width: 15%;
+	width: 20%;
 }
 
 #mtec-home-button {
@@ -202,6 +202,41 @@ button{
 	color: #3F6CB4;
 }
 
+#all-cell-type-button-jcs {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	margin-right: 10px;
+	transition-duration: 0.2s;
+}
+
+#all-cell-type-button-jcs:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
+}
+
+#no-cell-type-button-jcs {
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 5px 10px;
+	transition-duration: 0.2s;
+}
+
+#no-cell-type-button-jcs:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
+}
+
 #first-percentile-button {
 	background-color: white;
 	border-color: lightgray;
@@ -276,6 +311,24 @@ button{
 	color: #3F6CB4;
 }
 
+#cell-type-legend-button-mtecs {
+	font-size: 0.9em;
+	background-color: white;
+	border-color: lightgray;
+	border-width: 1px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius: 5px;
+	padding: 3px 8px;
+	transition-duration: 0.2s;
+}
+
+#cell-type-legend-button-mtecs:hover {
+	background-color: lightgray;
+	color: #3F6CB4;
+}
+
 #cell-type-legend-button-etacs {
 	font-size: 0.9em;
 	background-color: white;
@@ -294,7 +347,7 @@ button{
 	color: #3F6CB4;
 }
 
-#cell-type-legend-button-mtecs {
+#cell-type-legend-button-jcs {
 	font-size: 0.9em;
 	background-color: white;
 	border-color: lightgray;
@@ -307,7 +360,7 @@ button{
 	transition-duration: 0.2s;
 }
 
-#cell-type-legend-button-mtecs:hover {
+#cell-type-legend-button-jcs:hover {
 	background-color: lightgray;
 	color: #3F6CB4;
 }
