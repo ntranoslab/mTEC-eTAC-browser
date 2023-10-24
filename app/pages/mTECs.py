@@ -681,10 +681,10 @@ def update_graph(genotype_value_left, genotype_value_right, gene_value, expressi
         if input_id == 'genotype-graph-gene-slider':
             lower_slider_value = min(genotype_graph_gene_slider)
             higher_slider_value = max(genotype_graph_gene_slider)
-        elif input_id == 'first-percentile-button':
+        elif input_id == 'first-percentile-button-genotype':
             lower_slider_value = percentile_values[1]
             higher_slider_value = max(genotype_graph_gene_slider)
-        elif input_id == 'ninty-ninth-percentile-button':
+        elif input_id == 'ninty-ninth-percentile-button-genotype':
             lower_slider_value = min(genotype_graph_gene_slider)
             higher_slider_value = percentile_values[0]
         elif input_id == 'dot-size-slider-genotype':
