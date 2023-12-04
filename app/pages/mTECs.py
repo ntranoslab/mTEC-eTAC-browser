@@ -18,7 +18,7 @@ dash.register_page(__name__)
 ##=========================Global variables=========================##
 database = 'thymus'
 if ('LOCALDEV' in os.environ) | ('LOCALDEPLOY' in os.environ):
-    host = 'gardner-lab-computer'
+    host = 'gardner-lab'
     user = 'nolan'
     passwd = os.getenv('MYSQLPASSWORD')
 else:
