@@ -26,10 +26,10 @@ layout = html.Div([
                     html.Button('eTACs', className='page-buttons'),
                     href='/etacs'
                     ),
-                    html.A(
-                    html.Button('JCs', className='page-buttons'),
-                    href='/jcs'
-                    ),
+                    # html.A(
+                    # html.Button('JCs', className='page-buttons'),
+                    # href='/jcs'
+                    # ),
                 ], id = 'tabs'),
     ], className = 'header'),
 

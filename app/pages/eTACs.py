@@ -124,10 +124,10 @@ layout = html.Div([
                     html.Button('eTACs', className='selected-button'),
                     href='/etacs'
                     ),
-                    html.A(
-                    html.Button('JCs', className='page-buttons'),
-                    href='/jcs'
-                    ),
+                    # html.A(
+                    # html.Button('JCs', className='page-buttons'),
+                    # href='/jcs'
+                    # ),
                 ], id = 'tabs'),
     ], className = 'header'),
 
