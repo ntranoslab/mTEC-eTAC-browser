@@ -1,0 +1,17 @@
+greenlet==3.0.2
+numexpr @ file:///home/conda/feedstock_root/build_artifacts/numexpr_1697637017869/work
+numpy @ file:///home/conda/feedstock_root/build_artifacts/numpy_1700874463738/work/dist/numpy-1.26.2-cp312-cp312-linux_x86_64.whl#sha256=623edd991be8f808d1f8e311b00923eff511e493e579c21bed09d101c09032d0
+packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1696202382185/work
+pandas==2.1.4
+py-cpuinfo @ file:///home/conda/feedstock_root/build_artifacts/py-cpuinfo_1666774466606/work
+PyMySQL==1.1.0
+python-dateutil==2.8.2
+pytz==2023.3.post1
+setuptools==68.2.2
+six==1.16.0
+SQLAlchemy==1.4.50
+SQLAlchemy-Utils==0.41.1
+tables @ file:///home/conda/feedstock_root/build_artifacts/pytables_1701702192927/work
+typing_extensions==4.9.0
+tzdata==2023.3
+wheel==0.42.0
