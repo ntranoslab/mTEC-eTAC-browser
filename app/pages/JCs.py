@@ -82,7 +82,7 @@ color_list = ['#1f77b4',
  'darkred',
  'darkblue']
 
-sorted_cell_list = metadata.cell_type.unique().copy()
+sorted_cell_list = metadata.celltype.unique().copy()
 sorted_cell_list.sort()
 
 checklist_children = [{"label": html.Div([
@@ -90,8 +90,8 @@ checklist_children = [{"label": html.Div([
     html.Div(sorted_cell_list[i], style={'font-size': 12, 'padding-left': 5, 'color': 'black'}),
     ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}), "value": sorted_cell_list[i]} for i in range(len(sorted_cell_list))]
 
-if len(color_list) >= len(metadata.cell_type.unique()):
-    color_list = color_list[0:len(metadata.cell_type.unique())]
+if len(color_list) >= len(metadata.celltype.unique()):
+    color_list = color_list[0:len(metadata.celltype.unique())]
     color_list.reverse()
 else:
     color_list.reverse()
@@ -365,7 +365,7 @@ def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slid
         dot_size_slider_value = dot_size_slider_value if dot_size_slider_value != None else 3
 
 
-        gene_data = gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False)
+        gene_data = gene_data.sort_values(by=['celltype'], kind='mergesort', ascending=False)
 
         gene_data_filtered = pd.DataFrame()
 
@@ -376,7 +376,7 @@ def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slid
             cell_type_checklist = sorted_cell_list
 
         for i in cell_type_checklist:
-                gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data['cell_type'] == i]])
+                gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data['celltype'] == i]])
         
         #graphs
         #sort dff based on cells highest expressing to lowest expressing gene - makes the gene scatter plot graph highest expressing cells on top of lower expressing cells
@@ -401,8 +401,8 @@ def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slid
                          #y coordinates
                          y='y',
                          color = gene_value if gene_value != None else default_gene,
-                         hover_name = 'cell_type',
-                         hover_data = {'x': False, 'y': False, 'cell_type': False},
+                         hover_name = 'celltype',
+                         hover_data = {'x': False, 'y': False, 'celltype': False},
                          range_color=
                          #min of color range
                          [lower_slider_value, 
@@ -445,11 +445,11 @@ def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slid
                             x='x',
                             #x coordinates
                             y='y',
-                            color = 'cell_type',
+                            color = 'celltype',
                             color_discrete_sequence = color_list,
                             #color_discrete_map = {'Other': 'lightgray'}, 
-                            hover_name = 'cell_type',
-                            hover_data = {'x': False, 'y': False, 'cell_type': False}
+                            hover_name = 'celltype',
+                            hover_data = {'x': False, 'y': False, 'celltype': False}
                         )
             cell_type_fig.update_traces(
                 marker=dict(
