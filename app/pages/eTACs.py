@@ -40,7 +40,6 @@ with open(f"static/{database}_gene_table_lookup.csv") as f:
     next(f)  # Skip the header
     reader_etacs = csv.reader(f, skipinitialspace=True)
     gene_lookup_etacs = dict(reader_etacs)
-    print(f)
 gene_list_etacs = gene_lookup_etacs.keys()
 gene_list_etacs = list(gene_list_etacs)
 for i in range(len(gene_list_etacs)):
