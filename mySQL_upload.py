@@ -177,10 +177,12 @@ data = pd.read_hdf(data_file)
 data.index = [i for i in range(0, data.shape[0])]
 # Get metadata to seperate df
 metadata_df = data[metadata_cols]
+# write metadata df to database
+sql_upload_csv(metadata_df, engine, "cellmetadata")
+# Subset on genes that start with a number
+data = data.filter(regex='^[^0-9]', axis=1)
 # Subset on gene columns
 data = data[data.columns[~data.columns.isin(metadata_df.columns)]]
-# Remove gene columns that start with integer
-data = data[data.columns[~data.columns.str.match('^\d')]]
 # Remove gene columns that start with Gm
 data = data[data.columns[~data.columns.str.startswith("Gm")]]
 # Convert all column names to lowercase for easier matching
@@ -222,8 +224,6 @@ for letter in gene_sets:
         gene_table_dict.update(gene_mapping)
         # Upload the df to the database
         sql_upload_csv(gene_df, engine, letter)
-# write metadata df to database
-sql_upload_csv(metadata_df, engine, "cellmetadata")
 
 ##### Cleanup
 print()
