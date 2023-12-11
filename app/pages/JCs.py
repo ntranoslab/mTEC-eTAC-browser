@@ -35,19 +35,19 @@ default_gene='aire'
 
 default_expression_data_value = 'Normalized'
 
-metadata = pd.read_sql('cellmetadata', con=engine)
+metadata_jc = pd.read_sql('cellmetadata', con=engine)
 with open(f"static/{database}_gene_table_lookup.csv") as f:
     next(f)  # Skip the header
     reader = csv.reader(f, skipinitialspace=True)
-    gene_lookup = dict(reader)
-gene_list = gene_lookup.keys()
-gene_list = list(gene_list)
-for i in range(len(gene_list)):
-    gene_list[i] = gene_list[i].capitalize()
+    gene_lookup_jc = dict(reader)
+gene_list_jc = gene_lookup_jc.keys()
+gene_list_jc = list(gene_list_jc)
+for i in range(len(gene_list_jc)):
+    gene_list_jc[i] = gene_list_jc[i].capitalize()
 
-#dataset_list = metadata.dataset.unique()
-if hasattr(metadata, 'dataset'):
-    dataset_list = np.insert(metadata.dataset.unique(), 0, 'All') if metadata.dataset.unique().size >= 1 else metadata.dataset.unique()
+#dataset_list = metadata_jc.dataset.unique()
+if hasattr(metadata_jc, 'dataset'):
+    dataset_list = np.insert(metadata_jc.dataset.unique(), 0, 'All') if metadata_jc.dataset.unique().size >= 1 else metadata_jc.dataset.unique()
 else:
     dataset_list = ['All']
 
@@ -84,7 +84,7 @@ color_list = ['#1f77b4',
  'indigo',
  'peru']
 
-sorted_cell_list = metadata.celltype.unique().copy()
+sorted_cell_list = metadata_jc.celltype.unique().copy()
 sorted_cell_list.sort()
 
 checklist_children = [{"label": html.Div([
@@ -92,8 +92,8 @@ checklist_children = [{"label": html.Div([
     html.Div(sorted_cell_list[i], style={'font-size': 12, 'padding-left': 5, 'color': 'black'}),
     ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}), "value": sorted_cell_list[i]} for i in range(len(sorted_cell_list))]
 
-if len(color_list) >= len(metadata.celltype.unique()):
-    color_list = color_list[0:len(metadata.celltype.unique())]
+if len(color_list) >= len(metadata_jc.celltype.unique()):
+    color_list = color_list[0:len(metadata_jc.celltype.unique())]
     color_list.reverse()
 else:
     color_list.reverse()
@@ -145,7 +145,7 @@ layout = html.Div([
             html.Div([
                 #input for gene
                 html.H3('Gene:', id='gene-headline'),
-                dcc.Dropdown(gene_list, placeholder = 'Select a gene...', id='gene-value-jcs'),
+                dcc.Dropdown(gene_list_jc, placeholder = 'Select a gene...', id='gene-value-jcs'),
                 #dropdown for dataset
                 html.H3('Dataset:', id='dataset-headline'),
                 dcc.Dropdown(dataset_list, placeholder = 'Select a dataset...', value='All', id='dataset-value-jcs'),
@@ -292,14 +292,14 @@ layout = html.Div([
 def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slider_value, umap_graphic_gene_slider, color_scale_dropdown_value, first_per_button_click, ninty_ninth_per_button_click, cell_type_fig_restyle_data, all_cell_type_button_click, no_cell_type_button_click, cell_type_checklist, cell_type_legend_button):
 
     input_id = ctx.triggered_id
-    global metadata
-    if metadata is not None:
+    global metadata_jc
+    if metadata_jc is not None:
         #set initial gene value to be equal to default gene
         if gene_value is None:
             gene_value = default_gene
 
         #check if gene value is in dataframe
-        gene_value_in_df = gene_value in gene_list
+        gene_value_in_df = gene_value in gene_list_jc
         #set gene value to be equal to default gene if gene not in dataframe (assuming default gene is in dataframe)
         if not gene_value_in_df:
             gene_value = default_gene
@@ -308,7 +308,7 @@ def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slid
         gene_value = gene_value.lower()
 
         #table to get gene_value from
-        table = gene_lookup[gene_value]
+        table = gene_lookup_jc[gene_value]
         
         if expression_data_value is None:
             expression_data_value = default_expression_data_value
@@ -321,12 +321,12 @@ def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slid
 
         #makes dataset value into list of selected datasets
         if (dataset_value != 'All') & (len(dataset_list) > 1):
-            metadata_subset = metadata[metadata.dataset == dataset_value]
+            metadata_jc_subset = metadata_jc[metadata_jc.dataset == dataset_value]
         else:
-            metadata_subset = metadata
+            metadata_jc_subset = metadata_jc
 
         # #change genotype dropdown list depending on dataset input value
-        # genotype_list_subset = metadata_subset.genotype.unique()
+        # genotype_list_subset = metadata_jc_subset.genotype.unique()
         # if genotype_list_subset.size == 0:
         #     raise ValueError("No genotypes found in this dataset...")
         # elif genotype_list_subset.size > 1:
@@ -337,12 +337,12 @@ def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slid
         #     genotype_value = default_genotype_value if default_genotype_value in genotype_list_subset else genotype_list_subset[0]
         # #makes genotype value into list of selected genotypes
         # if genotype_value != 'All':
-        #     metadata_subset = metadata_subset[metadata_subset.genotype == genotype_value]
+        #     metadata_jc_subset = metadata_jc_subset[metadata_jc_subset.genotype == genotype_value]
         # else:
-        #     metadata_subset = metadata_subset
+        #     metadata_jc_subset = metadata_jc_subset
 
         #subset expression data on selected cells [gene_value, meta_cols]
-        gene_data = pd.merge(gene_data, metadata, on='barcode', how='inner')
+        gene_data = pd.merge(gene_data, metadata_jc, on='barcode', how='inner')
 
         #percentile slider code
         percentile_values = np.quantile(gene_data[gene_value], [0.99, 0.01])
