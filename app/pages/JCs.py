@@ -38,8 +38,8 @@ default_expression_data_value = 'Normalized'
 metadata_jc = pd.read_sql('cellmetadata', con=engine)
 with open(f"static/{database}_gene_table_lookup.csv") as f:
     next(f)  # Skip the header
-    reader = csv.reader(f, skipinitialspace=True)
-    gene_lookup_jc = dict(reader)
+    reader_jc = csv.reader(f, skipinitialspace=True)
+    gene_lookup_jc = dict(reader_jc)
 gene_list_jc = gene_lookup_jc.keys()
 gene_list_jc = list(gene_list_jc)
 for i in range(len(gene_list_jc)):

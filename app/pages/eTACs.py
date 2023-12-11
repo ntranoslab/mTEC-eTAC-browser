@@ -38,8 +38,8 @@ default_expression_data_value = 'Normalized'
 metadata_etacs = pd.read_sql('cellmetadata', con=engine)
 with open(f"static/{database}_gene_table_lookup.csv") as f:
     next(f)  # Skip the header
-    reader = csv.reader(f, skipinitialspace=True)
-    gene_lookup_etacs = dict(reader)
+    reader_etacs = csv.reader(f, skipinitialspace=True)
+    gene_lookup_etacs = dict(reader_etacs)
 gene_list_etacs = gene_lookup_etacs.keys()
 gene_list_etacs = list(gene_list_etacs)
 for i in range(len(gene_list_etacs)):
