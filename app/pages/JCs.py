@@ -82,7 +82,7 @@ color_list = ['#1f77b4',
  'darkred',
  'darkblue',
  'grey',
- 'peru']
+ 'indigo']
 
 sorted_cell_list = metadata.celltype.unique().copy()
 sorted_cell_list.sort()
@@ -151,7 +151,7 @@ layout = html.Div([
                 dcc.Dropdown(dataset_list, placeholder = 'Select a dataset...', value='All', id='dataset-value-jcs'),
                 #dropdown for counts vs normalized
                 html.H3('Expression data:', id='expression-data-headline'),
-                dcc.Dropdown(['Raw counts', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-jcs'),
+                dcc.Dropdown(['Log1p', 'Normalized'], placeholder = 'Select a visualization...', id='expression-data-value-jcs'),
                 #slider for dot size
                 html.H3('Dot size', id = 'dot-size-headline'),
                 html.Div([
