@@ -80,8 +80,8 @@ color_list = ['#1f77b4',
  '#ffed6f',
  'darkred',
  'darkblue',
- 'grey',
- 'indigo']
+ 'indigo',
+ 'peru']
 
 sorted_cell_list = metadata.celltype.unique().copy()
 sorted_cell_list.sort()
