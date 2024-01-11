@@ -1,6 +1,6 @@
 ﻿# mTEC-eTAC-atlases
 **Welcome!**
-This is our [single cell analyzer](http://gardner-lab-computer:8050/) for our data on *Aire*-expressing cells in the thymus, lymph nodes, and more.
+This is our [single cell analyzer](http://gardner-lab:8050/) for our data on *Aire*-expressing cells in the thymus, lymph nodes and more.
 
 ---
 ## Overview
@@ -9,16 +9,17 @@ This *Aire*-expressing Cell Atlas is a web application that lets users easily vi
 ### Thymus
 This tab leads to a page with vizualizations of our thymus cell population, focusing on our medullary thymic epitelial cell data.
 The first row of graphs is a UMAP of the single cell data of the thymus with a heat map of the expression of the selected gene (left) and the same UMAP showing the cell types within the data (right). 
-One can change the selected gene to view, the genotype of the data, which dataset the data is pulling from, dataset for cell types, whether to view counts or normalized data, and change the color map and scale, including changing the max and min of the color bar and resetting the scale max and min to the 99th and 1st percentile of the data.
+One can change the selected gene to view, choose which dataset the data is pulling from, filter the genotype of the data, whether to view log1p transformed or normalized counts, dot size of cells in the UMAP and change the color map and scale, including changing the max and min of the color bar and resetting the scale max and min to the 99th and 1st percentile of the data.
 
 The second row of graphs is for comparing UMAPs of differing genotypes within our data, where the genotype displayed on the left graph is the reference genotype.
 The color map and scale is based off of the reference genotype data (this includes the 99th and 1st percentile).
-One can easily change genotypes or swap reference (left) and comparison (right) genotype. Like the first row of graphs, one can also change the selected gene.
+One can easily change genotypes or swap reference (left) and comparison (right) genotype. Like the first row of graphs, one can also change the selected gene, expression data and dot size.
 
 ### Lymph Nodes
-This page contains vizualizations of our single cell data within the lymph nodes, primarily focusing on extrathymic *Aire*-expressing cells.
-The selected gene and colormap and scale can be changed.
-The percentiles are based off of the 1st and 99th percentile of the selected gene from the single cell lymph node data.
+This page contains vizualizations of our single cell data within the lymph nodes, enriched for extrathymic *Aire*-expressing cells.
+The row of graphs is a tSNE of the single cell data of the lymph node cell populations with a heat map of the expression of the selected gene (left) and the same tSNE showing the cell types within the data (right). 
+Similar to the Thymus page, the selected gene, expression data, dot size, colormap and scale can be changed.
+The percentiles are based off of the 1st and 99th percentile of the selected gene expression from the single cell lymph node data.
 
 ---
 ## Cheat Sheet
@@ -26,10 +27,9 @@ The percentiles are based off of the 1st and 99th percentile of the selected gen
 - Gene: Change selected gene
 - Dataset: Change dataset
 - Genotype: Change selected genotype within dataset
-- Dataset for cell types: Choose which cell types to view
-- Expression data: Choose to view raw counts or normalized data
+- Expression data: Choose to view log1p counts or normalized data
 - Dot size: Change dot size of points on UMAPs/tSNEs
-- Color Map: Change color map color
+- Color Map: Change map color scheme
 - Scale: Adjust color scale maximum and minimum
 - Percentiles: Reset scale to 1st or 99th percentile of selected gene value expresison
 - Swap Button: Swap left and right genotypes (where scale and percentiles are based on the left graph)
