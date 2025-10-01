@@ -1,4 +1,3 @@
-
 #----------------------------------Imports----------------------------------#
 from sqlalchemy_utils import database_exists, create_database
 import pandas as pd
@@ -10,7 +9,6 @@ import getopt
 import time
 import warnings
 warnings.simplefilter("ignore")
-
 #---------------------------User defined settings---------------------------#
 # Setup timer to track runtime
 start_time = time.time()
@@ -162,7 +160,7 @@ if database_exists(engine.url):
     with engine.connect() as connection:
         # Drop the database if it already exists
         sql_query = f"DROP DATABASE IF EXISTS {database}"
-        connection.execute(db.text(sql_query))
+        connection.execute(sql_query)
 create_database(engine.url)
 with engine.connect() as connection:
     sql_query = f"USE {database}"

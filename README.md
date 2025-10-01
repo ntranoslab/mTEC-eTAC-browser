@@ -34,9 +34,3 @@ The percentiles are based off of the 1st and 99th percentile of the selected gen
 - Percentiles: Reset scale to 1st or 99th percentile of selected gene value expresison
 - Swap Button: Swap left and right genotypes (where scale and percentiles are based on the left graph)
 - Cell type annotations: Choose which cell list to view in cell type graph
-
----
-## Implementation
-Coming soon: the web application will run online using an AWS EC2 instance with its dataset in a MySQL RDS, a relational database aws service.
-
-***Hope you enjoy!***

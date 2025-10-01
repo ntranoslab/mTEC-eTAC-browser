@@ -18,8 +18,8 @@ dash.register_page(__name__)
 ##=========================Global variables=========================##
 database = 'thymus'
 if ('LOCALDEV' in os.environ) | ('LOCALDEPLOY' in os.environ):
-    host = 'gardner-lab'
-    user = 'nolan'
+    host = 'localhost'
+    user = 'root'
     passwd = os.getenv('MYSQLPASSWORD')
 else:
     ssm = boto3.client('ssm', region_name='us-west-2')
