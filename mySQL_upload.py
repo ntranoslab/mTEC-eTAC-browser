@@ -8,13 +8,15 @@ import os
 import getopt
 import time
 import warnings
+import tempfile
+from contextlib import contextmanager
 warnings.simplefilter("ignore")
 #---------------------------User defined settings---------------------------#
 # Setup timer to track runtime
 start_time = time.time()
 
 # Default parameters
-max_columns = 1000
+max_columns = 500
 
 # Set up required variables
 data_file = None
@@ -64,7 +66,7 @@ help = f'''
     
     -c max_columns
     --columns max_columns
-        The maximum number of columns in a mySQL table (default: 1000)
+        The maximum number of columns in a mySQL table (default: 500)
 
     -h 
     --help 
@@ -92,7 +94,7 @@ for argument, value in arguments:
     elif argument in ("-m", "--metadata"):
         metadata_cols = value.split(",")
     elif argument in ("-c", "--columns"):
-        max_columns = value
+        max_columns = int(value)
     elif argument in ("-h", "--help"):
         print(help)
         sys.exit()
@@ -106,6 +108,45 @@ for var in req_vars:
     if var is None:
         print(help)
         sys.exit()
+
+#------------------------------------Methods----------------------------------#
+@contextmanager
+def temp_csv(df, index_label='barcode'):
+    # write a clean CSV MySQL can slurp quickly
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        df.to_csv(f.name, index=True, index_label=index_label)  # header included
+        path = f.name
+    try:
+        yield path
+    finally:
+        try:
+            os.remove(path)
+        except OSError:
+            pass
+
+def load_via_infile(engine, df, table, dtype_map=None, index_label='barcode'):
+    # 1) Create empty table with the schema you want (fast)
+    df.head(0).to_sql(table, con=engine, if_exists='replace', index=True, index_label=index_label, dtype=dtype_map, method=None)
+    # 2) Bulk load
+    with engine.begin() as conn, temp_csv(df, index_label=index_label) as csv_path:
+        # Helpful session knobs for speed (session-scoped; safe if you're not relying on FKs right now)
+        conn.exec_driver_sql("SET autocommit=0")
+        conn.exec_driver_sql("SET unique_checks=0")
+        conn.exec_driver_sql("SET foreign_key_checks=0")
+        # If you have replication and don’t need these loads in the binlog:
+        # conn.exec_driver_sql("SET sql_log_bin=0")
+        safe_path = csv_path.replace("\\", "/")
+        conn.exec_driver_sql(f"""
+            LOAD DATA LOCAL INFILE '{safe_path}'
+            INTO TABLE `{table}`
+            FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+            LINES TERMINATED BY '\n'
+            IGNORE 1 LINES
+        """)
+        # Re-enable checks (optional; the transaction commit will end the session anyway)
+        conn.exec_driver_sql("SET unique_checks=1")
+        conn.exec_driver_sql("SET foreign_key_checks=1")
+
 print()
 print("=======================================================================")
 print("----------------------mySQL scRNAseq data uploader---------------------")
@@ -116,42 +157,8 @@ print(f"Uploading data: {data_file}")
 print(f"mySQL engine: mysql+pymysql://{user}:*****@{host}/{database}?local_infile=1")
 print(f"Cell metadata: {metadata_cols}")
 
-#----------------------------------Methods---------------------------------#
-def sql_upload_csv(df, engine, table_name, debug=False):
-    # Create tmp.csv containing df to upload
-    df.to_csv("tmp.csv", index_label="barcode")
-    df = pd.read_csv("tmp.csv")
-    # mapping of pandas column dtypes to mySQL data types
-    dtype_map = {"float64": "DOUBLE", "object": "TINYTEXT", "int64": "MEDIUMINT"}
-    col_string = []
-    # iterate over columns in dataframe
-    for i,column in enumerate(df.columns):
-        # Get column dtype
-        dtype = str(df.dtypes[i])
-        # Add column name and dtype to column string list
-        col_string.append(f"`{column}` {dtype}")
-    # Convert col string list to single string
-    col_string = ", ".join(col_string)
-    # Replace column dtype with corresponding mySQL data type
-    for initial, replace in dtype_map.items():
-        col_string = col_string.replace(initial, replace)
-    # Connect to database
-    with engine.connect() as connection:
-        # Drop the table if it already exists
-        sql_query = f"DROP TABLE IF EXISTS {str(table_name)}"
-        connection.execute(sql_query)
-        # Create new table with columns/data types
-        sql_query = f"CREATE TABLE {str(table_name)}({col_string})"
-        connection.execute(sql_query)
-        # Load temp csv into table
-        line = r'\n'
-        sql_query = f"LOAD DATA LOCAL INFILE 'tmp.csv' REPLACE INTO TABLE {str(table_name)} FIELDS TERMINATED BY ',' IGNORE 1 ROWS"
-        connection.execute(sql_query)
-    # Cleanup tmp file
-    os.remove("tmp.csv")
 
 #------------------------------------Main----------------------------------#
-
 ##### Setup connection to mySQL server
 engine = db.create_engine(f"mysql+pymysql://{user}:{passwd}@{host}/{database}?local_infile=1")
 # Setup database (delete it if it exists and recreate it)
@@ -160,11 +167,11 @@ if database_exists(engine.url):
     with engine.connect() as connection:
         # Drop the database if it already exists
         sql_query = f"DROP DATABASE IF EXISTS {database}"
-        connection.execute(sql_query)
+        connection.execute(db.text(sql_query))
 create_database(engine.url)
 with engine.connect() as connection:
     sql_query = f"USE {database}"
-    connection.execute(sql_query)
+    connection.execute(db.text(sql_query))
 print()
 
 print("---------------------Upload---------------------")
@@ -176,13 +183,12 @@ data.index = [i for i in range(0, data.shape[0])]
 # Get metadata to seperate df
 metadata_df = data[metadata_cols]
 # write metadata df to database
-sql_upload_csv(metadata_df, engine, "cellmetadata")
+load_via_infile(engine, metadata_df, "cellmetadata", index_label='barcode')
+
 # Subset on genes that start with a number
 data = data.filter(regex='^[^0-9]', axis=1)
 # Subset on gene columns
 data = data[data.columns[~data.columns.isin(metadata_df.columns)]]
-# Remove gene columns that start with Gm
-data = data[data.columns[~data.columns.str.startswith("Gm")]]
 # Convert all column names to lowercase for easier matching
 data.columns = data.columns.str.lower()
 ##### Upload tables to mySQL database
@@ -215,13 +221,13 @@ for letter in gene_sets:
             gene_mapping = dict(zip(subtable.columns, [f"{letter}{i}"]*len(subtable.columns)))
             gene_table_dict.update(gene_mapping)
             # Upload the subtable to the database
-            sql_upload_csv(subtable, engine, f"{letter}{i}")
+            load_via_infile(engine, subtable, f"{letter}{i}", index_label='barcode')
     else:
         # Save the gene to table mapping
         gene_mapping = dict(zip(gene_df.columns, [f"{letter}"]*len(gene_df.columns)))
         gene_table_dict.update(gene_mapping)
         # Upload the df to the database
-        sql_upload_csv(gene_df, engine, letter)
+        load_via_infile(engine, gene_df, letter, index_label='barcode')
 
 ##### Cleanup
 print()

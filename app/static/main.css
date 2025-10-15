@@ -84,6 +84,11 @@ button{
 	cursor: default;
 }
 
+#age-headline {
+	color: #4C5C75;
+	cursor: default;
+}
+
 #cell-type-annotations-headline {
 	color: #4C5C75;
 	cursor: default;
@@ -402,14 +407,6 @@ button{
 	margin-left: 25px;
 	margin-right: 25px;
 	padding: 0px;
-}
-
-#description-headline {
-	cursor: default;
-}
-
-#description {
-	cursor: default;
 }
 
 

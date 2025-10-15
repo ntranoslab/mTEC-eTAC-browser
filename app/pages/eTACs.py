@@ -6,6 +6,7 @@ import dash
 import plotly.express as px
 import numpy as np
 import sqlalchemy as db
+import plotly.graph_objects as go
 
 import pandas as pd
 import csv
@@ -83,16 +84,18 @@ color_list = ['#1f77b4',
  'indigo',
  'peru']
 
-sorted_cell_list = metadata.celltype.unique().copy()
+sorted_cell_list = metadata.cell_type.unique().copy()
 sorted_cell_list.sort()
+
+cell_colors = dict(zip(sorted_cell_list, color_list))
 
 checklist_children = [{"label": html.Div([
     html.Button(disabled = True, style={'background-color': color_list[i], 'padding-left': 10}, className = 'icon-button'),
     html.Div(sorted_cell_list[i], style={'font-size': 12, 'padding-left': 5, 'color': 'black'}),
     ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}), "value": sorted_cell_list[i]} for i in range(len(sorted_cell_list))]
 
-if len(color_list) >= len(metadata.celltype.unique()):
-    color_list = color_list[0:len(metadata.celltype.unique())]
+if len(color_list) >= len(metadata.cell_type.unique()):
+    color_list = color_list[0:len(metadata.cell_type.unique())]
     color_list.reverse()
 else:
     color_list.reverse()
@@ -173,22 +176,9 @@ layout = html.Div([
                                         'width': 1080,
                                         'scale': 1
                                     },
+                                    'scrollZoom': True,
                                     'displaylogo': False,
-                                    'modeBarButtonsToAdd': [
-                                         # {'name': 'color toggler', 'icon': 'icon1',
-                                         #  'click': "function (gd) {Plotly.toImage(gd, { format: 'png', width: 2100, height: 900 })}"
-                                            # var newColor = colors[Math.floor(3 * Math.random())]
-                                            # Plotly.restyle(gd, 'line.color', newColor)
-                                        #  }},
-                                        # {
-                                        #   'name': 'button1',
-                                        #   'icon': Plotly.Icons.pencil,
-                                        #   'direction': 'up',
-                                        #   click: function(gd) {alert('button1')
-                                        # }
-                                          # }
-                                         ],
-                                    'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
+                                    'modeBarButtonsToRemove': ['select2d','lasso2d','resetScale2d']
                                 },
                                 id='umap-graphic-gene-etacs')
                         ], style={'width': '42%', 'marginRight': '1.5%'}),
@@ -206,8 +196,9 @@ layout = html.Div([
                                         'width': 1080,
                                         'scale': 1
                                     },
+                                    'scrollZoom': True,
                                     'displaylogo': False,
-                                    'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d','resetScale2d']
+                                    'modeBarButtonsToRemove': ['select2d','lasso2d','resetScale2d']
                                 },
                                 id='umap-graphic-cell-types-etacs')
                         ], style={'width': '35%', 'marginLeft': '1.5%'}),
@@ -249,13 +240,6 @@ layout = html.Div([
         ], style={'marginLeft': '2.5%','display': 'flex', 'justify-content': 'space-evenly', 'width': '35%'}),
 
     ], className = 'page-body', style = {'marginLeft': '-2.75%', 'marginRight': '-2.75%'}),
-
-    html.Div([
-        html.H3('Description:', id='description-headline'),
-        html.H5('About us and Links to Publications...To be, or not to be: that is the question: Whether tis nobler in the mind to suffer\\The slings and arrows of outrageous fortune,\\Or to take arms against a sea of troubles,\\And by opposing end them?\\To die: to sleep;\\No more; and by a sleep to say we end The heart-ache and the thousand natural shocksThat flesh is heir to, tis a consummation Devoutly to be wishd. // To die, to sleep;To sleep: perchance to dream: ay, theres the rub For in that sleep of death what dreams may come When we have shuffled off this mortal coil,Must give us pause: // theres the respect That makes calamity of so long life;', id = 'description')
-        ])
-    
-
 ])
 
     
@@ -318,28 +302,6 @@ def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slid
         if dataset_value is None:
             dataset_value = default_dataset_value
 
-        #makes dataset value into list of selected datasets
-        if (dataset_value != 'All') & (len(dataset_list) > 1):
-            metadata_subset = metadata[metadata.dataset == dataset_value]
-        else:
-            metadata_subset = metadata
-
-        # #change genotype dropdown list depending on dataset input value
-        # genotype_list_subset = metadata_subset.genotype.unique()
-        # if genotype_list_subset.size == 0:
-        #     raise ValueError("No genotypes found in this dataset...")
-        # elif genotype_list_subset.size > 1:
-        #     genotype_list_subset = np.insert(genotype_list_subset, 0, 'All')
-
-        # #set default genotype value to WT
-        # if genotype_value is None or genotype_value not in genotype_list_subset:
-        #     genotype_value = default_genotype_value if default_genotype_value in genotype_list_subset else genotype_list_subset[0]
-        # #makes genotype value into list of selected genotypes
-        # if genotype_value != 'All':
-        #     metadata_subset = metadata_subset[metadata_subset.genotype == genotype_value]
-        # else:
-        #     metadata_subset = metadata_subset
-
         #subset expression data on selected cells [gene_value, meta_cols]
         gene_data = pd.merge(gene_data, metadata, on='barcode', how='inner')
 
@@ -366,7 +328,7 @@ def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slid
         dot_size_slider_value = dot_size_slider_value if dot_size_slider_value != None else 3
 
 
-        gene_data = gene_data.sort_values(by=['celltype'], kind='mergesort', ascending=False)
+        gene_data = gene_data.sort_values(by=['cell_type'], kind='mergesort', ascending=False)
 
         gene_data_filtered = pd.DataFrame()
 
@@ -375,121 +337,144 @@ def update_graph(gene_value, expression_data_value, dataset_value, dot_size_slid
 
         if input_id == 'all-cell-type-button-etacs':
             cell_type_checklist = sorted_cell_list
+        
+        if dataset_value != "All":
+            unselected = gene_data[~gene_data.cell_type.isin(cell_type_checklist) | (gene_data.dataset != dataset_value)]
+            selected = gene_data[gene_data.cell_type.isin(cell_type_checklist) & (gene_data.dataset == dataset_value)]
+        else:
+            unselected = gene_data[~gene_data.cell_type.isin(cell_type_checklist)]
+            selected = gene_data[gene_data.cell_type.isin(cell_type_checklist)]
+        selected = selected.sort_values(by=["cell_type"], kind='mergesort', ascending=False)
+        cell_types_to_plot = selected["cell_type"].unique()
+        cell_types_to_plot.sort()
+        color_list_copy = [cell_colors[cell_type] for cell_type in cell_types_to_plot]
+        color_list_copy.reverse()
 
-        for i in cell_type_checklist:
-                gene_data_filtered = pd.concat([gene_data_filtered, gene_data[gene_data['celltype'] == i]])
         
         #graphs
-        #sort dff based on cells highest expressing to lowest expressing gene - makes the gene scatter plot graph highest expressing cells on top of lower expressing cells
-        if len(cell_type_checklist) == 0:
-            fig = px.scatter(x=[0],
-                 y=[0],
-                 color_discrete_sequence=['white']
-                 )
-            fig.update_layout(
-                xaxis={'visible': False, 'showticklabels': False},
-                yaxis={'visible': False, 'showticklabels': False},
-                margin = dict(l=50, r=50, t=50, b=50, pad=4),
-                plot_bgcolor = "white",
-                hovermode = False
+        #selected cells
+        gene_fig_sel = px.scatter(
+            selected.sort_values(by=[gene_value], kind='mergesort'),
+            x='x',
+            y='y',
+            color = gene_value if gene_value != None else default_gene,
+            hover_name = "cell_type",
+            hover_data = {'x': False, 'y': False, gene_value: True},
+            range_color=[lower_slider_value, higher_slider_value],
+            color_continuous_scale = color_scale_dropdown_value,
+            labels = {gene_value: gene_value.capitalize() + ' expression'},
+        )
+        gene_fig_sel.update_traces(
+            marker=dict(
+                size=dot_size_slider_value,
+                line=dict(width=0, color='black')
                 )
-            gene_fig = fig
-            cell_type_fig = fig
+            )
+        gene_fig_sel.update_coloraxes(colorbar_title_text='')
+
+        #unselected cells
+        gene_bg = go.Scattergl(  # Scattergl is faster for lots of points
+            x=unselected['x'],
+            y=unselected['y'],
+            mode='markers',
+            marker=dict(
+                size=dot_size_slider_value,
+                color='lightgrey',       # fixed grey
+                line=dict(width=0)       # optional thin outline if you want: line=dict(width=0.3, color='rgba(0,0,0,0.2)')
+            ),
+            hoverinfo='skip',            # keep hovers clean
+            showlegend=False
+        )
+        gene_selected = selected.sort_values(by=[gene_value], kind='mergesort')
+        gene_fg = go.Scattergl(
+            x=np.round(gene_selected['x'], 3),
+            y=np.round(gene_selected['y'], 3),
+            mode='markers',
+            marker=dict(
+                size=dot_size_slider_value,
+                line=dict(width=0),  # outlines cost a lot; avoid or keep tiny
+                color=np.round(gene_selected[gene_value].to_numpy(), 3),         # numeric array
+                colorscale=color_scale_dropdown_value,
+                cmin=lower_slider_value,
+                cmax=higher_slider_value,
+                showscale=True
+            ),
+            # minimal hover to cut payload; or set 'hoverinfo':'skip' if N is huge
+            customdata=np.stack([gene_selected.cell_type.to_numpy()], axis=-1),
+            hovertemplate=(
+                f"<b>%{{customdata}}</b><br>"
+                f"{gene_value.capitalize()}: %{{marker.color:.3g}}<extra></extra>"
+            )
+            # hoverinfo='skip'
+        )
+
+        # Assemble into figure
+        gene_fig = go.Figure(data=[gene_bg, gene_fg])
+        gene_fig.update_layout(
+            # keep colorbar thin
+            coloraxis_colorbar=dict(title='', thicknessmode='pixels', thickness=30),  # harmless even though we set showscale on trace
+            xaxis=dict(visible=False, showticklabels=False),
+            yaxis=dict(visible=False, showticklabels=False, scaleanchor='x', scaleratio=1.0),
+            margin=dict(l=10, r=10),
+            plot_bgcolor="white",
+            dragmode='pan',
+            showlegend=False,
+            # preserve zoom/pan between updates in Dash (prevents full re-render)
+            uirevision="gene-plot"
+        )
+
+        # Selected cells
+        cell_type_fig_sel = px.scatter(
+            selected,
+            x='x',
+            y='y',
+            color="cell_type",
+            color_discrete_sequence=color_list_copy,
+            color_discrete_map={},
+            hover_name = "cell_type",
+            hover_data = {'x': False, 'y': False, "cell_type": False},
+            render_mode="webgl",
+        )
+        cell_type_fig_sel.update_traces(
+            marker=dict(
+                size=dot_size_slider_value,
+                line=dict(width=0, color="black")
+            )
+        )
+        if cell_type_legend_button is None:
+            show_cell_legend = False
+        elif cell_type_legend_button % 2 == 0:
+            show_cell_legend = False
         else:
-            gene_fig = px.scatter(gene_data_filtered.sort_values(by=[gene_value], kind='mergesort'),
-                         #x coordinates
-                         x='x',
-                         #y coordinates
-                         y='y',
-                         color = gene_value if gene_value != None else default_gene,
-                         hover_name = 'celltype',
-                         hover_data = {'x': False, 'y': False, 'celltype': False},
-                         range_color=
-                         #min of color range
-                         [lower_slider_value, 
-                         #max of color range
-                         higher_slider_value],
-                         color_continuous_scale = color_scale_dropdown_value,
-                         labels = {gene_value: gene_value.capitalize() + ' expression'}
-                         )
-            gene_fig.update_traces(
-                marker=dict(
-                    size=dot_size_slider_value, 
-                    line=dict(width=0)
-                    )
-                )
-            gene_fig.update_layout(
-                autosize = True,
-                title = {
-                    'text': '<b>' + gene_value.capitalize() + '</b>',
-                    'x': 0.5,
-                    'y': 0.95,
-                    'xanchor': 'center',
-                    'yanchor': 'top',
-                    'font': {
-                        'size': 20,
-                        'family': 'Arial',
-                        'color': '#4C5C75'
-                    }
-                },
-                coloraxis_colorbar= {'thicknessmode': 'pixels', 'thickness': 30},
-                xaxis={'visible': False, 'showticklabels': False},
-                yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
-                margin={'l': 10, 'r': 10},
-                plot_bgcolor = "white"
-                )
-            gene_fig.update_coloraxes(
-                colorbar_title_text=''
-                )
+            show_cell_legend = True
 
-            cell_type_fig = px.scatter(gene_data,
-                            x='x',
-                            #x coordinates
-                            y='y',
-                            color = 'celltype',
-                            color_discrete_sequence = color_list,
-                            #color_discrete_map = {'Other': 'lightgray'}, 
-                            hover_name = 'celltype',
-                            hover_data = {'x': False, 'y': False, 'celltype': False}
-                        )
-            cell_type_fig.update_traces(
-                marker=dict(
-                    size=dot_size_slider_value, 
-                    line=dict(width=0)
-                    )
-                )
-            if cell_type_legend_button is None:
-                show_cell_legend = False
-            elif cell_type_legend_button % 2 == 0:
-                show_cell_legend = False
-            else:
-                show_cell_legend = True
-            cell_type_fig.update_layout(
-                autosize = True,
-                title = {
-                    'text': '<b>Cell Types</b>',
-                    'x': 0.5,
-                    'y': 0.95,
-                    'xanchor': 'center',
-                    'yanchor': 'top',
-                    'font': {
-                        'size': 20,
-                        'family': 'Arial',
-                        'color': '#4C5C75'
-                    }
-                },
-                showlegend = show_cell_legend,
-                legend={'title': '', 'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
-                margin={'l':10, 'r': 10},
-                xaxis={'visible': False, 'showticklabels': False},
-                yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
-                plot_bgcolor = "white"
-                )
-
-            cell_type_fig.for_each_trace(
-                lambda trace: trace.update(visible='legendonly') if trace.name not in cell_type_checklist else (),
-                )
-
+        # Assemble into figure
+        cell_type_fig = go.Figure(gene_bg)    # put grey layer first (drawn underneath)
+        for tr in cell_type_fig_sel.data:     # then add the colored layer (keeps coloraxis & colorbar)
+            cell_type_fig.add_trace(tr)
+        cell_type_fig.update_layout(
+            autosize = True,
+            title = {
+                'text': '<b>Cell Types</b>',
+                'x': 0.5,
+                'y': 0.95,
+                'xanchor': 'center',
+                'yanchor': 'top',
+                'font': {
+                    'size': 20,
+                    'family': 'Arial',
+                    'color': '#4C5C75'
+                }
+            },
+            showlegend = show_cell_legend,
+            legend={'title': '', 'entrywidthmode': 'pixels', 'entrywidth': 30, 'traceorder': 'reversed', 'itemsizing': 'constant'},
+            margin={'l':10, 'r': 10},
+            xaxis={'visible': False, 'showticklabels': False},
+            yaxis={'visible': False, 'showticklabels': False, 'scaleanchor': 'x', 'scaleratio': 1.0},
+            plot_bgcolor = "white",
+            dragmode='pan',
+            uirevision="celltype-plot"
+        )
         percentile_marks = {percentile_values[0]: '99th', percentile_values[1]: '1st'}
 
         return gene_fig, cell_type_fig, gene_value.capitalize(), expression_data_value, dataset_value, dot_size_slider_value, df_gene_min, df_gene_max, percentile_marks, [lower_slider_value, higher_slider_value], cell_type_checklist
